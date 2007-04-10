@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/server/HttpServiceImpl.java,v $
- * $Revision: 1.2 $
- * $Date: 2007/04/10 00:11:39 $
+ * $Revision: 1.3 $
+ * $Date: 2007/04/10 00:11:55 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -20,7 +20,6 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.Properties;
 
 import Acme.Serve.Serve;
-import Acme.Serve.Serve.BasicAuthRealm;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.jameica.system.Settings;
 import de.willuhn.jameica.webadmin.Plugin;
@@ -210,6 +209,9 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
 
 /**********************************************************************
  * $Log: HttpServiceImpl.java,v $
+ * Revision 1.3  2007/04/10 00:11:55  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.2  2007/04/10 00:11:39  willuhn
  * *** empty log message ***
  *
