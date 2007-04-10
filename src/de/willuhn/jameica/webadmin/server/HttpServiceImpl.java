@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/server/HttpServiceImpl.java,v $
- * $Revision: 1.3 $
- * $Date: 2007/04/10 00:11:55 $
+ * $Revision: 1.4 $
+ * $Date: 2007/04/10 00:52:32 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -13,19 +13,17 @@
 
 package de.willuhn.jameica.webadmin.server;
 
-import java.io.IOException;
-import java.io.PrintStream;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.Properties;
+import java.util.HashMap;
+import java.util.Map;
 
-import Acme.Serve.Serve;
+import winstone.Launcher;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.jameica.system.Settings;
 import de.willuhn.jameica.webadmin.Plugin;
 import de.willuhn.jameica.webadmin.rmi.HttpService;
 import de.willuhn.logging.Logger;
-import de.willuhn.logging.LoggerOutputStream;
 
 
 /**
@@ -33,7 +31,7 @@ import de.willuhn.logging.LoggerOutputStream;
  */
 public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
 {
-  private Worker worker = null;
+  private Launcher server = null;
 
   /**
    * @throws RemoteException
@@ -64,7 +62,7 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
    */
   public boolean isStarted() throws RemoteException
   {
-    return this.worker != null;
+    return this.server != null;
   }
 
   /**
@@ -77,8 +75,38 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
       Logger.warn("service allready started, skipping request");
       return;
     }
-    this.worker = new Worker();
-    this.worker.start();
+    
+    try
+    {
+      Settings settings = Application.getPluginLoader().getPlugin(Plugin.class).getResources().getSettings();
+
+      Map args = new HashMap();
+      args.put("httpPort",new Integer(settings.getInt("listener.port",8080)));
+      // httpListenAddress
+      // webroot
+      // -debug                  = set the level of debug msgs (1-9). Default is 5 (INFO level)
+//      --httpsPort              = set the https listening port. -1 to disable, Default is disabled
+//      --httpsListenAddress     = set the https listening address. Default is all interfaces
+//      --httpsKeyStore          = the location of the SSL KeyStore file. Default is ./winstone.ks
+//      --httpsKeyStorePassword  = the password for the SSL KeyStore file. Default is null
+//      --httpsKeyManagerType    = the SSL KeyManagerFactory type (eg SunX509, IbmX509). Default is SunX509
+//      --handlerCountStartup    = set the no of worker threads to spawn at startup. Default is 5
+//      --handlerCountMax        = set the max no of worker threads to allow. Default is 300
+//      --handlerCountMaxIdle    = set the max no of idle worker threads to allow. Default is 50
+//
+//      --directoryListings      = enable directory lists (true/false). Default is true
+//      
+//      --realmClassName               = Set the realm class to use for user authentication. Defaults to ArgumentsRealm class
+//      --accessLoggerClassName        = Set the access logger class to use for user authentication. Defaults to disabled
+//      --simpleAccessLogger.format    = The log format to use. Supports combined/common/resin/custom (SimpleAccessLogger only)
+//      --simpleAccessLogger.file      = The location pattern for the log file(SimpleAccessLogger only)
+      Launcher.initLogger(args);
+      this.server = new Launcher(args);
+    }
+    catch (Exception e)
+    {
+      Logger.error("unable to init http-server",e);
+    }
   }
 
   /**
@@ -93,115 +121,11 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
     }
     try
     {
-      this.worker.interrupt();
+      this.server.shutdown();
     }
     finally
     {
-      this.worker = null;
-    }
-  }
-
-  /**
-   * Worker-Thread fuer den Webserver.
-   */
-  private class Worker extends Thread
-  {
-    private Server server = null;
-    
-    /**
-     * ct.
-     */
-    private Worker()
-    {
-      super("[jameica.webadmin] http-worker");
-      setDaemon(true);
-    }
-
-    /**
-     * @see java.lang.Thread#run()
-     */
-    public void run()
-    {
-      try
-      {
-        Settings settings = Application.getPluginLoader().getPlugin(Plugin.class).getResources().getSettings();
-        Properties props = new Properties();
-        props.put("port",new Integer(settings.getInt("listener.port",Serve.DEF_PORT)));
-        props.put(Serve.ARG_NOHUP,Serve.ARG_NOHUP);
-
-        this.server = new Server(props);
-        this.server.addDefaultServlets(null);
-        this.server.serve();
-      }
-      catch (Exception e)
-      {
-        Logger.error("unable to start http-server",e);
-        this.server = null;
-      }
-    }
-
-    /**
-     * @see java.lang.Thread#interrupt()
-     */
-    public void interrupt()
-    {
-      try
-      {
-        if (this.server != null)
-        {
-          Logger.info("stopping http-server");
-          try
-          {
-            this.server.notifyStop();
-          }
-          catch (IOException ioe)
-          {
-            Logger.error("error while notifying sevrlets",ioe);
-          }
-          this.server.destroyAllServlets();
-        }
-      }
-      finally
-      {
-        super.interrupt();
-      }
-    }
-  }
-  
-  /**
-   * Ueberschrieben, um die Log-Ausgaben bequemer umzuleiten.
-   */
-  private class Server extends Serve
-  {
-    /**
-     * @see Acme.Serve.Serve#log(java.lang.String, java.lang.Throwable)
-     */
-    public void log(String message, Throwable throwable)
-    {
-      Logger.error(message,throwable);
-    }
-
-    /**
-     * @see Acme.Serve.Serve#log(java.lang.String)
-     */
-    public void log(String message)
-    {
-      Logger.info(message);
-    }
-
-    /**
-     * ct.
-     * @param params
-     */
-    private Server(Properties params)
-    {
-      super(params,new PrintStream(new LoggerOutputStream(Logger.getLevel())));
-      // TODO: Konstruktor von "BasicAuthRealm" ist "package default" und damit unsichtbar
-//      PathTreeDictionary pt = new PathTreeDictionary();
-//      BasicAuthRealm realm = new BasicAuthRealm("Jameica-Webadmin Login");
-//      realm.put("admin",Application.getCallback().getPassword());
-//      pt.put("/",realm);
-//      this.setRealms(pt);
+      this.server = null;
     }
   }
 }
@@ -209,6 +133,9 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
 
 /**********************************************************************
  * $Log: HttpServiceImpl.java,v $
+ * Revision 1.4  2007/04/10 00:52:32  willuhn
+ * @C moved to winstone (better realm integration)
+ *
  * Revision 1.3  2007/04/10 00:11:55  willuhn
  * *** empty log message ***
  *

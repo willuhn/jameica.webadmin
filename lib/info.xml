@@ -1,6 +1,6 @@
 <info>
-  <name>TJWS</name>
-  <description>Tiny Java Web Server and Servlet Container</description>
-  <url>http://tjws.sourceforge.net/</url>
-  <license>BSD - http://www.opensource.org/licenses/bsd-license.php</license>
+  <name>Winstone</name>
+  <description>Tiny Servlet Container.</description>
+  <url>http://winstone.sourceforge.net/</url>
+  <license>CDDL - http://www.opensource.org/licenses/cddl1.php</license>
 </info>
