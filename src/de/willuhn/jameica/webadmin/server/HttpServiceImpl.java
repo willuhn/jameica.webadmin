@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/server/HttpServiceImpl.java,v $
- * $Revision: 1.5 $
- * $Date: 2007/04/12 00:02:55 $
+ * $Revision: 1.6 $
+ * $Date: 2007/04/12 13:35:17 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -16,13 +16,14 @@ package de.willuhn.jameica.webadmin.server;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
+import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
+import org.mortbay.jetty.security.Constraint;
+import org.mortbay.jetty.security.ConstraintMapping;
+import org.mortbay.jetty.security.SecurityHandler;
 import org.mortbay.jetty.servlet.ServletHandler;
 
-import de.willuhn.jameica.system.Application;
-import de.willuhn.jameica.system.Settings;
-import de.willuhn.jameica.webadmin.JettyLogger;
-import de.willuhn.jameica.webadmin.Plugin;
+import de.willuhn.jameica.webadmin.Settings;
 import de.willuhn.jameica.webadmin.rmi.HttpService;
 import de.willuhn.jameica.webadmin.servlets.RootServlet;
 import de.willuhn.logging.Logger;
@@ -83,14 +84,39 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
       // Logging zu uns umleiten
       System.setProperty("org.mortbay.log.class",JettyLogger.class.getName());
 
-      Settings settings = Application.getPluginLoader().getPlugin(Plugin.class).getResources().getSettings();
-      int port = new Integer(settings.getInt("listener.http.port",8080)).intValue();
-      this.server = new Server(port);
+      Logger.info("started webserver at port " + Settings.getPort());
+      this.server = new Server(Settings.getPort());
       this.server.setStopAtShutdown(false);
+      if (Settings.getUseSSL())
+        this.server.setConnectors(new Connector[]{new JameicaSocketConnector()});
 
+      // Root-Servlet
       ServletHandler handler = new ServletHandler();
-      handler.addServletWithMapping(RootServlet.class, "/");      
-      this.server.setHandler(handler);
+      handler.addServletWithMapping(RootServlet.class, "/");
+
+      if (Settings.getUseAuth())
+      {
+        Constraint constraint = new Constraint();
+        constraint.setName(Constraint.__BASIC_AUTH);;
+        constraint.setRoles(new String[]{"admin"});
+        constraint.setAuthenticate(true);
+
+        ConstraintMapping cm = new ConstraintMapping();
+        cm.setConstraint(constraint);
+        cm.setPathSpec("/*");
+
+        SecurityHandler sh = new SecurityHandler();
+        sh.setUserRealm(new JameicaUserRealm());
+        sh.setConstraintMappings(new ConstraintMapping[]{cm});
+
+        // Authentifizierung drum rum wrappen
+        sh.setHandler(handler);
+        this.server.setHandler(sh);
+      }
+      else
+      {
+        this.server.setHandler(handler);
+      }
 
       this.server.start();
     }
@@ -128,6 +154,11 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
 
 /**********************************************************************
  * $Log: HttpServiceImpl.java,v $
+ * Revision 1.6  2007/04/12 13:35:17  willuhn
+ * @N SSL-Support
+ * @N Authentifizierung
+ * @N Korrektes Logging
+ *
  * Revision 1.5  2007/04/12 00:02:55  willuhn
  * @C replaced winstone with jetty (because of ssl support via custom socketfactory)
  *

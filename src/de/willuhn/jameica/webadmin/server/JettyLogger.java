@@ -1,7 +1,7 @@
 /**********************************************************************
- * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/Attic/JettyLogger.java,v $
+ * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/server/Attic/JettyLogger.java,v $
  * $Revision: 1.1 $
- * $Date: 2007/04/12 00:02:55 $
+ * $Date: 2007/04/12 13:35:17 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -11,7 +11,9 @@
  *
  **********************************************************************/
 
-package de.willuhn.jameica.webadmin;
+package de.willuhn.jameica.webadmin.server;
+
+import java.text.MessageFormat;
 
 import org.mortbay.log.Logger;
 
@@ -37,7 +39,7 @@ public class JettyLogger implements Logger
    */
   public void debug(String arg0, Object arg1, Object arg2)
   {
-    de.willuhn.logging.Logger.write(Level.DEBUG,arg0);
+    de.willuhn.logging.Logger.write(Level.DEBUG,format(arg0,arg1,arg2));
   }
 
   /**
@@ -53,7 +55,7 @@ public class JettyLogger implements Logger
    */
   public void info(String arg0, Object arg1, Object arg2)
   {
-    de.willuhn.logging.Logger.write(Level.INFO,arg0);
+    de.willuhn.logging.Logger.write(Level.INFO,format(arg0,arg1,arg2));
   }
 
   /**
@@ -85,7 +87,22 @@ public class JettyLogger implements Logger
    */
   public void warn(String arg0, Object arg1, Object arg2)
   {
-    de.willuhn.logging.Logger.write(Level.WARN,arg0);
+    de.willuhn.logging.Logger.write(Level.WARN,format(arg0,arg1,arg2));
+  }
+  
+  /**
+   * Formatiert die Log-Nachricht.
+   * @param msg
+   * @param param1
+   * @param param2
+   * @return die formatierte Log-Nachricht.
+   */
+  private String format(String msg, Object param1, Object param2)
+  {
+    msg = msg.replaceFirst("\\{\\}","{0}");
+    msg = msg.replaceFirst("\\{\\}","{1}");
+    
+    return MessageFormat.format(msg,new Object[]{param1,param2});
   }
 
   /**
@@ -103,6 +120,11 @@ public class JettyLogger implements Logger
 
 /**********************************************************************
  * $Log: JettyLogger.java,v $
+ * Revision 1.1  2007/04/12 13:35:17  willuhn
+ * @N SSL-Support
+ * @N Authentifizierung
+ * @N Korrektes Logging
+ *
  * Revision 1.1  2007/04/12 00:02:55  willuhn
  * @C replaced winstone with jetty (because of ssl support via custom socketfactory)
  *
