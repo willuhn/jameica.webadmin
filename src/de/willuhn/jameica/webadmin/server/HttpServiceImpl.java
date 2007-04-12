@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/server/HttpServiceImpl.java,v $
- * $Revision: 1.4 $
- * $Date: 2007/04/10 00:52:32 $
+ * $Revision: 1.5 $
+ * $Date: 2007/04/12 00:02:55 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -15,14 +15,16 @@ package de.willuhn.jameica.webadmin.server;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.HashMap;
-import java.util.Map;
 
-import winstone.Launcher;
+import org.mortbay.jetty.Server;
+import org.mortbay.jetty.servlet.ServletHandler;
+
 import de.willuhn.jameica.system.Application;
 import de.willuhn.jameica.system.Settings;
+import de.willuhn.jameica.webadmin.JettyLogger;
 import de.willuhn.jameica.webadmin.Plugin;
 import de.willuhn.jameica.webadmin.rmi.HttpService;
+import de.willuhn.jameica.webadmin.servlets.RootServlet;
 import de.willuhn.logging.Logger;
 
 
@@ -31,7 +33,7 @@ import de.willuhn.logging.Logger;
  */
 public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
 {
-  private Launcher server = null;
+  private Server server = null;
 
   /**
    * @throws RemoteException
@@ -78,30 +80,19 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
     
     try
     {
-      Settings settings = Application.getPluginLoader().getPlugin(Plugin.class).getResources().getSettings();
+      // Logging zu uns umleiten
+      System.setProperty("org.mortbay.log.class",JettyLogger.class.getName());
 
-      Map args = new HashMap();
-      args.put("httpPort",new Integer(settings.getInt("listener.port",8080)));
-      // httpListenAddress
-      // webroot
-      // -debug                  = set the level of debug msgs (1-9). Default is 5 (INFO level)
-//      --httpsPort              = set the https listening port. -1 to disable, Default is disabled
-//      --httpsListenAddress     = set the https listening address. Default is all interfaces
-//      --httpsKeyStore          = the location of the SSL KeyStore file. Default is ./winstone.ks
-//      --httpsKeyStorePassword  = the password for the SSL KeyStore file. Default is null
-//      --httpsKeyManagerType    = the SSL KeyManagerFactory type (eg SunX509, IbmX509). Default is SunX509
-//      --handlerCountStartup    = set the no of worker threads to spawn at startup. Default is 5
-//      --handlerCountMax        = set the max no of worker threads to allow. Default is 300
-//      --handlerCountMaxIdle    = set the max no of idle worker threads to allow. Default is 50
-//
-//      --directoryListings      = enable directory lists (true/false). Default is true
-//      
-//      --realmClassName               = Set the realm class to use for user authentication. Defaults to ArgumentsRealm class
-//      --accessLoggerClassName        = Set the access logger class to use for user authentication. Defaults to disabled
-//      --simpleAccessLogger.format    = The log format to use. Supports combined/common/resin/custom (SimpleAccessLogger only)
-//      --simpleAccessLogger.file      = The location pattern for the log file(SimpleAccessLogger only)
-      Launcher.initLogger(args);
-      this.server = new Launcher(args);
+      Settings settings = Application.getPluginLoader().getPlugin(Plugin.class).getResources().getSettings();
+      int port = new Integer(settings.getInt("listener.http.port",8080)).intValue();
+      this.server = new Server(port);
+      this.server.setStopAtShutdown(false);
+
+      ServletHandler handler = new ServletHandler();
+      handler.addServletWithMapping(RootServlet.class, "/");      
+      this.server.setHandler(handler);
+
+      this.server.start();
     }
     catch (Exception e)
     {
@@ -121,7 +112,11 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
     }
     try
     {
-      this.server.shutdown();
+      this.server.stop();
+    }
+    catch (Exception e)
+    {
+      Logger.error("unable to stop http-server",e);
     }
     finally
     {
@@ -133,6 +128,9 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
 
 /**********************************************************************
  * $Log: HttpServiceImpl.java,v $
+ * Revision 1.5  2007/04/12 00:02:55  willuhn
+ * @C replaced winstone with jetty (because of ssl support via custom socketfactory)
+ *
  * Revision 1.4  2007/04/10 00:52:32  willuhn
  * @C moved to winstone (better realm integration)
  *
