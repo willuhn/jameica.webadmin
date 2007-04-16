@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/server/HttpServiceImpl.java,v $
- * $Revision: 1.6 $
- * $Date: 2007/04/12 13:35:17 $
+ * $Revision: 1.7 $
+ * $Date: 2007/04/16 00:12:39 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -15,6 +15,7 @@ package de.willuhn.jameica.webadmin.server;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.Date;
 
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
@@ -23,8 +24,10 @@ import org.mortbay.jetty.security.ConstraintMapping;
 import org.mortbay.jetty.security.SecurityHandler;
 import org.mortbay.jetty.servlet.ServletHandler;
 
+import de.willuhn.jameica.system.Application;
 import de.willuhn.jameica.webadmin.Settings;
 import de.willuhn.jameica.webadmin.rmi.HttpService;
+import de.willuhn.jameica.webadmin.servlets.ImageServlet;
 import de.willuhn.jameica.webadmin.servlets.RootServlet;
 import de.willuhn.logging.Logger;
 
@@ -93,6 +96,8 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
       // Root-Servlet
       ServletHandler handler = new ServletHandler();
       handler.addServletWithMapping(RootServlet.class, "/");
+      handler.addServletWithMapping(ImageServlet.class, "/img");
+      handler.addServletWithMapping(ImageServlet.class, "/favicon.ico");
 
       if (Settings.getUseAuth())
       {
@@ -119,6 +124,9 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
       }
 
       this.server.start();
+      
+      // Wir setzen noch eine System-Nachricht, die dann im Webfrontend angezeigt wird:
+      Application.addWelcomeMessage("System gestartet am " + new Date().toString());
     }
     catch (Exception e)
     {
@@ -154,6 +162,9 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
 
 /**********************************************************************
  * $Log: HttpServiceImpl.java,v $
+ * Revision 1.7  2007/04/16 00:12:39  willuhn
+ * @N Image-Handler
+ *
  * Revision 1.6  2007/04/12 13:35:17  willuhn
  * @N SSL-Support
  * @N Authentifizierung
