@@ -1,181 +1,21 @@
-<html>
-  <head>
-    <title>Jameica $!{manifest.Version} $!{manifest.Buildnumber}</title>
-  </head>
+<style>
+  #main {
+    width                    : 650px;
+    border-right             : 1px dotted #909090;
+    padding-right            : 20px;
+  }
+  #content {
+    width                    : 960px;
+  }
+</style>
+
+<div id="content">
+
+  <div id="main">
+    #parse("status.vm")
+    #parse("messages.vm")
+  </div>
   
-  <style>
-    body
-    {
-      background-image        : url("img?panel-reverse.gif");
-      background-repeat       : repeat-x;
-      margin                  : 10px;
-      font-family             : Verdana, Helvetica, Arial;
-      font-size               : 9pt;
-    }
-    
-    p,h1,h2,h3,h4,ul,ol,li,div,td,th,address,blockquote,nobr,b,i {
-      font-family             : Verdana, Helvetica, Arial;
-      font-size               : 9pt;
-    }
-    
-    table {
-    }
-    th {
-      text-align               : left;
-    }
-    td {
-      vertical-align           : top;
-      text-align               : left;
-    }
-    
-    ol,ul {
-      list-style-position      : outside;
-      margin-top               : 5px;
-      margin-bottom            : 10px;
-    }
-    
-    ul {
-      list-style-type          : disk;
-    }
-    
-    li {
-      margin                    : 20px;
-    }
-    
-    h1 {
-      color                    : #d76B00;
-      font-weight              : bold;
-      font-size                : 12pt;
-      margin-top               : 10px;
-    }
-    
-    h2 {
-      color                    : #909090;
-      font-weight              : bold;
-      font-size                : 11pt;
-      margin-top               : 10px;
-    }
-    
-    h3 {
-      font-weight              : normal;
-      font-size                : 10pt;
-      margin-top               : 5px;
-    }
-    
-    pre {
-      margin-top               : 4px;
-      margin-bottom            : 4px;
-      padding                  : 4px;
-      border                   : 1px solid #E0E0E0;
-      font-family              : "BitStream Vera Sans Mono", "Terminal [DEC]", "Courier New", "Courier";
-      font-size                : 8pt;
-      color                    : #505050;
-    }
-    
-    a:link  {
-      color                    : #000088;
-      text-decoration          : none;
-    }
-    
-    a:visited  {
-      color                    : #808080;
-      text-decoration          : none;
-    }
-    
-    a:hover {
-      color                    : #0000dd;
-      text-decoration          : none;
-    }
-    
-    a:active {
-      color                    : #0000dd;
-      text-decoration          : none;
-    }
-    
-    a:focus {
-      color                    : #0000dd;
-      text-decoration          : none;
-    }
+  #parse("log.vm")
 
-
-    table.data {
-      width                    : 100%;
-      border                   : 1px solid #E0E0E0;
-      margin-top               : 14px;
-      margin-bottom            : 14px;
-    }
-    table.data th {
-      color                    : #ffffff;
-      padding-left             : 3px;
-      padding-right            : 10px;
-      background-color         : #b0b0a0;
-    }
-    table.data td {
-      background               : #f8f8f8;
-      margin                   : 0px;
-      padding-left             : 3px;
-      padding-right            : 10px;
-      color                    : #505050;
-    }
-    
-    #content {
-      width                    : 960px;
-    }
-
-    #main {
-      width                    : 650px;
-      border-right             : 1px dotted #909090;
-      padding-right            : 20px;
-    }
-
-    #messages {
-      position                 : absolute;
-      width                    : 300px;
-      left                     : 700px;
-      top                      : 15px;
-      align                    : right;
-    }
-    #messages h2 {
-      font-size                : 10pt;
-      margin                   : 0px;
-    }
-    #messages table.data td {
-      font-size                : 7pt;
-    }
-
-  </style>
-  
-  <body>
-    <h1>Jameica - Administration</h1>
-
-    <div id="content">
-    
-      <div id="main">
-        <table class="data">
-          <tr>
-            <td>Version</td>
-            <td>$!{manifest.Version} $!{manifest.Buildnumber}</td>
-          </tr>
-          <tr>
-            <td>Benutzer-Verzeichnis</td>
-            <td>$!{config.WorkDir}</td>
-          </tr>
-        </table>
-      </div>
-
-      <div id="messages">
-        <h2>System-Nachrichten</h2>
-        <table class="data">
-          #foreach($message in $messages)
-            <tr>
-              <td>$!{message}</td>
-            </tr>
-          #end
-        </table>
-      </div>
-
-    </div>
-
-  </body>
-  
-</html>
+</div>

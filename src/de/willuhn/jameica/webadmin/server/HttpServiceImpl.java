@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/server/HttpServiceImpl.java,v $
- * $Revision: 1.7 $
- * $Date: 2007/04/16 00:12:39 $
+ * $Revision: 1.8 $
+ * $Date: 2007/04/16 11:22:15 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -15,7 +15,6 @@ package de.willuhn.jameica.webadmin.server;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.Date;
 
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
@@ -24,7 +23,6 @@ import org.mortbay.jetty.security.ConstraintMapping;
 import org.mortbay.jetty.security.SecurityHandler;
 import org.mortbay.jetty.servlet.ServletHandler;
 
-import de.willuhn.jameica.system.Application;
 import de.willuhn.jameica.webadmin.Settings;
 import de.willuhn.jameica.webadmin.rmi.HttpService;
 import de.willuhn.jameica.webadmin.servlets.ImageServlet;
@@ -124,9 +122,6 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
       }
 
       this.server.start();
-      
-      // Wir setzen noch eine System-Nachricht, die dann im Webfrontend angezeigt wird:
-      Application.addWelcomeMessage("System gestartet am " + new Date().toString());
     }
     catch (Exception e)
     {
@@ -162,6 +157,9 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
 
 /**********************************************************************
  * $Log: HttpServiceImpl.java,v $
+ * Revision 1.8  2007/04/16 11:22:15  willuhn
+ * @N display log
+ *
  * Revision 1.7  2007/04/16 00:12:39  willuhn
  * @N Image-Handler
  *
