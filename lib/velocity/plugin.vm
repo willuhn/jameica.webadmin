@@ -1,0 +1,55 @@
+
+<div id="breadcrumbs">
+  <a href="/">Index</a>
+  &raquo;
+  <a href="plugin?plugin=$!{plugin.Name}">$!{plugin.Name}</a>
+</div>
+
+<table class="data">
+  <tr>
+    <td>Beschreibung</td>
+    <td>$!{plugin.Description}</td>
+  </tr>
+  <tr>
+    <td>Version</td>
+    <td>$!{plugin.Version} $!{plugin.Buildnumber}</td>
+  </tr>
+  <tr>
+    <td>Verzeichnis</td>
+    <td>$!{plugin.PluginDir}</td>
+  </tr>
+</table>
+
+<h2>Services</h2>
+<table class="data">
+  <tr>
+    <th>Name</th>
+    <th>Klasse</th>
+    <th>Abhängigkeiten</th>
+    <th>Status</th>
+    <th>Aktion</th>
+  </tr>
+  #foreach($service in $plugin.Services)
+    #set($serviceclass = $classloader.load($plugin.getPluginClass()))
+    #set($instance = $servicefactory.lookup($serviceclass,$service.Name))
+    #set($deps = $service.depends())
+    <tr>
+      <td>$!{service.Name}</td>
+      <td>$!{service.Classname}</td>
+      <td>
+        #foreach($dep in $deps)
+          $dep
+          <br/>
+        #end
+      </td>
+
+      #if($!{instance.isStarted()})
+        <td style="color:#46824A">gestartet</td>
+        <td><a onclick="return window.confirm('Service $!{service.Name} wirklich stoppen?');" href="?plugin=$!{plugin.Name}&service=$!{service.Name}&action=stop">Stoppen</a>
+      #else
+        <td style="color:#6E1416">NICHT gestartet</td>
+        <td><a href="?plugin=$!{plugin.Name}&service=$!{service.Name}&action=start">Starten</a>
+      #end
+    </tr>
+  #end
+</table>

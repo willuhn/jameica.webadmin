@@ -16,8 +16,8 @@
 </style>
 
 <h2>System-Log</h2>
-<div id="log" style="width:990px;height:160px;overflow:auto; overflow-y:auto;overflow-x:hidden">
-  <table class="data" style="margin:0px;padding:0px;">
+<div style="border: 1px solid #e0e0e0; width:990px;height:160px;overflow:auto; overflow-y:auto;overflow-x:hidden">
+  <table class="data" style="border:none; margin:0px;padding:0px;">
     <tr>
       <th>Datum</th>
       <th>Quelle</th>
@@ -30,13 +30,9 @@
       #set($source = $source.substring($pos))
       <tr class="$!{level.Name}">
         <td style="white-space:nowrap;">$!{dateformat.format(${message.Date})}</td>
-        <td>$source.$!{message.LoggingMethod}()</td>
-        <td>$!{message.Text}</td>
+        <td><pre>$source.$!{message.LoggingMethod}()</pre></td>
+        <td><pre>$!{message.Text}</pre></td>
       </tr>
     #end
   </table>
 </div>
-
-<script type="text/javascript">
-  document.getElementById("log").scrollBy(0,100000);
-</script>

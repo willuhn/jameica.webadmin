@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/servlets/Attic/RootServlet.java,v $
- * $Revision: 1.3 $
- * $Date: 2007/04/16 11:22:15 $
+ * $Revision: 1.4 $
+ * $Date: 2007/04/16 13:44:45 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -33,6 +33,7 @@ import org.apache.velocity.app.Velocity;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.jameica.webadmin.Plugin;
 import de.willuhn.logging.Logger;
+import de.willuhn.util.ApplicationException;
 import de.willuhn.util.I18N;
 
 
@@ -41,21 +42,11 @@ import de.willuhn.util.I18N;
  */
 public class RootServlet extends HttpServlet
 {
-  // Start-Datum von Jameica
   private final static Date started          = new Date();
-  
-  // Datums-Format
   private final static DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
 
-  private I18N i18n = null;
-  
-  static
-  {
-    
-  }
-  
-  
-  private VelocityContext context = new VelocityContext();
+  protected I18N i18n = null;
+  protected VelocityContext context = new VelocityContext();
   
   /**
    * ct.
@@ -66,6 +57,8 @@ public class RootServlet extends HttpServlet
     
     context.put("manifest",      Application.getManifest());
     context.put("pluginloader",  Application.getPluginLoader());
+    context.put("classloader",   Application.getClassLoader());
+    context.put("plugins",       Application.getPluginLoader().getInstalledManifests());
     context.put("servicefactory",Application.getServiceFactory());
     context.put("sslfactory",    Application.getSSLFactory());
     context.put("config",        Application.getConfig());
@@ -82,9 +75,14 @@ public class RootServlet extends HttpServlet
 
     try
     {
-      prepareContext(request);
+      prepareContext(request,response);
       Template template = Velocity.getTemplate("template.vm");
       template.merge(context,response.getWriter());
+    }
+    catch (ApplicationException ae)
+    {
+      Application.addWelcomeMessage(ae.getMessage());
+      response.sendRedirect("/");
     }
     catch (IOException ioe)
     {
@@ -105,8 +103,10 @@ public class RootServlet extends HttpServlet
    * Sie gehoeren nicht in den Konstruktor weil Servlets per Spezifikation
    * mehrfach verwendet werden duerfen.
    * @param request der Request.
+   * @param response der Response.
+   * @throws ApplicationException
    */
-  private void prepareContext(HttpServletRequest request)
+  protected void prepareContext(HttpServletRequest request, HttpServletResponse response) throws ApplicationException
   {
     String name = "index.vm";
     String query = request.getQueryString();
@@ -148,6 +148,12 @@ public class RootServlet extends HttpServlet
 
 /**********************************************************************
  * $Log: RootServlet.java,v $
+ * Revision 1.4  2007/04/16 13:44:45  willuhn
+ * @N display logs
+ * @N display installed plugins
+ * @N display plugin details
+ * @N ability to start/stop services
+ *
  * Revision 1.3  2007/04/16 11:22:15  willuhn
  * @N display log
  *

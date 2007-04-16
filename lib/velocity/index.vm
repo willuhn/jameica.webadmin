@@ -1,21 +1,15 @@
-<style>
-  #main {
-    width                    : 650px;
-    border-right             : 1px dotted #909090;
-    padding-right            : 20px;
-  }
-  #content {
-    width                    : 960px;
-  }
-</style>
+<table>
+  <tr>
+    <td style="border-right:1px dotted #909090;padding-right: 20px;width:650px">
+      #parse("status.vm")
+      #parse("plugins.vm")
+    </td>
+    <td style="padding-left: 20px;width:300px">
+      #parse("messages.vm")
+    </td>
+  </tr>
+</table>
 
-<div id="content">
-
-  <div id="main">
-    #parse("status.vm")
-    #parse("messages.vm")
-  </div>
-  
+<div style="margin-top:20px">
   #parse("log.vm")
-
 </div>
