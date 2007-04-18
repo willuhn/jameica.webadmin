@@ -1,0 +1,15 @@
+<h2>Installierte Zertifikate</h2>
+<table class="data">
+  <tr>
+    <th>Distinguished Name/Gültigkeit</th>
+  </tr>
+  #set($certs = $sslfactory.getTrustedCertificates())
+  #foreach($cert in $certs)
+    <tr>
+      <td>
+        <a title="Klicken für Details" href="cert?=$!{cert.SubjectDN}">$!{cert.SubjectDN.Name}</a>
+        <br/>Gültigkeit: $dateformat.format($cert.NotBefore) - $dateformat.format($cert.NotAfter)
+      </td>
+    </tr>
+  #end
+</table>

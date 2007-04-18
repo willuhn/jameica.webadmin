@@ -4,12 +4,12 @@
     <th>Name</th>
     <th>Version</th>
     <th>Beschreibung</th>
-    
-#foreach($plugin in $plugins)
-  <tr>
-    <td><a title="Klicken für Details" href="plugin?plugin=$!{plugin.Name}">$!{plugin.Name}</a></td>
-    <td>$!{plugin.Version} $!{plugin.Buildnumber}</td>
-    <td>$!{plugin.Description}</td>
   </tr>
-#end
+  #foreach($plugin in $plugins)
+    <tr>
+      <td><a title="Klicken für Details" href="plugin?plugin=$!{plugin.Name}">$!{plugin.Name}</a></td>
+      <td>$!{plugin.Version} $!{plugin.Buildnumber}</td>
+      <td>$!{plugin.Description}</td>
+    </tr>
+  #end
 </table>

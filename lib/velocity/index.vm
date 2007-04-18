@@ -7,6 +7,7 @@
     <td style="border-right:1px dotted #909090;padding-right: 20px;width:650px">
       #parse("status.vm")
       #parse("plugins.vm")
+      #parse("certs.vm")
     </td>
     <td style="padding-left: 20px;width:300px">
       #parse("messages.vm")
