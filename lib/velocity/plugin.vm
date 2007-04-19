@@ -12,7 +12,7 @@
   </tr>
   <tr>
     <td>Version</td>
-    <td>$!{plugin.Version} $!{plugin.Buildnumber}</td>
+    <td>$!{plugin.Version} [Build $!{plugin.Buildnumber}]</td>
   </tr>
   <tr>
     <td>Verzeichnis</td>

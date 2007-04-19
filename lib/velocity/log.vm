@@ -30,7 +30,7 @@
       #set($source = $source.substring($pos))
       <tr class="$!{level.Name}">
         <td style="white-space:nowrap;">$!{dateformat.format(${message.Date})}</td>
-        <td><pre>$source.$!{message.LoggingMethod}()</pre></td>
+        <td><pre>$source.$!{message.LoggingMethod}</pre></td>
         <td><pre>$!{message.Text}</pre></td>
       </tr>
     #end
