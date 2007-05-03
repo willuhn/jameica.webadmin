@@ -7,7 +7,7 @@
   #foreach($cert in $certs)
     <tr>
       <td>
-        <a title="Klicken für Details" href="cert?=$!{cert.SubjectDN}">$!{cert.SubjectDN.Name}</a>
+        <a title="Klicken für Details" href="/cert?=$!{cert.SubjectDN}">$!{cert.SubjectDN.Name}</a>
         <br/>Gültigkeit: $dateformat.format($cert.NotBefore) - $dateformat.format($cert.NotAfter)
       </td>
     </tr>

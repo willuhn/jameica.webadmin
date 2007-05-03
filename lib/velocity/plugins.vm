@@ -7,7 +7,7 @@
   </tr>
   #foreach($plugin in $plugins)
     <tr>
-      <td><a title="Klicken für Details" href="plugin?plugin=$!{plugin.Name}">$!{plugin.Name}</a></td>
+      <td><a title="Klicken für Details" href="/plugin?plugin=$!{plugin.Name}">$!{plugin.Name}</a></td>
       <td>$!{plugin.Version} [Build $!{plugin.Buildnumber}]</td>
       <td>$!{plugin.Description}</td>
     </tr>
