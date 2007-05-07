@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/servlets/Attic/ResourceServlet.java,v $
- * $Revision: 1.1 $
- * $Date: 2007/05/03 23:39:52 $
+ * $Revision: 1.2 $
+ * $Date: 2007/05/07 22:21:28 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -31,14 +31,16 @@ import de.willuhn.logging.Logger;
  */
 public class ResourceServlet extends HttpServlet
 {
+
   /**
-   * Liefert den Pfad, aus dem gelesen werden soll.
-   * Kann ueberschrieben werden.
-   * @return der Pfad, aus dem gelesen werden soll.
+   * Liefert Pfad und Resource der zu ladenden Ressource.
+   * Sie muss sich mittels im Classpath befinden, um gefunden zu werden.
+   * @param request
+   * @return
    */
-  protected String getPath()
+  protected String getResource(HttpServletRequest request)
   {
-    return "res";
+    return request.getRequestURI();
   }
 
   /**
@@ -46,21 +48,20 @@ public class ResourceServlet extends HttpServlet
    */
   protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
   {
-    String name = request.getQueryString();
-
-    if (name == null || name.length() == 0)
-      throw new IOException("no filename given");
-    
     InputStream is = null;
-    
-    String path = getPath() + "/" + name;
     
     try
     {
-      is = Application.getClassLoader().getResourceAsStream(path);
+      String name = getResource(request);
+      
+      // Wir entfernen ggf. den Slash
+      if (name.startsWith("/"))
+        name = name.substring(1);
+      
+      is = Application.getClassLoader().getResourceAsStream(name);
       if (is == null)
       {
-        Logger.warn("404: " + path);
+        Logger.warn("404: unable to find " + name);
         response.sendError(HttpServletResponse.SC_NOT_FOUND);
         return;
       }
@@ -77,9 +78,7 @@ public class ResourceServlet extends HttpServlet
           os.write(buffer,0,read);
       }
       while (read > 0);
-      
       os.flush();
-      Logger.debug("200: " + path);
     }
     finally
     {
@@ -93,6 +92,9 @@ public class ResourceServlet extends HttpServlet
 
 /**********************************************************************
  * $Log: ResourceServlet.java,v $
+ * Revision 1.2  2007/05/07 22:21:28  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.1  2007/05/03 23:39:52  willuhn
  * @N Vorbereitungen fuer Integration von GWT (Google Web Toolkit)
  *

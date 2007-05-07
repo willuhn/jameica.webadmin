@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/server/HttpServiceImpl.java,v $
- * $Revision: 1.10 $
- * $Date: 2007/05/03 23:39:52 $
+ * $Revision: 1.11 $
+ * $Date: 2007/05/07 22:21:28 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -18,7 +18,6 @@ import java.rmi.server.UnicastRemoteObject;
 
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
-import org.mortbay.jetty.handler.HandlerList;
 import org.mortbay.jetty.security.Constraint;
 import org.mortbay.jetty.security.ConstraintMapping;
 import org.mortbay.jetty.security.SecurityHandler;
@@ -26,7 +25,6 @@ import org.mortbay.jetty.servlet.ServletHandler;
 
 import de.willuhn.jameica.webadmin.Settings;
 import de.willuhn.jameica.webadmin.rmi.HttpService;
-import de.willuhn.jameica.webadmin.servlets.ImageServlet;
 import de.willuhn.jameica.webadmin.servlets.PluginServlet;
 import de.willuhn.jameica.webadmin.servlets.ResourceServlet;
 import de.willuhn.jameica.webadmin.servlets.RootServlet;
@@ -94,26 +92,18 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
       if (Settings.getUseSSL())
         this.server.setConnectors(new Connector[]{new JameicaSocketConnector()});
 
-      HandlerList list = new HandlerList();
-      
       // Servlets
       ServletHandler handler = new ServletHandler();
 
-      handler.addServletWithMapping(ResourceServlet.class, "/res");
-      handler.addServletWithMapping(ImageServlet.class, "/img");
+      handler.addServletWithMapping(ResourceServlet.class, "/res/*");
+      handler.addServletWithMapping(ResourceServlet.class, "/img/*");
 
       // a) Velocity
       handler.addServletWithMapping(RootServlet.class, "/");
       handler.addServletWithMapping(PluginServlet.class, "/plugin");
       
       // b) GWT
-      // TODO: Funktioniert noch nicht
-//      ServletHolder holder = new ServletHolder(DefaultServlet.class);
-//      holder.setInitParameter("dirAllowed","true");
-//      holder.setInitParameter("resourceBase","/work/willuhn/eclipse/jameica.webadmin/src/res/gwt/de.willuhn.jameica.webadmin.gwt.WebAdmin");
-//      handler.addServletWithMapping(holder,"/*");
-      
-      list.addHandler(handler);
+//      handler.addServletWithMapping(GwtServlet.class, "/");
       
       if (Settings.getUseAuth())
       {
@@ -131,13 +121,13 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
         sh.setConstraintMappings(new ConstraintMapping[]{cm});
 
         // Authentifizierung drum rum wrappen
-        sh.setHandler(list);
+        sh.setHandler(handler);
         this.server.setHandler(sh);
       }
       else
       {
         // Ansonsten direkt die Haendler-Liste an den Server geben
-        this.server.setHandler(list);
+        this.server.setHandler(handler);
       }
       
       this.server.start();
@@ -176,6 +166,9 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
 
 /**********************************************************************
  * $Log: HttpServiceImpl.java,v $
+ * Revision 1.11  2007/05/07 22:21:28  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.10  2007/05/03 23:39:52  willuhn
  * @N Vorbereitungen fuer Integration von GWT (Google Web Toolkit)
  *

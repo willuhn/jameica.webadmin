@@ -5,5 +5,4 @@
 
 	<!-- Specify the app entry point class.                   -->
 	<entry-point class='de.willuhn.jameica.webadmin.gwt.client.WebAdmin'/>
-  
 </module>

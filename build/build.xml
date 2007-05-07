@@ -48,6 +48,7 @@
 		<property name="project.zipdir" 			  value="${project.release}/${define.pluginname}" />
 
 		<property name="src.dir" 					      value="src" />
+		<property name="res.dir" 						    value="${src.dir}/res" />
 		<property name="lib.dir" 					      value="lib" />
 		<property name="class.dir" 					    value="${project.tmp}/bin" />
 
@@ -84,6 +85,10 @@
 			<include name="**/*.class" />
 			<classpath refid="compilepath" />
 		</rmic>
+
+		<copy todir="${class.dir}/res">
+			<fileset dir="${res.dir}" />
+		</copy>
 
 	</target>
 

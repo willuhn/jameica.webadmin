@@ -1,6 +1,6 @@
 body
 {
-  background-image        : url("/img?panel-reverse.gif");
+  background-image        : url("/img/panel-reverse.gif");
   background-repeat       : repeat-x;
   margin                  : 10px;
   font-family             : Verdana, Helvetica, Arial;
@@ -89,7 +89,7 @@ table.data {
 }
 table.data th {
   background-color         : #b0b0a0;
-  background-image         : url("/img?panel-reverse.gif");
+  background-image         : url("/img/panel-reverse.gif");
   background-repeat        : repeat-x;
   color                    : #440000;
   padding-left             : 3px;

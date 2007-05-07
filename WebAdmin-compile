@@ -1,3 +1,3 @@
 #!/bin/sh
 APPDIR=`dirname $0`;
-java  -cp "$APPDIR/src:$APPDIR/bin:/opt/gwt-linux-1.3.3/gwt-user.jar:/opt/gwt-linux-1.3.3/gwt-dev-linux.jar" com.google.gwt.dev.GWTCompiler -out "$APPDIR/src/res/gwt" "$@" de.willuhn.jameica.webadmin.gwt.WebAdmin;
+java  -cp "$APPDIR/../jameica/bin:$APPDIR/src:$APPDIR/bin:/opt/gwt-linux-1.3.3/gwt-user.jar:/opt/gwt-linux-1.3.3/gwt-dev-linux.jar" com.google.gwt.dev.GWTCompiler -out "$APPDIR/src/res/gwt" "$@" de.willuhn.jameica.webadmin.gwt.WebAdmin;
