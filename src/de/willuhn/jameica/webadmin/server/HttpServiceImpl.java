@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/server/HttpServiceImpl.java,v $
- * $Revision: 1.11 $
- * $Date: 2007/05/07 22:21:28 $
+ * $Revision: 1.12 $
+ * $Date: 2007/05/14 23:42:36 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -97,13 +97,8 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
 
       handler.addServletWithMapping(ResourceServlet.class, "/res/*");
       handler.addServletWithMapping(ResourceServlet.class, "/img/*");
-
-      // a) Velocity
-      handler.addServletWithMapping(RootServlet.class, "/");
-      handler.addServletWithMapping(PluginServlet.class, "/plugin");
-      
-      // b) GWT
-//      handler.addServletWithMapping(GwtServlet.class, "/");
+      handler.addServletWithMapping(RootServlet.class,     "/");
+      handler.addServletWithMapping(PluginServlet.class,   "/plugin");
       
       if (Settings.getUseAuth())
       {
@@ -166,6 +161,9 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
 
 /**********************************************************************
  * $Log: HttpServiceImpl.java,v $
+ * Revision 1.12  2007/05/14 23:42:36  willuhn
+ * @R removed GWT - sucks!
+ *
  * Revision 1.11  2007/05/07 22:21:28  willuhn
  * *** empty log message ***
  *
