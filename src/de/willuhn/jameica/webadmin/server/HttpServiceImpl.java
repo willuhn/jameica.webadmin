@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/server/HttpServiceImpl.java,v $
- * $Revision: 1.14 $
- * $Date: 2007/05/15 11:21:12 $
+ * $Revision: 1.15 $
+ * $Date: 2007/05/15 13:42:36 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -15,26 +15,21 @@ package de.willuhn.jameica.webadmin.server;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
 
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
-import org.mortbay.jetty.deployer.WebAppDeployer;
-import org.mortbay.jetty.handler.ContextHandler;
 import org.mortbay.jetty.handler.ContextHandlerCollection;
 import org.mortbay.jetty.handler.DefaultHandler;
 import org.mortbay.jetty.handler.HandlerCollection;
 import org.mortbay.jetty.security.Constraint;
 import org.mortbay.jetty.security.ConstraintMapping;
 import org.mortbay.jetty.security.SecurityHandler;
-import org.mortbay.jetty.servlet.Context;
-import org.mortbay.jetty.webapp.WebAppContext;
 
 import de.willuhn.jameica.system.Application;
 import de.willuhn.jameica.webadmin.Settings;
+import de.willuhn.jameica.webadmin.deploy.Deployer;
 import de.willuhn.jameica.webadmin.rmi.HttpService;
-import de.willuhn.jameica.webadmin.servlets.PluginServlet;
-import de.willuhn.jameica.webadmin.servlets.ResourceServlet;
-import de.willuhn.jameica.webadmin.servlets.RootServlet;
 import de.willuhn.logging.Logger;
 
 
@@ -43,7 +38,7 @@ import de.willuhn.logging.Logger;
  */
 public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
 {
-  private Server server = null;
+  private Worker worker = null;
 
   /**
    * @throws RemoteException
@@ -74,7 +69,7 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
    */
   public boolean isStarted() throws RemoteException
   {
-    return this.server != null;
+    return this.worker != null;
   }
 
   /**
@@ -87,83 +82,9 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
       Logger.warn("service allready started, skipping request");
       return;
     }
-    
-    try
-    {
-      // Logging zu uns umleiten
-      System.setProperty("org.mortbay.log.class",JettyLogger.class.getName());
 
-      Logger.info("started webserver at port " + Settings.getPort());
-      this.server = new Server(Settings.getPort());
-      this.server.setStopAtShutdown(false);
-      if (Settings.getUseSSL())
-        this.server.setConnectors(new Connector[]{new JameicaSocketConnector()});
-
-      ContextHandlerCollection collection = new ContextHandlerCollection();
-
-      Logger.info("deploy admin console");
-      Context webadmin = new Context(server,"/webadmin",Context.ALL);
-      webadmin.addServlet(ResourceServlet.class, "/res/*");
-      webadmin.addServlet(RootServlet.class,     "/");
-      webadmin.addServlet(PluginServlet.class,   "/plugin");
-      collection.addHandler(webadmin);
-
-      Logger.info("deploy webapps");
-      ContextHandler con = new WebAppContext("/work/willuhn/eclipse3/jameica.webadmin/lib/webapps/test","/test");
-      // con.setClassLoader(Application.getClassLoader());
-      collection.addHandler(con);
-      
-//      WebAppDeployer warDeploy = new WebAppDeployer();
-//      warDeploy.setAllowDuplicates(false);
-//      warDeploy.setExtract(true);
-//      warDeploy.setWebAppDir("/work/willuhn/eclipse/jameica.webadmin/lib/webapps");
-//      warDeploy.setContexts(collection);
-//      warDeploy.setConfigurationClasses(new String[] { 
-//          "org.mortbay.jetty.webapp.WebInfConfiguration", 
-//          "org.mortbay.jetty.webapp.WebXmlConfiguration", 
-//          "org.mortbay.jetty.webapp.JettyWebXmlConfiguration",
-//          "org.mortbay.jetty.webapp.TagLibConfiguration",
-//          "org.mortbay.jetty.plus.webapp.EnvConfiguration"
-//      });
-//      warDeploy.setParentLoaderPriority(false);
-      
-      HandlerCollection handlers = new HandlerCollection();
-      handlers.addHandler(collection);
-      handlers.addHandler(new DefaultHandler());
-
-      if (Settings.getUseAuth())
-      {
-        Logger.info("activating authentication");
-        Constraint constraint = new Constraint();
-        constraint.setName(Constraint.__BASIC_AUTH);;
-        constraint.setRoles(new String[]{"admin"});
-        constraint.setAuthenticate(true);
-
-        ConstraintMapping cm = new ConstraintMapping();
-        cm.setConstraint(constraint);
-        cm.setPathSpec("/*");
-
-        SecurityHandler sh = new SecurityHandler();
-        sh.setUserRealm(new JameicaUserRealm());
-        sh.setConstraintMappings(new ConstraintMapping[]{cm});
-
-        // Authentifizierung drum rum wrappen
-        sh.setHandler(handlers);
-        this.server.setHandler(sh);
-      }
-      else
-      {
-        // Ansonsten direkt die Haendler-Liste an den Server geben
-        this.server.setHandler(handlers);
-      }
-      
-      
-      this.server.start();
-    }
-    catch (Exception e)
-    {
-      Logger.error("unable to init http-server",e);
-    }
+    worker = new Worker();
+    worker.start();
   }
 
   /**
@@ -178,7 +99,7 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
     }
     try
     {
-      this.server.stop();
+      this.worker.interrupt();
     }
     catch (Exception e)
     {
@@ -186,7 +107,133 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
     }
     finally
     {
-      this.server = null;
+      this.worker = null;
+    }
+  }
+  
+  
+  private class Worker extends Thread
+  {
+    private Server server = null;
+
+    private Worker()
+    {
+      setContextClassLoader(HttpServiceImpl.this.getClass().getClassLoader());
+    }
+    
+    /**
+     * @see java.lang.Thread#run()
+     */
+    public void run()
+    {
+      try
+      {
+        // Logging zu uns umleiten
+        System.setProperty("org.mortbay.log.class",JettyLogger.class.getName());
+
+        Logger.info("started webserver at port " + Settings.getPort());
+        this.server = new Server(Settings.getPort());
+        this.server.setStopAtShutdown(false);
+        if (Settings.getUseSSL())
+          this.server.setConnectors(new Connector[]{new JameicaSocketConnector()});
+
+        ContextHandlerCollection collection = new ContextHandlerCollection();
+
+        ArrayList deployer = new ArrayList();
+        try
+        {
+          Class[] cl = Application.getClassLoader().getClassFinder().findImplementors(Deployer.class);
+          for (int i=0;i<cl.length;++i)
+          {
+            try
+            {
+              deployer.add((Deployer) cl[i].newInstance());
+            }
+            catch (Exception e)
+            {
+              Logger.error("error while loading deployer " + cl[i].getName() + ", skipping",e);
+            }
+          }
+        }
+        catch (ClassNotFoundException e)
+        {
+          // Dann halt nicht
+        }
+        
+        if (deployer.size() == 0)
+        {
+          Logger.warn("no deployers found, skipping http-server");
+          return;
+        }
+        
+        for (int i=0;i<deployer.size();++i)
+        {
+          Deployer d = (Deployer) deployer.get(i);
+          try
+          {
+            d.deploy(this.server,collection);
+          }
+          catch (Exception e)
+          {
+            Logger.error("error while starting deployer " + d.getClass().getName() + ", skipping");
+          }
+        }
+
+        // Wir erzeugen eine Handler-Collection mit Default-Handler.
+        HandlerCollection handlers = new HandlerCollection();
+        handlers.addHandler(collection);
+        handlers.addHandler(new DefaultHandler());
+
+        if (Settings.getUseAuth())
+        {
+          Logger.info("activating authentication");
+          Constraint constraint = new Constraint();
+          constraint.setName(Constraint.__BASIC_AUTH);;
+          constraint.setRoles(new String[]{"admin"});
+          constraint.setAuthenticate(true);
+
+          ConstraintMapping cm = new ConstraintMapping();
+          cm.setConstraint(constraint);
+          cm.setPathSpec("/*");
+
+          SecurityHandler sh = new SecurityHandler();
+          sh.setUserRealm(new JameicaUserRealm());
+          sh.setConstraintMappings(new ConstraintMapping[]{cm});
+
+          // Authentifizierung drum rum wrappen
+          sh.setHandler(handlers);
+          this.server.setHandler(sh);
+        }
+        else
+        {
+          // Ansonsten direkt die Haendler-Liste an den Server geben
+          this.server.setHandler(handlers);
+        }
+        
+        
+        this.server.start();
+        this.server.join();
+      }
+      catch (InterruptedException ie)
+      {
+        Logger.info("http-server stopped");
+        try
+        {
+          this.server.stop();
+        }
+        catch (Exception e)
+        {
+          Logger.error("unable to stop http-server",e);
+        }
+        finally
+        {
+          this.server = null;
+        }
+      }
+      catch (Exception e)
+      {
+        Logger.error("unable to init http-server",e);
+      }
     }
   }
 }
@@ -194,6 +241,9 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
 
 /**********************************************************************
  * $Log: HttpServiceImpl.java,v $
+ * Revision 1.15  2007/05/15 13:42:36  willuhn
+ * @N Deployment von Webapps, WARs fertig und konfigurierbar
+ *
  * Revision 1.14  2007/05/15 11:21:12  willuhn
  * *** empty log message ***
  *
