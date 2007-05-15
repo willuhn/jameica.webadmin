@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/servlets/Attic/ResourceServlet.java,v $
- * $Revision: 1.2 $
- * $Date: 2007/05/07 22:21:28 $
+ * $Revision: 1.3 $
+ * $Date: 2007/05/15 11:21:12 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -36,11 +36,11 @@ public class ResourceServlet extends HttpServlet
    * Liefert Pfad und Resource der zu ladenden Ressource.
    * Sie muss sich mittels im Classpath befinden, um gefunden zu werden.
    * @param request
-   * @return
+   * @return den Pfad zur Ressource.
    */
   protected String getResource(HttpServletRequest request)
   {
-    return request.getRequestURI();
+    return request.getServletPath() + request.getPathInfo();
   }
 
   /**
@@ -92,6 +92,9 @@ public class ResourceServlet extends HttpServlet
 
 /**********************************************************************
  * $Log: ResourceServlet.java,v $
+ * Revision 1.3  2007/05/15 11:21:12  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.2  2007/05/07 22:21:28  willuhn
  * *** empty log message ***
  *

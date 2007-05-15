@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/server/HttpServiceImpl.java,v $
- * $Revision: 1.13 $
- * $Date: 2007/05/15 00:22:20 $
+ * $Revision: 1.14 $
+ * $Date: 2007/05/15 11:21:12 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -19,12 +19,17 @@ import java.rmi.server.UnicastRemoteObject;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.deployer.WebAppDeployer;
+import org.mortbay.jetty.handler.ContextHandler;
+import org.mortbay.jetty.handler.ContextHandlerCollection;
+import org.mortbay.jetty.handler.DefaultHandler;
+import org.mortbay.jetty.handler.HandlerCollection;
 import org.mortbay.jetty.security.Constraint;
 import org.mortbay.jetty.security.ConstraintMapping;
 import org.mortbay.jetty.security.SecurityHandler;
 import org.mortbay.jetty.servlet.Context;
-import org.mortbay.jetty.servlet.ServletHandler;
+import org.mortbay.jetty.webapp.WebAppContext;
 
+import de.willuhn.jameica.system.Application;
 import de.willuhn.jameica.webadmin.Settings;
 import de.willuhn.jameica.webadmin.rmi.HttpService;
 import de.willuhn.jameica.webadmin.servlets.PluginServlet;
@@ -94,36 +99,38 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
       if (Settings.getUseSSL())
         this.server.setConnectors(new Connector[]{new JameicaSocketConnector()});
 
-      // Servlets
-//      ServletHandler handler = new ServletHandler();
+      ContextHandlerCollection collection = new ContextHandlerCollection();
 
       Logger.info("deploy admin console");
-//      handler.addServletWithMapping(ResourceServlet.class, "/res/*");
-//      handler.addServletWithMapping(ResourceServlet.class, "/img/*");
-//      handler.addServletWithMapping(RootServlet.class,     "/");
-//      handler.addServletWithMapping(PluginServlet.class,   "/plugin");
-
-      Context context = new Context(server,"/",Context.ALL);
-      context.addServlet(ResourceServlet.class, "/res/*");
-      context.addServlet(ResourceServlet.class, "/img/*");
-      context.addServlet(RootServlet.class,     "/");
-      context.addServlet(PluginServlet.class,   "/plugin");
+      Context webadmin = new Context(server,"/webadmin",Context.ALL);
+      webadmin.addServlet(ResourceServlet.class, "/res/*");
+      webadmin.addServlet(RootServlet.class,     "/");
+      webadmin.addServlet(PluginServlet.class,   "/plugin");
+      collection.addHandler(webadmin);
 
       Logger.info("deploy webapps");
-      WebAppDeployer warDeploy = new WebAppDeployer();
-      warDeploy.setAllowDuplicates(false);
-      warDeploy.setExtract(true);
-      // warDeploy.setWebAppDir("/work/willuhn/eclipse/jameica.webadmin/lib/webapps");
-      warDeploy.setContexts(context);
-      warDeploy.setConfigurationClasses(new String[] { 
-          "org.mortbay.jetty.webapp.WebInfConfiguration", 
-          "org.mortbay.jetty.webapp.WebXmlConfiguration", 
-          "org.mortbay.jetty.webapp.JettyWebXmlConfiguration",
-          "org.mortbay.jetty.webapp.TagLibConfiguration",
-          "org.mortbay.jetty.plus.webapp.EnvConfiguration"
-      });
-      warDeploy.setParentLoaderPriority(false);
+      ContextHandler con = new WebAppContext("/work/willuhn/eclipse3/jameica.webadmin/lib/webapps/test","/test");
+      // con.setClassLoader(Application.getClassLoader());
+      collection.addHandler(con);
       
+//      WebAppDeployer warDeploy = new WebAppDeployer();
+//      warDeploy.setAllowDuplicates(false);
+//      warDeploy.setExtract(true);
+//      warDeploy.setWebAppDir("/work/willuhn/eclipse/jameica.webadmin/lib/webapps");
+//      warDeploy.setContexts(collection);
+//      warDeploy.setConfigurationClasses(new String[] { 
+//          "org.mortbay.jetty.webapp.WebInfConfiguration", 
+//          "org.mortbay.jetty.webapp.WebXmlConfiguration", 
+//          "org.mortbay.jetty.webapp.JettyWebXmlConfiguration",
+//          "org.mortbay.jetty.webapp.TagLibConfiguration",
+//          "org.mortbay.jetty.plus.webapp.EnvConfiguration"
+//      });
+//      warDeploy.setParentLoaderPriority(false);
+      
+      HandlerCollection handlers = new HandlerCollection();
+      handlers.addHandler(collection);
+      handlers.addHandler(new DefaultHandler());
+
       if (Settings.getUseAuth())
       {
         Logger.info("activating authentication");
@@ -141,14 +148,15 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
         sh.setConstraintMappings(new ConstraintMapping[]{cm});
 
         // Authentifizierung drum rum wrappen
-        sh.setHandler(context);
+        sh.setHandler(handlers);
         this.server.setHandler(sh);
       }
       else
       {
         // Ansonsten direkt die Haendler-Liste an den Server geben
-        this.server.setHandler(context);
+        this.server.setHandler(handlers);
       }
+      
       
       this.server.start();
     }
@@ -186,6 +194,9 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
 
 /**********************************************************************
  * $Log: HttpServiceImpl.java,v $
+ * Revision 1.14  2007/05/15 11:21:12  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.13  2007/05/15 00:22:20  willuhn
  * @N Vorbereitung fuer WAR-Deployment
  *

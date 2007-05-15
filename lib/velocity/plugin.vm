@@ -1,8 +1,8 @@
 
 <div id="breadcrumbs">
-  <a href="/">Index</a>
+  <a href="/webadmin/">Index</a>
   &raquo;
-  <a href="/plugin?plugin=$!{plugin.Name}">$!{plugin.Name}</a>
+  <a href="plugin?plugin=$!{plugin.Name}">$!{plugin.Name}</a>
 </div>
 
 <table class="data">
@@ -45,10 +45,10 @@
 
       #if($!{instance.isStarted()})
         <td style="color:#46824A">gestartet</td>
-        <td><a onclick="return window.confirm('Service $!{service.Name} wirklich stoppen?');" href="/plugin?plugin=$!{plugin.Name}&service=$!{service.Name}&action=stop">Stoppen</a>
+        <td><a onclick="return window.confirm('Service $!{service.Name} wirklich stoppen?');" href="plugin?plugin=$!{plugin.Name}&service=$!{service.Name}&action=stop">Stoppen</a>
       #else
         <td style="color:#6E1416">NICHT gestartet</td>
-        <td><a href="/plugin?plugin=$!{plugin.Name}&service=$!{service.Name}&action=start">Starten</a>
+        <td><a href="plugin?plugin=$!{plugin.Name}&service=$!{service.Name}&action=start">Starten</a>
       #end
     </tr>
   #end
