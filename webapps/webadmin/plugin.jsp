@@ -67,6 +67,7 @@
 <h2>Services</h2>
 <table class="data">
   <tr>
+    <th>Identifier</th>
     <th>Name</th>
     <th>Klasse</th>
     <th>Abhängigkeiten</th>
@@ -82,6 +83,7 @@
       %>
 		    <tr>
 		      <td><%= __serviceList[i].getName() %></td>
+		      <td><%= si.getName() %></td>
 		      <td><%= __serviceList[i].getClassname() %></td>
 		      <td>
 		        <% for (int k=0;k<deps.length;++k) { %>
@@ -92,10 +94,10 @@
 		
 		      <% if (si.isStarted()) { %>
 		        <td style="color:#46824A">gestartet</td>
-		        <td><a onclick="return window.confirm('Service <%= si.getName() %> wirklich stoppen?');" href="plugin.jsp?plugin=<%= __pluginName %>&service=<%= si.getName() %>&action=stop">Stoppen</a>
+		        <td><a onclick="return window.confirm('Service <%= __serviceList[i].getName() %> wirklich stoppen?');" href="plugin.jsp?plugin=<%= __pluginName %>&service=<%= __serviceList[i].getName() %>&action=stop">Stoppen</a>
 		      <% } else { %>
 		        <td style="color:#6E1416">NICHT gestartet</td>
-		        <td><a href="plugin.jsp?plugin=<%= __pluginName %>&service=<%= si.getName() %>&action=start">Starten</a>
+		        <td><a href="plugin.jsp?plugin=<%= __pluginName %>&service=<%= __serviceList[i].getName() %>&action=start">Starten</a>
 		      <% } %>
 		    </tr>
       <%
