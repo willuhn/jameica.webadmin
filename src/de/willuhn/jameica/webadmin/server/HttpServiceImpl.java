@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/server/HttpServiceImpl.java,v $
- * $Revision: 1.12 $
- * $Date: 2007/05/14 23:42:36 $
+ * $Revision: 1.13 $
+ * $Date: 2007/05/15 00:22:20 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -18,9 +18,11 @@ import java.rmi.server.UnicastRemoteObject;
 
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
+import org.mortbay.jetty.deployer.WebAppDeployer;
 import org.mortbay.jetty.security.Constraint;
 import org.mortbay.jetty.security.ConstraintMapping;
 import org.mortbay.jetty.security.SecurityHandler;
+import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHandler;
 
 import de.willuhn.jameica.webadmin.Settings;
@@ -93,15 +95,38 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
         this.server.setConnectors(new Connector[]{new JameicaSocketConnector()});
 
       // Servlets
-      ServletHandler handler = new ServletHandler();
+//      ServletHandler handler = new ServletHandler();
 
-      handler.addServletWithMapping(ResourceServlet.class, "/res/*");
-      handler.addServletWithMapping(ResourceServlet.class, "/img/*");
-      handler.addServletWithMapping(RootServlet.class,     "/");
-      handler.addServletWithMapping(PluginServlet.class,   "/plugin");
+      Logger.info("deploy admin console");
+//      handler.addServletWithMapping(ResourceServlet.class, "/res/*");
+//      handler.addServletWithMapping(ResourceServlet.class, "/img/*");
+//      handler.addServletWithMapping(RootServlet.class,     "/");
+//      handler.addServletWithMapping(PluginServlet.class,   "/plugin");
+
+      Context context = new Context(server,"/",Context.ALL);
+      context.addServlet(ResourceServlet.class, "/res/*");
+      context.addServlet(ResourceServlet.class, "/img/*");
+      context.addServlet(RootServlet.class,     "/");
+      context.addServlet(PluginServlet.class,   "/plugin");
+
+      Logger.info("deploy webapps");
+      WebAppDeployer warDeploy = new WebAppDeployer();
+      warDeploy.setAllowDuplicates(false);
+      warDeploy.setExtract(true);
+      // warDeploy.setWebAppDir("/work/willuhn/eclipse/jameica.webadmin/lib/webapps");
+      warDeploy.setContexts(context);
+      warDeploy.setConfigurationClasses(new String[] { 
+          "org.mortbay.jetty.webapp.WebInfConfiguration", 
+          "org.mortbay.jetty.webapp.WebXmlConfiguration", 
+          "org.mortbay.jetty.webapp.JettyWebXmlConfiguration",
+          "org.mortbay.jetty.webapp.TagLibConfiguration",
+          "org.mortbay.jetty.plus.webapp.EnvConfiguration"
+      });
+      warDeploy.setParentLoaderPriority(false);
       
       if (Settings.getUseAuth())
       {
+        Logger.info("activating authentication");
         Constraint constraint = new Constraint();
         constraint.setName(Constraint.__BASIC_AUTH);;
         constraint.setRoles(new String[]{"admin"});
@@ -116,13 +141,13 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
         sh.setConstraintMappings(new ConstraintMapping[]{cm});
 
         // Authentifizierung drum rum wrappen
-        sh.setHandler(handler);
+        sh.setHandler(context);
         this.server.setHandler(sh);
       }
       else
       {
         // Ansonsten direkt die Haendler-Liste an den Server geben
-        this.server.setHandler(handler);
+        this.server.setHandler(context);
       }
       
       this.server.start();
@@ -161,6 +186,9 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
 
 /**********************************************************************
  * $Log: HttpServiceImpl.java,v $
+ * Revision 1.13  2007/05/15 00:22:20  willuhn
+ * @N Vorbereitung fuer WAR-Deployment
+ *
  * Revision 1.12  2007/05/14 23:42:36  willuhn
  * @R removed GWT - sucks!
  *
