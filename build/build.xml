@@ -48,7 +48,6 @@
 		<property name="project.zipdir" 			  value="${project.release}/${define.pluginname}" />
 
 		<property name="src.dir" 					      value="src" />
-		<property name="res.dir" 						    value="${src.dir}/res" />
 		<property name="lib.dir" 					      value="lib" />
 		<property name="class.dir" 					    value="${project.tmp}/bin" />
 
@@ -59,7 +58,6 @@
 			<pathelement location="../jameica/releases/jameica-lib.jar" />
 			<pathelement location="../jameica/lib/de_willuhn_ds/de_willuhn_ds.jar" />
 			<pathelement location="../jameica/lib/de_willuhn_util/de_willuhn_util.jar" />
-			<pathelement location="../jameica/lib/velocity/velocity-1.4.jar" />
       <fileset dir="${lib.dir}">
         <include name="**/*.jar" />
       </fileset>
@@ -85,10 +83,6 @@
 			<include name="**/*.class" />
 			<classpath refid="compilepath" />
 		</rmic>
-
-		<copy todir="${class.dir}/res">
-			<fileset dir="${res.dir}" />
-		</copy>
 
 	</target>
 
@@ -125,6 +119,11 @@
 		<copy todir="${project.zipdir}/lib">
 			<fileset dir="${lib.dir}" />
 		</copy>
+
+      <mkdir dir="${project.zipdir}/webapps" />
+      <copy todir="${project.zipdir}/webapps">
+        <fileset dir="webapps" />
+      </copy>
 
     <copy file="plugin.xml" todir="${project.zipdir}" />
 		<copy file="${build.dir}/COPYING" todir="${project.zipdir}" />

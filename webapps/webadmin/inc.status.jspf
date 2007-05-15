@@ -1,0 +1,27 @@
+<%@page import="de.willuhn.jameica.system.Application"%>
+<%@page import="de.willuhn.jameica.webadmin.beans.Uptime"%>
+
+<%@page import="de.willuhn.jameica.system.Config"%>
+<jsp:useBean id="uptime" class="de.willuhn.jameica.webadmin.beans.Uptime"/>
+
+<h2>System-Status</h2>
+<table class="data">
+  <tr>
+    <td>Version</td>
+    <td>
+      <%= Application.getManifest().getVersion() %>
+      <%= Application.getManifest().getBuildnumber() %>
+  </tr>
+  <tr>
+    <td>Uptime</td>
+    <td>
+      <jsp:getProperty name="uptime" property="uptime"/>
+      <br/>
+      Server-Start: <jsp:getProperty name="uptime" property="started"/>
+    </td>
+  </tr>
+  <tr>
+    <td>Benutzer-Verzeichnis</td>
+    <td><%= Application.getConfig().getWorkDir() %></td>
+  </tr>
+</table>

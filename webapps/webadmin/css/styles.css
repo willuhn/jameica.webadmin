@@ -1,0 +1,112 @@
+body
+{
+  background-image        : url("../img/panel-reverse.gif");
+  background-repeat       : repeat-x;
+  margin                  : 10px;
+  font-family             : Verdana, Helvetica, Arial;
+  font-size               : 9pt;
+}
+
+p,h1,h2,h3,h4,ul,ol,li,div,td,th,address,blockquote,nobr,b,i {
+  font-family             : Verdana, Helvetica, Arial;
+  font-size               : 9pt;
+}
+
+table {
+}
+th {
+  text-align               : left;
+}
+td {
+  vertical-align           : top;
+  text-align               : left;
+}
+
+ol,ul {
+  list-style-position      : outside;
+  margin-top               : 5px;
+  margin-bottom            : 10px;
+}
+
+ul {
+  list-style-type          : disk;
+}
+
+li {
+  margin                    : 20px;
+}
+
+h1 {
+  color                    : #d76B00;
+  font-weight              : bold;
+  font-size                : 12pt;
+  margin-top               : 10px;
+}
+
+h2 {
+  color                    : #909090;
+  font-weight              : bold;
+  font-size                : 11pt;
+  margin-top               : 10px;
+}
+
+pre {
+  font-family              : "BitStream Vera Sans Mono", "Terminal [DEC]", "Courier New", "Courier";
+  font-size                : 8pt;
+}
+
+a:link  {
+  color                    : #000088;
+  text-decoration          : none;
+}
+
+a:visited  {
+  color                    : #000088;
+  text-decoration          : none;
+}
+
+a:hover {
+  color                    : #0000dd;
+  text-decoration          : none;
+}
+
+a:active {
+  color                    : #0000dd;
+  text-decoration          : none;
+}
+
+a:focus {
+  color                    : #0000dd;
+  text-decoration          : none;
+}
+
+
+table.data {
+  width                    : 100%;
+  border                   : 1px solid #E0E0E0;
+  margin-top               : 14px;
+  margin-bottom            : 14px;
+}
+table.data th {
+  background-color         : #b0b0a0;
+  background-image         : url("../img/panel-reverse.gif");
+  background-repeat        : repeat-x;
+  color                    : #440000;
+  padding-left             : 3px;
+  padding-right            : 10px;
+}
+table.data td {
+  font-size                : 7pt;
+  background               : #f8f8f8;
+  margin                   : 0px;
+  padding-left             : 3px;
+  padding-right            : 3px;
+  color                    : #505050;
+}
+
+#breadcrumbs {
+  border-top               : 1 px solid #d76B00;
+  background               : #f9f9f9;
+  padding-left             : 5px;
+  color                    : #000088;
+}

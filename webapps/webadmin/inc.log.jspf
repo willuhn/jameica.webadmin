@@ -1,0 +1,47 @@
+<%@page import="de.willuhn.logging.Logger"%>
+<%@page import="de.willuhn.logging.Level"%>
+<%@page import="de.willuhn.logging.Message"%>
+<%@page import="java.text.DateFormat"%>
+<%@page import="java.text.SimpleDateFormat"%>
+<style>
+    /* Log-Levels einfaerben */
+    table.data tr.DEBUG td {
+      color                    : #46824A;
+    }
+    table.data tr.INFO td {
+      color                    : #46824A;
+    }
+    table.data tr.WARN td {
+      color                    : #5770B2;
+    }
+    table.data tr.ERR td {
+      color                    : #6E1416;
+      background               : #FFAC95;
+    }
+</style>
+
+<h2>System-Log</h2>
+<div style="border: 1px solid #e0e0e0; width:990px;height:160px;overflow:auto; overflow-y:auto;overflow-x:hidden">
+  <table class="data" style="border:none; margin:0px;padding:0px;">
+    <tr>
+      <th>Datum</th>
+      <th>Quelle</th>
+      <th>Text</th>
+    </tr>
+    
+    <%
+      DateFormat __logDf   = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+      Message[] __logLines = Logger.getLastLines();
+      for (int i=0;i<__logLines.length;++i)
+      {
+        %>
+		      <tr class="<%= __logLines[i].getLevel().getName() %>">
+		        <td style="white-space:nowrap;"><%= __logDf.format(__logLines[i].getDate()) %></td>
+		        <td><pre><%= __logLines[i].getLoggingClass() %>.<%=__logLines[i].getLoggingMethod() %></pre></td>
+		        <td><pre><%= __logLines[i].getText() %></pre></td>
+		      </tr>
+        <%
+      }
+    %>
+  </table>
+</div>

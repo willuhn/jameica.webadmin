@@ -1,0 +1,26 @@
+<%@page import="de.willuhn.jameica.system.Application"%>
+
+<h2>System-Nachrichten</h2>
+
+<%
+  String[] __msgList = Application.getWelcomeMessages();
+  if (__msgList != null && __msgList.length > 0)
+  {
+    %>
+      
+      <table class="data">
+        <% for (int i=0;i<__msgList.length;++i) { %>
+			    <tr>
+			      <td><%= __msgList[i] %></td>
+			    </tr>
+        <% } %>
+      </table>
+    <%
+  }
+  else
+  {
+    %>
+      <table class="data"><tr><td>Keine System-Nachrichten</td></tr></table>
+    <%
+  }
+%>

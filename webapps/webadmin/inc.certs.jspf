@@ -1,0 +1,34 @@
+<%@page import="de.willuhn.jameica.system.Application"%>
+
+<%@page import="java.security.cert.X509Certificate"%>
+<%@page import="de.willuhn.jameica.security.Principal"%>
+<%@page import="java.text.DateFormat"%>
+<%@page import="java.text.SimpleDateFormat"%>
+<%@page import="de.willuhn.jameica.security.Certificate"%>
+
+<h2>Installierte Zertifikate</h2>
+<table class="data">
+  <tr>
+    <th>Ausgestellt für</th>
+    <th>Gültigkeit</th>
+  </tr>
+  <%
+    DateFormat __certDf = new SimpleDateFormat("dd.MM.yyyy");
+    X509Certificate[] __certList = Application.getSSLFactory().getTrustedCertificates();
+    for (int i=0;i<__certList.length;++i)
+    {
+      Certificate cert = new Certificate(__certList[i]);
+      %>
+	      <tr>
+		      <td>
+		        <a title="Klicken für Details" href="cert.jsp?cert=<%= cert.getSHA1Fingerprint() %>"><%= cert.getSubject().getAttribute(Principal.COMMON_NAME)%></a>
+		      </td>
+		      <td>
+		        <%= __certDf.format(__certList[i].getNotBefore()) %> -
+		        <%= __certDf.format(__certList[i].getNotAfter()) %>
+		      </td>
+		    </tr>
+		  <%
+    }
+  %>
+</table>
