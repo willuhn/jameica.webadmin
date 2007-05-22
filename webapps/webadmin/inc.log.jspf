@@ -3,6 +3,8 @@
 <%@page import="de.willuhn.logging.Message"%>
 <%@page import="java.text.DateFormat"%>
 <%@page import="java.text.SimpleDateFormat"%>
+<%@page import="java.util.Collections"%>
+<%@page import="java.lang.reflect.Array"%>
 <style>
     /* Log-Levels einfaerben */
     table.data tr.DEBUG td {
@@ -32,12 +34,14 @@
     <%
       DateFormat __logDf   = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
       Message[] __logLines = Logger.getLastLines();
-      for (int i=0;i<__logLines.length;++i)
+      for (int i=__logLines.length-1;i>=0;--i)
       {
+        String loggingClass = __logLines[i].getLoggingClass();
+        loggingClass = loggingClass.substring(loggingClass.lastIndexOf('.')+1);
         %>
 		      <tr class="<%= __logLines[i].getLevel().getName() %>">
 		        <td style="white-space:nowrap;"><%= __logDf.format(__logLines[i].getDate()) %></td>
-		        <td><pre><%= __logLines[i].getLoggingClass() %>.<%=__logLines[i].getLoggingMethod() %></pre></td>
+		        <td><pre><%= loggingClass %></pre></td>
 		        <td><pre><%= __logLines[i].getText() %></pre></td>
 		      </tr>
         <%
