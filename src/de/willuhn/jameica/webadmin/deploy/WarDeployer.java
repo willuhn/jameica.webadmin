@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/deploy/WarDeployer.java,v $
- * $Revision: 1.1 $
- * $Date: 2007/05/15 13:42:36 $
+ * $Revision: 1.2 $
+ * $Date: 2007/06/01 09:36:23 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -59,7 +59,7 @@ public class WarDeployer implements Deployer
       if (wars == null || wars.length == 0)
       {
         Logger.info("no war files found in " + dir.getAbsolutePath());
-        return;
+        continue;
       }
 
       for (int k=0;k<wars.length;++k)
@@ -87,6 +87,9 @@ public class WarDeployer implements Deployer
 
 /*********************************************************************
  * $Log: WarDeployer.java,v $
+ * Revision 1.2  2007/06/01 09:36:23  willuhn
+ * @B war deployer bricht mit der Suche zu frueh ab
+ *
  * Revision 1.1  2007/05/15 13:42:36  willuhn
  * @N Deployment von Webapps, WARs fertig und konfigurierbar
  *
