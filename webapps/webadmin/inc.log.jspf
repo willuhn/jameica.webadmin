@@ -16,7 +16,7 @@
     table.data tr.WARN td {
       color                    : #5770B2;
     }
-    table.data tr.ERR td {
+    table.data tr.ERROR td {
       color                    : #6E1416;
       background               : #FFAC95;
     }
