@@ -23,7 +23,7 @@
 </style>
 
 <h2>System-Log</h2>
-<div style="border: 1px solid #e0e0e0; width:990px;height:160px;overflow:auto; overflow-y:auto;overflow-x:hidden">
+<div style="border: 1px solid #a5a5a5;height:180px;overflow:auto; overflow-y:auto;overflow-x:hidden">
   <table class="data" style="border:none; margin:0px;padding:0px;">
     <tr>
       <th>Datum</th>
@@ -39,8 +39,8 @@
         String loggingClass = __logLines[i].getLoggingClass();
         loggingClass = loggingClass.substring(loggingClass.lastIndexOf('.')+1);
         %>
-		      <tr class="<%= __logLines[i].getLevel().getName() %>">
-		        <td style="white-space:nowrap;"><%= __logDf.format(__logLines[i].getDate()) %></td>
+		      <tr onmouseover="change_to(this);" onmouseout="change_back(this);" class="<%= __logLines[i].getLevel().getName() %>">
+		        <td style="white-space:nowrap;"><pre><%= __logDf.format(__logLines[i].getDate()) %></pre></td>
 		        <td><pre><%= loggingClass %></pre></td>
 		        <td><pre><%= __logLines[i].getText() %></pre></td>
 		      </tr>

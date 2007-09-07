@@ -1,15 +1,15 @@
 body
 {
-  background-image        : url("../img/panel-reverse.gif");
+  background-image        : url("/webadmin/img/panel-reverse.gif");
   background-repeat       : repeat-x;
   margin                  : 10px;
-  font-family             : Verdana, Helvetica, Arial;
-  font-size               : 9pt;
+  font-family             : Tahoma, Arial, Verdana, Geneva, Helvetica, Sans;
+  font-size								: 8.5pt;
 }
 
 p,h1,h2,h3,h4,ul,ol,li,div,td,th,address,blockquote,nobr,b,i {
-  font-family             : Verdana, Helvetica, Arial;
-  font-size               : 9pt;
+  font-family             : Tahoma, Arial, Verdana, Geneva, Helvetica, Sans;
+  font-size								: 8.5pt;
 }
 
 table {
@@ -29,7 +29,7 @@ ol,ul {
 }
 
 ul {
-  list-style-type          : disk;
+  list-style-type          : disc;
 }
 
 li {
@@ -39,20 +39,21 @@ li {
 h1 {
   color                    : #d76B00;
   font-weight              : bold;
-  font-size                : 12pt;
+  font-size                : 11pt;
   margin-top               : 10px;
 }
 
 h2 {
   color                    : #909090;
   font-weight              : bold;
-  font-size                : 11pt;
+  font-size                : 10pt;
   margin-top               : 10px;
 }
 
 pre {
-  font-family              : "BitStream Vera Sans Mono", "Terminal [DEC]", "Courier New", "Courier";
-  font-size                : 8pt;
+  font-family              : "DejaVu Sans Mono", "BitStream Vera Sans Mono", "Terminal [DEC]", "Courier New", "Courier";
+  font-size                : 8.0pt;
+  margin                   : 1px;
 }
 
 a:link  {
@@ -83,30 +84,73 @@ a:focus {
 
 table.data {
   width                    : 100%;
-  border                   : 1px solid #E0E0E0;
-  margin-top               : 14px;
-  margin-bottom            : 14px;
+  border                   : 1px solid #a5a5a5;
 }
+
 table.data th {
-  background-color         : #b0b0a0;
-  background-image         : url("../img/panel-reverse.gif");
+  background-image         : url("/webadmin/img/panel-blue.gif");
   background-repeat        : repeat-x;
-  color                    : #440000;
-  padding-left             : 3px;
-  padding-right            : 10px;
+  color                    : #ffffff;
+  padding                  : 1px 4px 1px 5px;
+  text-align               : left;
+  font-weight              : normal;
+  border                   : none;
 }
-table.data td {
-  font-size                : 7pt;
-  background               : #f8f8f8;
-  margin                   : 0px;
-  padding-left             : 3px;
-  padding-right            : 3px;
+table.data tr {
+  background               : #F7F7F0;
   color                    : #505050;
+}
+table.data tr.highlight {
+  background               : #F7E9CB;
+  color                    : #000090;
+}
+
+table.data tr.locked {
+  background               : #F7F7F0;
+  color                    : #C5C5C0;
+}
+
+table.data td {
+  padding                  : 1px;
+  text-align               : left;
+  vertical-align           : top;
+}
+
+table.data td.filter {
+  padding                  : 1px 4px 1px 5px;
+  background               : #fbfbfb;
+  background-image         : url('/webadmin/img/panel-gray-reverse.gif');
+  background-repeat        : repeat-x;
+  text-align               : left;
+  vertical-align           : top;
+}
+
+table.data td.footer {
+	color                    : #999999;
+  padding                  : 1px 4px 1px 5px;
+  background-color         : #d0d0d0;
+  background-image         : url('/webadmin/img/panel-gray.gif');
+  background-repeat        : repeat-x;
+  text-align               : right;
+  vertical-align           : top;
 }
 
 #breadcrumbs {
-  border-top               : 1 px solid #d76B00;
+  border-top               : 1px solid #d76B00;
   background               : #f9f9f9;
   padding-left             : 5px;
   color                    : #000088;
 }
+
+span.small {
+	font-size                : 8pt;
+}
+
+div.note {
+	margin                   : 5px 0px 5px 0px;
+  padding                  : 1px 5px 1px 5px;
+  border                   : 1px solid #E0E0E0;
+  color                    : #800000;
+	font-size                : 8pt;
+}
+

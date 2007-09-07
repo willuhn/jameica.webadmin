@@ -49,6 +49,10 @@
   <a href="plugin.jsp?plugin=<%= __pluginName %>">Plugin <%= __pluginName %></a>
 </div>
 
+<h2>Plugin <%= __pluginName %></h2>
+
+<h3>Kenndaten</h3>
+
 <table class="data">
   <tr>
     <td>Beschreibung</td>
@@ -64,7 +68,8 @@
   </tr>
 </table>
 
-<h2>Services</h2>
+<h3>Services</h3>
+
 <table class="data">
   <tr>
     <th>Identifier</th>
@@ -81,7 +86,7 @@
       Service si = Application.getServiceFactory().lookup(__pluginClass,__serviceList[i].getName());
       String[] deps = __serviceList[i].depends();
       %>
-		    <tr>
+		    <tr onmouseover="change_to(this);" onmouseout="change_back(this);">
 		      <td><%= __serviceList[i].getName() %></td>
 		      <td><%= si.getName() %></td>
 		      <td><%= __serviceList[i].getClassname() %></td>

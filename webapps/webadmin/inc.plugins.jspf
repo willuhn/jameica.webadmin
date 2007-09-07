@@ -15,7 +15,7 @@
     {
       Manifest mf = (Manifest) manifests.get(i);
       %>
-		    <tr>
+		    <tr onmouseover="change_to(this);" onmouseout="change_back(this);">
 		      <td><a title="Klicken für Details" href="plugin.jsp?plugin=<%= mf.getName() %>"><%= mf.getName() %></a></td>
 		      <td><%= mf.getVersion() %> [Build <%= mf.getBuildnumber() %>]</td>
 		      <td><%= mf.getDescription() %></td>

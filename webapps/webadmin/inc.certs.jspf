@@ -19,7 +19,7 @@
     {
       Certificate cert = new Certificate(__certList[i]);
       %>
-	      <tr>
+		    <tr onmouseover="change_to(this);" onmouseout="change_back(this);">
 		      <td>
 		        <a title="Klicken für Details" href="cert.jsp?cert=<%= cert.getSHA1Fingerprint() %>"><%= cert.getSubject().getAttribute(Principal.COMMON_NAME)%></a>
 		      </td>
