@@ -4,7 +4,7 @@
   <a href="/webadmin/">Index</a>
 </div>
 
-<table>
+<table style="width:100%">
   <tr>
     <td style="border-right:1px dotted #909090;padding-right: 20px;width:650px">
       <%@ include file="inc.status.jspf" %>

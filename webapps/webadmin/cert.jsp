@@ -32,6 +32,8 @@
   <a href="cert.jsp?cert=<%= __certFp %>">Zertifikat <%= __cert.getSubject().getAttribute(Principal.COMMON_NAME) %></a>
 </div>
 
+<h2>Zertifikat <%= __cert.getSubject().getAttribute(Principal.COMMON_NAME) %></h2>
+
 <table class="data">
   <tr>
     <th>Namea</th>
