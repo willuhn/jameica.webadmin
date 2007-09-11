@@ -56,3 +56,5 @@
     </td>
   </tr>
 </table>
+
+<%@ include file="inc.bottom.jspf" %>
