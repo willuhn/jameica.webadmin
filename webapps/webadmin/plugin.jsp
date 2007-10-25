@@ -81,7 +81,7 @@
   </tr>
   <%
     ServiceDescriptor[] __serviceList = __pluginMf.getServices();
-  if (___serviceList != null)
+  if (__serviceList != null)
   {
     for (int i=0;i<__serviceList.length;++i)
     {
