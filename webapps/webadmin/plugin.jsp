@@ -81,32 +81,35 @@
   </tr>
   <%
     ServiceDescriptor[] __serviceList = __pluginMf.getServices();
+  if (___serviceList != null)
+  {
     for (int i=0;i<__serviceList.length;++i)
     {
       Service si = Application.getServiceFactory().lookup(__pluginClass,__serviceList[i].getName());
       String[] deps = __serviceList[i].depends();
       %>
-		    <tr onmouseover="change_to(this);" onmouseout="change_back(this);">
-		      <td><%= __serviceList[i].getName() %></td>
-		      <td><%= si.getName() %></td>
-		      <td><%= __serviceList[i].getClassname() %></td>
-		      <td>
-		        <% for (int k=0;k<deps.length;++k) { %>
-		          <%= deps[k] %>
-		          <br/>
-		        <% } %>
-		      </td>
-		
-		      <% if (si.isStarted()) { %>
-		        <td style="color:#46824A">gestartet</td>
-		        <td><a onclick="return window.confirm('Service <%= __serviceList[i].getName() %> wirklich stoppen?');" href="plugin.jsp?plugin=<%= __pluginName %>&service=<%= __serviceList[i].getName() %>&action=stop">Stoppen</a>
-		      <% } else { %>
-		        <td style="color:#6E1416">NICHT gestartet</td>
-		        <td><a href="plugin.jsp?plugin=<%= __pluginName %>&service=<%= __serviceList[i].getName() %>&action=start">Starten</a>
-		      <% } %>
-		    </tr>
+        <tr onmouseover="change_to(this);" onmouseout="change_back(this);">
+          <td><%= __serviceList[i].getName() %></td>
+          <td><%= si.getName() %></td>
+          <td><%= __serviceList[i].getClassname() %></td>
+          <td>
+            <% for (int k=0;k<deps.length;++k) { %>
+              <%= deps[k] %>
+              <br/>
+            <% } %>
+          </td>
+    
+          <% if (si.isStarted()) { %>
+            <td style="color:#46824A">gestartet</td>
+            <td><a onclick="return window.confirm('Service <%= __serviceList[i].getName() %> wirklich stoppen?');" href="plugin.jsp?plugin=<%= __pluginName %>&service=<%= __serviceList[i].getName() %>&action=stop">Stoppen</a>
+          <% } else { %>
+            <td style="color:#6E1416">NICHT gestartet</td>
+            <td><a href="plugin.jsp?plugin=<%= __pluginName %>&service=<%= __serviceList[i].getName() %>&action=start">Starten</a>
+          <% } %>
+        </tr>
       <%
     }
+  }
   %>
 </table>
 
