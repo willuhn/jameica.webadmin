@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/Plugin.java,v $
- * $Revision: 1.1 $
- * $Date: 2007/04/10 00:11:39 $
+ * $Revision: 1.2 $
+ * $Date: 2007/11/16 18:33:56 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -13,10 +13,7 @@
 
 package de.willuhn.jameica.webadmin;
 
-import java.io.File;
-
 import de.willuhn.jameica.plugin.AbstractPlugin;
-import de.willuhn.util.ApplicationException;
 
 
 /**
@@ -27,46 +24,20 @@ public class Plugin extends AbstractPlugin
 
   /**
    * ct.
-   * @param file
    */
-  public Plugin(File file)
+  public Plugin()
   {
-    super(file);
+    super();
   }
-
-  /**
-   * @see de.willuhn.jameica.plugin.AbstractPlugin#init()
-   */
-  public void init() throws ApplicationException
-  {
-  }
-
-  /**
-   * @see de.willuhn.jameica.plugin.AbstractPlugin#install()
-   */
-  public void install() throws ApplicationException
-  {
-  }
-
-  /**
-   * @see de.willuhn.jameica.plugin.AbstractPlugin#shutDown()
-   */
-  public void shutDown()
-  {
-  }
-
-  /**
-   * @see de.willuhn.jameica.plugin.AbstractPlugin#update(double)
-   */
-  public void update(double oldVersion) throws ApplicationException
-  {
-  }
-
 }
 
 
 /**********************************************************************
  * $Log: Plugin.java,v $
+ * Revision 1.2  2007/11/16 18:33:56  willuhn
+ * @D javadoc fixed
+ * @R removed unused methods/deprecated methods
+ *
  * Revision 1.1  2007/04/10 00:11:39  willuhn
  * *** empty log message ***
  *
