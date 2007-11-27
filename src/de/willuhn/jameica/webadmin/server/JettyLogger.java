@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/server/Attic/JettyLogger.java,v $
- * $Revision: 1.1 $
- * $Date: 2007/04/12 13:35:17 $
+ * $Revision: 1.2 $
+ * $Date: 2007/11/27 16:28:52 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -102,7 +102,15 @@ public class JettyLogger implements Logger
     msg = msg.replaceFirst("\\{\\}","{0}");
     msg = msg.replaceFirst("\\{\\}","{1}");
     
-    return MessageFormat.format(msg,new Object[]{param1,param2});
+    try
+    {
+      return MessageFormat.format(msg,new Object[]{param1,param2});
+    }
+    catch (Exception e)
+    {
+      // ignore
+    }
+    return msg;
   }
 
   /**
@@ -120,6 +128,9 @@ public class JettyLogger implements Logger
 
 /**********************************************************************
  * $Log: JettyLogger.java,v $
+ * Revision 1.2  2007/11/27 16:28:52  willuhn
+ * @B ignore errors while formatting merssages
+ *
  * Revision 1.1  2007/04/12 13:35:17  willuhn
  * @N SSL-Support
  * @N Authentifizierung
