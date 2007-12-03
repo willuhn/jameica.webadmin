@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/deploy/WarDeployer.java,v $
- * $Revision: 1.2 $
- * $Date: 2007/06/01 09:36:23 $
+ * $Revision: 1.3 $
+ * $Date: 2007/12/03 19:00:19 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -14,12 +14,10 @@
 package de.willuhn.jameica.webadmin.deploy;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.mortbay.jetty.HandlerContainer;
 import org.mortbay.jetty.Server;
-import org.mortbay.jetty.handler.ContextHandler;
 import org.mortbay.jetty.webapp.WebAppContext;
 
 import de.willuhn.io.FileFinder;
@@ -38,19 +36,11 @@ public class WarDeployer implements Deployer
    */
   public void deploy(Server server, HandlerContainer container)
   {
-    ArrayList dirs = new ArrayList();
-    
-    // Erstmal alle Plugins ermitteln
     List list = Application.getPluginLoader().getInstalledPlugins();
     for (int i=0;i<list.size();++i)
     {
       AbstractPlugin plugin = (AbstractPlugin) list.get(i);
-      dirs.add(new File(plugin.getResources().getPath()));
-    }
-
-    for (int i=0;i<dirs.size();++i)
-    {
-      File dir = (File) dirs.get(i);
+      File dir = new File(plugin.getResources().getPath());
 
       FileFinder finder = new FileFinder(dir);
       finder.extension("war");
@@ -71,7 +61,9 @@ public class WarDeployer implements Deployer
 
         try
         {
-          ContextHandler app = new WebAppContext(path,context);
+          WebAppContext app = new WebAppContext(path,context);
+          // TODO
+          // app.setClassLoader(plugin.getResources().getClassLoader());
           container.addHandler(app);
         }
         catch (Exception e)
@@ -87,6 +79,9 @@ public class WarDeployer implements Deployer
 
 /*********************************************************************
  * $Log: WarDeployer.java,v $
+ * Revision 1.3  2007/12/03 19:00:19  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.2  2007/06/01 09:36:23  willuhn
  * @B war deployer bricht mit der Suche zu frueh ab
  *

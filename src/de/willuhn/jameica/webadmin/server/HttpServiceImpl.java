@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/server/HttpServiceImpl.java,v $
- * $Revision: 1.15 $
- * $Date: 2007/05/15 13:42:36 $
+ * $Revision: 1.16 $
+ * $Date: 2007/12/03 19:00:19 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -118,7 +118,8 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
 
     private Worker()
     {
-      setContextClassLoader(HttpServiceImpl.this.getClass().getClassLoader());
+      ClassLoader cl = HttpServiceImpl.this.getClass().getClassLoader();
+      setContextClassLoader(cl);
     }
     
     /**
@@ -241,6 +242,9 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
 
 /**********************************************************************
  * $Log: HttpServiceImpl.java,v $
+ * Revision 1.16  2007/12/03 19:00:19  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.15  2007/05/15 13:42:36  willuhn
  * @N Deployment von Webapps, WARs fertig und konfigurierbar
  *

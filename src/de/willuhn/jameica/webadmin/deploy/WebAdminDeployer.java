@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/deploy/WebAdminDeployer.java,v $
- * $Revision: 1.2 $
- * $Date: 2007/05/15 15:33:17 $
+ * $Revision: 1.3 $
+ * $Date: 2007/12/03 19:00:19 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -40,12 +40,24 @@ public class WebAdminDeployer extends AbstractWebAppDeployer
     AbstractPlugin plugin = Application.getPluginLoader().getPlugin(Plugin.class);
     return plugin.getResources().getPath() + File.separator + "webapps" + File.separator + "webadmin";
   }
+  
+  /**
+   * @see de.willuhn.jameica.webadmin.deploy.AbstractWebAppDeployer#getContextClassLoader()
+   */
+  protected ClassLoader getContextClassLoader()
+  {
+    AbstractPlugin plugin = Application.getPluginLoader().getPlugin(Plugin.class);
+    return plugin.getResources().getClassLoader();
+  }
 
 }
 
 
 /*********************************************************************
  * $Log: WebAdminDeployer.java,v $
+ * Revision 1.3  2007/12/03 19:00:19  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.2  2007/05/15 15:33:17  willuhn
  * @N helloworld.war
  * @C Webadmin komplett auf JSP umgestellt
