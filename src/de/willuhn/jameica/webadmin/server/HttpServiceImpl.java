@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/server/HttpServiceImpl.java,v $
- * $Revision: 1.16 $
- * $Date: 2007/12/03 19:00:19 $
+ * $Revision: 1.17 $
+ * $Date: 2007/12/03 23:43:49 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -118,6 +118,7 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
 
     private Worker()
     {
+      // Ich weiss nicht warum, aber Jetty braucht das so
       ClassLoader cl = HttpServiceImpl.this.getClass().getClassLoader();
       setContextClassLoader(cl);
     }
@@ -242,6 +243,9 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
 
 /**********************************************************************
  * $Log: HttpServiceImpl.java,v $
+ * Revision 1.17  2007/12/03 23:43:49  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.16  2007/12/03 19:00:19  willuhn
  * *** empty log message ***
  *

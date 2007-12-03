@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/deploy/WarDeployer.java,v $
- * $Revision: 1.3 $
- * $Date: 2007/12/03 19:00:19 $
+ * $Revision: 1.4 $
+ * $Date: 2007/12/03 23:43:49 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -62,8 +62,6 @@ public class WarDeployer implements Deployer
         try
         {
           WebAppContext app = new WebAppContext(path,context);
-          // TODO
-          // app.setClassLoader(plugin.getResources().getClassLoader());
           container.addHandler(app);
         }
         catch (Exception e)
@@ -79,6 +77,9 @@ public class WarDeployer implements Deployer
 
 /*********************************************************************
  * $Log: WarDeployer.java,v $
+ * Revision 1.4  2007/12/03 23:43:49  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.3  2007/12/03 19:00:19  willuhn
  * *** empty log message ***
  *

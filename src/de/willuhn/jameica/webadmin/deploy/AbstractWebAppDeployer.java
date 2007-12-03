@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/deploy/AbstractWebAppDeployer.java,v $
- * $Revision: 1.2 $
- * $Date: 2007/12/03 19:00:19 $
+ * $Revision: 1.3 $
+ * $Date: 2007/12/03 23:43:49 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -36,9 +36,6 @@ public abstract class AbstractWebAppDeployer implements Deployer
 
     Logger.info("deploying " + context + " (" + path + ")");
     WebAppContext app = new WebAppContext(path,context);
-
-    // TODO
-    // app.setClassLoader(new URLClassLoader(new URL[0],getContextClassLoader()));
     container.addHandler(app);
   }
   
@@ -56,22 +53,14 @@ public abstract class AbstractWebAppDeployer implements Deployer
    * @return der Name des Context.
    */
   protected abstract String getContext();
-  
-  /**
-   * Liefert den Classloader, der fuer den Context verwendet werden soll.
-   * Ist standardmaessig der Classloader, mit dem der Deployer selbst
-   * geladen wurde. Kann jedoch ueberschrieben werden.
-   * @return der Classloader.
-   */
-  protected ClassLoader getContextClassLoader()
-  {
-    return this.getClass().getClassLoader();
-  }
 }
 
 
 /*********************************************************************
  * $Log: AbstractWebAppDeployer.java,v $
+ * Revision 1.3  2007/12/03 23:43:49  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.2  2007/12/03 19:00:19  willuhn
  * *** empty log message ***
  *
