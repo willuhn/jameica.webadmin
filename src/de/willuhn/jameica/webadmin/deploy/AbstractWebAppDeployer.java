@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/deploy/AbstractWebAppDeployer.java,v $
- * $Revision: 1.3 $
- * $Date: 2007/12/03 23:43:49 $
+ * $Revision: 1.4 $
+ * $Date: 2007/12/04 12:13:48 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -15,6 +15,10 @@ package de.willuhn.jameica.webadmin.deploy;
 
 import org.mortbay.jetty.HandlerContainer;
 import org.mortbay.jetty.Server;
+import org.mortbay.jetty.security.Constraint;
+import org.mortbay.jetty.security.ConstraintMapping;
+import org.mortbay.jetty.security.SecurityHandler;
+import org.mortbay.jetty.security.UserRealm;
 import org.mortbay.jetty.webapp.WebAppContext;
 
 import de.willuhn.logging.Logger;
@@ -36,7 +40,39 @@ public abstract class AbstractWebAppDeployer implements Deployer
 
     Logger.info("deploying " + context + " (" + path + ")");
     WebAppContext app = new WebAppContext(path,context);
-    container.addHandler(app);
+
+    UserRealm realm = getUserRealm();
+    if (realm != null)
+    {
+      Logger.info("  activating authentication");
+      Constraint constraint = new Constraint();
+      constraint.setName(Constraint.__BASIC_AUTH);
+      String[] roles = getSecurityRoles();
+      if (roles != null)
+      {
+        Logger.info("  roles:");
+        for (int i=0;i<roles.length;++i)
+        {
+          Logger.info("    " + roles[i]);
+        }
+        constraint.setRoles(roles);
+      }
+      constraint.setAuthenticate(true);
+
+      ConstraintMapping cm = new ConstraintMapping();
+      cm.setConstraint(constraint);
+      cm.setPathSpec("/*");
+
+      SecurityHandler sh = new SecurityHandler();
+      sh.setUserRealm(realm);
+      sh.setConstraintMappings(new ConstraintMapping[]{cm});
+      sh.setHandler(app);
+      container.addHandler(sh);
+    }
+    else
+    {
+      container.addHandler(app);
+    }
   }
   
   /**
@@ -53,11 +89,36 @@ public abstract class AbstractWebAppDeployer implements Deployer
    * @return der Name des Context.
    */
   protected abstract String getContext();
+  
+  /**
+   * Liefert die Benutzer-Rollen, die in der Web-Applikation zur Verfuegung stehen.
+   * Dummy-Implementierung, die keine Rollen zurueckliefert.
+   * Kann jedoch ueberschrieben werden.
+   * @return Liste der Rollen der Webanwendung. 
+   */
+  protected String[] getSecurityRoles()
+  {
+    return null;
+  }
+  
+  /**
+   * Liefert das Login-Handle, welches fuer die Web-Applikation verwendet werden soll.
+   * Dummy-Implementierung, die kein Login-Handle zurueckliefert.
+   * Kann jedoch ueberschrieben werden.
+   * @return das Login-Handle.
+   */
+  protected UserRealm getUserRealm()
+  {
+    return null;
+  }
 }
 
 
 /*********************************************************************
  * $Log: AbstractWebAppDeployer.java,v $
+ * Revision 1.4  2007/12/04 12:13:48  willuhn
+ * @N Login pro Webanwendung konfigurierbar
+ *
  * Revision 1.3  2007/12/03 23:43:49  willuhn
  * *** empty log message ***
  *

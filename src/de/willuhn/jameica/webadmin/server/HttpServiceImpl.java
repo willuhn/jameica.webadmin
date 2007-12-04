@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/server/HttpServiceImpl.java,v $
- * $Revision: 1.17 $
- * $Date: 2007/12/03 23:43:49 $
+ * $Revision: 1.18 $
+ * $Date: 2007/12/04 12:13:48 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -22,9 +22,6 @@ import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.ContextHandlerCollection;
 import org.mortbay.jetty.handler.DefaultHandler;
 import org.mortbay.jetty.handler.HandlerCollection;
-import org.mortbay.jetty.security.Constraint;
-import org.mortbay.jetty.security.ConstraintMapping;
-import org.mortbay.jetty.security.SecurityHandler;
 
 import de.willuhn.jameica.system.Application;
 import de.willuhn.jameica.webadmin.Settings;
@@ -185,34 +182,8 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
         HandlerCollection handlers = new HandlerCollection();
         handlers.addHandler(collection);
         handlers.addHandler(new DefaultHandler());
+        this.server.setHandler(handlers);
 
-        if (Settings.getUseAuth())
-        {
-          Logger.info("activating authentication");
-          Constraint constraint = new Constraint();
-          constraint.setName(Constraint.__BASIC_AUTH);;
-          constraint.setRoles(new String[]{"admin"});
-          constraint.setAuthenticate(true);
-
-          ConstraintMapping cm = new ConstraintMapping();
-          cm.setConstraint(constraint);
-          cm.setPathSpec("/*");
-
-          SecurityHandler sh = new SecurityHandler();
-          sh.setUserRealm(new JameicaUserRealm());
-          sh.setConstraintMappings(new ConstraintMapping[]{cm});
-
-          // Authentifizierung drum rum wrappen
-          sh.setHandler(handlers);
-          this.server.setHandler(sh);
-        }
-        else
-        {
-          // Ansonsten direkt die Haendler-Liste an den Server geben
-          this.server.setHandler(handlers);
-        }
-        
-        
         this.server.start();
         this.server.join();
       }
@@ -243,6 +214,9 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
 
 /**********************************************************************
  * $Log: HttpServiceImpl.java,v $
+ * Revision 1.18  2007/12/04 12:13:48  willuhn
+ * @N Login pro Webanwendung konfigurierbar
+ *
  * Revision 1.17  2007/12/03 23:43:49  willuhn
  * *** empty log message ***
  *
