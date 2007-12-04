@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/server/HttpServiceImpl.java,v $
- * $Revision: 1.18 $
- * $Date: 2007/12/04 12:13:48 $
+ * $Revision: 1.19 $
+ * $Date: 2007/12/04 18:43:27 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -15,9 +15,9 @@ package de.willuhn.jameica.webadmin.server;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
 
 import org.mortbay.jetty.Connector;
+import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.ContextHandlerCollection;
 import org.mortbay.jetty.handler.DefaultHandler;
@@ -138,7 +138,6 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
 
         ContextHandlerCollection collection = new ContextHandlerCollection();
 
-        ArrayList deployer = new ArrayList();
         try
         {
           Class[] cl = Application.getClassLoader().getClassFinder().findImplementors(Deployer.class);
@@ -146,7 +145,17 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
           {
             try
             {
-              deployer.add((Deployer) cl[i].newInstance());
+              Deployer d = (Deployer) cl[i].newInstance();
+              Handler[] handlers = d.deploy();
+              if (handlers == null || handlers.length == 0)
+              {
+                Logger.info("skipping deployer " + d.getClass() + " - contains no handlers");
+              }
+              for (int k=0;k<handlers.length;++k)
+              {
+                collection.addHandler(handlers[k]);
+              }
+              
             }
             catch (Exception e)
             {
@@ -156,28 +165,10 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
         }
         catch (ClassNotFoundException e)
         {
-          // Dann halt nicht
-        }
-        
-        if (deployer.size() == 0)
-        {
           Logger.warn("no deployers found, skipping http-server");
           return;
         }
         
-        for (int i=0;i<deployer.size();++i)
-        {
-          Deployer d = (Deployer) deployer.get(i);
-          try
-          {
-            d.deploy(this.server,collection);
-          }
-          catch (Exception e)
-          {
-            Logger.error("error while starting deployer " + d.getClass().getName() + ", skipping");
-          }
-        }
-
         // Wir erzeugen eine Handler-Collection mit Default-Handler.
         HandlerCollection handlers = new HandlerCollection();
         handlers.addHandler(collection);
@@ -214,6 +205,10 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
 
 /**********************************************************************
  * $Log: HttpServiceImpl.java,v $
+ * Revision 1.19  2007/12/04 18:43:27  willuhn
+ * @N Update auf Jetty 6.1.6
+ * @N request.getRemoteUser() geht!!
+ *
  * Revision 1.18  2007/12/04 12:13:48  willuhn
  * @N Login pro Webanwendung konfigurierbar
  *

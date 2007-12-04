@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/deploy/AbstractWebAppDeployer.java,v $
- * $Revision: 1.4 $
- * $Date: 2007/12/04 12:13:48 $
+ * $Revision: 1.5 $
+ * $Date: 2007/12/04 18:43:27 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -13,8 +13,7 @@
 
 package de.willuhn.jameica.webadmin.deploy;
 
-import org.mortbay.jetty.HandlerContainer;
-import org.mortbay.jetty.Server;
+import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.security.Constraint;
 import org.mortbay.jetty.security.ConstraintMapping;
 import org.mortbay.jetty.security.SecurityHandler;
@@ -31,9 +30,9 @@ public abstract class AbstractWebAppDeployer implements Deployer
 {
 
   /**
-   * @see de.willuhn.jameica.webadmin.deploy.Deployer#deploy(org.mortbay.jetty.Server, org.mortbay.jetty.HandlerContainer)
+   * @see de.willuhn.jameica.webadmin.deploy.Deployer#deploy()
    */
-  public final void deploy(Server server, HandlerContainer container)
+  public final Handler[] deploy()
   {
     String path    = getPath();
     String context = getContext();
@@ -42,37 +41,33 @@ public abstract class AbstractWebAppDeployer implements Deployer
     WebAppContext app = new WebAppContext(path,context);
 
     UserRealm realm = getUserRealm();
-    if (realm != null)
+    if (realm == null)
+      return new Handler[]{app};
+    
+    Logger.info("  activating authentication via " + realm.getName());
+    Constraint constraint = new Constraint();
+    constraint.setName(Constraint.__BASIC_AUTH);
+    constraint.setAuthenticate(true);
+    String[] roles = getSecurityRoles();
+    if (roles != null)
     {
-      Logger.info("  activating authentication");
-      Constraint constraint = new Constraint();
-      constraint.setName(Constraint.__BASIC_AUTH);
-      String[] roles = getSecurityRoles();
-      if (roles != null)
-      {
-        Logger.info("  roles:");
-        for (int i=0;i<roles.length;++i)
-        {
-          Logger.info("    " + roles[i]);
-        }
-        constraint.setRoles(roles);
-      }
-      constraint.setAuthenticate(true);
-
-      ConstraintMapping cm = new ConstraintMapping();
-      cm.setConstraint(constraint);
-      cm.setPathSpec("/*");
-
-      SecurityHandler sh = new SecurityHandler();
-      sh.setUserRealm(realm);
-      sh.setConstraintMappings(new ConstraintMapping[]{cm});
-      sh.setHandler(app);
-      container.addHandler(sh);
+      constraint.setRoles(roles);
     }
-    else
-    {
-      container.addHandler(app);
-    }
+
+    ConstraintMapping cm = new ConstraintMapping();
+    cm.setConstraint(constraint);
+    cm.setPathSpec("/*");
+
+    // Wir nehmen uns den Security-Handler der Webapp und passen
+    // ihne fuer uns an.
+    SecurityHandler sh = app.getSecurityHandler();
+    sh.setUserRealm(realm);
+    sh.setConstraintMappings(new ConstraintMapping[]{cm});
+    
+    // NIE WIEDER AENDERN! Sonst liefert request.getRemoteUser() null!
+    app.setSecurityHandler(sh);
+    
+    return new Handler[]{app};
   }
   
   /**
@@ -116,6 +111,10 @@ public abstract class AbstractWebAppDeployer implements Deployer
 
 /*********************************************************************
  * $Log: AbstractWebAppDeployer.java,v $
+ * Revision 1.5  2007/12/04 18:43:27  willuhn
+ * @N Update auf Jetty 6.1.6
+ * @N request.getRemoteUser() geht!!
+ *
  * Revision 1.4  2007/12/04 12:13:48  willuhn
  * @N Login pro Webanwendung konfigurierbar
  *

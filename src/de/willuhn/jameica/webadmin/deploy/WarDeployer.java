@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/deploy/WarDeployer.java,v $
- * $Revision: 1.4 $
- * $Date: 2007/12/03 23:43:49 $
+ * $Revision: 1.5 $
+ * $Date: 2007/12/04 18:43:27 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -14,10 +14,10 @@
 package de.willuhn.jameica.webadmin.deploy;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
-import org.mortbay.jetty.HandlerContainer;
-import org.mortbay.jetty.Server;
+import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.webapp.WebAppContext;
 
 import de.willuhn.io.FileFinder;
@@ -32,11 +32,14 @@ public class WarDeployer implements Deployer
 {
 
   /**
-   * @see de.willuhn.jameica.webadmin.deploy.Deployer#deploy(org.mortbay.jetty.Server, org.mortbay.jetty.HandlerContainer)
+   * @see de.willuhn.jameica.webadmin.deploy.Deployer#deploy()
    */
-  public void deploy(Server server, HandlerContainer container)
+  public Handler[] deploy()
   {
     List list = Application.getPluginLoader().getInstalledPlugins();
+
+    ArrayList handlers = new ArrayList();
+
     for (int i=0;i<list.size();++i)
     {
       AbstractPlugin plugin = (AbstractPlugin) list.get(i);
@@ -48,7 +51,7 @@ public class WarDeployer implements Deployer
       
       if (wars == null || wars.length == 0)
       {
-        Logger.info("no war files found in " + dir.getAbsolutePath());
+        Logger.debug("no war files found in " + dir.getAbsolutePath());
         continue;
       }
 
@@ -61,8 +64,7 @@ public class WarDeployer implements Deployer
 
         try
         {
-          WebAppContext app = new WebAppContext(path,context);
-          container.addHandler(app);
+          handlers.add(new WebAppContext(path,context));
         }
         catch (Exception e)
         {
@@ -70,6 +72,7 @@ public class WarDeployer implements Deployer
         }
       }
     }
+    return (Handler[]) handlers.toArray(new Handler[handlers.size()]);
   }
 
 }
@@ -77,6 +80,10 @@ public class WarDeployer implements Deployer
 
 /*********************************************************************
  * $Log: WarDeployer.java,v $
+ * Revision 1.5  2007/12/04 18:43:27  willuhn
+ * @N Update auf Jetty 6.1.6
+ * @N request.getRemoteUser() geht!!
+ *
  * Revision 1.4  2007/12/03 23:43:49  willuhn
  * *** empty log message ***
  *
