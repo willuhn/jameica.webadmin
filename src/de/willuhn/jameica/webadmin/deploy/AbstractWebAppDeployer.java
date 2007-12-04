@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/deploy/AbstractWebAppDeployer.java,v $
- * $Revision: 1.5 $
- * $Date: 2007/12/04 18:43:27 $
+ * $Revision: 1.6 $
+ * $Date: 2007/12/04 19:09:13 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -41,31 +41,30 @@ public abstract class AbstractWebAppDeployer implements Deployer
     WebAppContext app = new WebAppContext(path,context);
 
     UserRealm realm = getUserRealm();
-    if (realm == null)
-      return new Handler[]{app};
-    
-    Logger.info("  activating authentication via " + realm.getName());
-    Constraint constraint = new Constraint();
-    constraint.setName(Constraint.__BASIC_AUTH);
-    constraint.setAuthenticate(true);
-    String[] roles = getSecurityRoles();
-    if (roles != null)
+    if (realm != null)
     {
-      constraint.setRoles(roles);
+      Logger.info("  activating authentication via " + realm.getName());
+      Constraint constraint = new Constraint();
+      constraint.setName(Constraint.__BASIC_AUTH);
+      constraint.setAuthenticate(true);
+      String[] roles = getSecurityRoles();
+      if (roles != null)
+      {
+        constraint.setRoles(roles);
+      }
+
+      ConstraintMapping cm = new ConstraintMapping();
+      cm.setConstraint(constraint);
+      cm.setPathSpec("/*");
+
+      // Wir nehmen uns den Security-Handler der Webapp und passen
+      // ihne fuer uns an.
+      // NIE WIEDER AENDERN! Sonst liefert request.getRemoteUser() null!
+      SecurityHandler sh = app.getSecurityHandler();
+      sh.setUserRealm(realm);
+      sh.setConstraintMappings(new ConstraintMapping[]{cm});
+//    app.setSecurityHandler(sh);
     }
-
-    ConstraintMapping cm = new ConstraintMapping();
-    cm.setConstraint(constraint);
-    cm.setPathSpec("/*");
-
-    // Wir nehmen uns den Security-Handler der Webapp und passen
-    // ihne fuer uns an.
-    SecurityHandler sh = app.getSecurityHandler();
-    sh.setUserRealm(realm);
-    sh.setConstraintMappings(new ConstraintMapping[]{cm});
-    
-    // NIE WIEDER AENDERN! Sonst liefert request.getRemoteUser() null!
-    app.setSecurityHandler(sh);
     
     return new Handler[]{app};
   }
@@ -111,6 +110,9 @@ public abstract class AbstractWebAppDeployer implements Deployer
 
 /*********************************************************************
  * $Log: AbstractWebAppDeployer.java,v $
+ * Revision 1.6  2007/12/04 19:09:13  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.5  2007/12/04 18:43:27  willuhn
  * @N Update auf Jetty 6.1.6
  * @N request.getRemoteUser() geht!!
