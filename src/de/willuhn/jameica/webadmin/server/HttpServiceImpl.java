@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/server/HttpServiceImpl.java,v $
- * $Revision: 1.19 $
- * $Date: 2007/12/04 18:43:27 $
+ * $Revision: 1.20 $
+ * $Date: 2007/12/06 13:34:22 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -145,6 +145,7 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
           {
             try
             {
+              Logger.info("init deployer " + cl[i].getName());
               Deployer d = (Deployer) cl[i].newInstance();
               Handler[] handlers = d.deploy();
               if (handlers == null || handlers.length == 0)
@@ -205,6 +206,9 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
 
 /**********************************************************************
  * $Log: HttpServiceImpl.java,v $
+ * Revision 1.20  2007/12/06 13:34:22  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.19  2007/12/04 18:43:27  willuhn
  * @N Update auf Jetty 6.1.6
  * @N request.getRemoteUser() geht!!
