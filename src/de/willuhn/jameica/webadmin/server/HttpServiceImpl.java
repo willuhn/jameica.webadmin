@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/server/HttpServiceImpl.java,v $
- * $Revision: 1.20 $
- * $Date: 2007/12/06 13:34:22 $
+ * $Revision: 1.21 $
+ * $Date: 2008/04/04 00:16:58 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -20,7 +20,6 @@ import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.ContextHandlerCollection;
-import org.mortbay.jetty.handler.DefaultHandler;
 import org.mortbay.jetty.handler.HandlerCollection;
 
 import de.willuhn.jameica.system.Application;
@@ -173,7 +172,10 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
         // Wir erzeugen eine Handler-Collection mit Default-Handler.
         HandlerCollection handlers = new HandlerCollection();
         handlers.addHandler(collection);
-        handlers.addHandler(new DefaultHandler());
+        
+        // Liefert eine Liste der verfuegbaren Contexte auf der Startseite (Information-Leak)
+        // handlers.addHandler(new DefaultHandler());
+        
         this.server.setHandler(handlers);
 
         this.server.start();
@@ -206,6 +208,11 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
 
 /**********************************************************************
  * $Log: HttpServiceImpl.java,v $
+ * Revision 1.21  2008/04/04 00:16:58  willuhn
+ * @N Apache XML-RPC von 3.0 auf 3.1 aktualisiert
+ * @N jameica.xmlrpc ist jetzt von jameica.webadmin abhaengig
+ * @N jameica.xmlrpc nutzt jetzt keinen eigenen embedded Webserver mehr sondern den Jetty von jameica.webadmin mittels Servlet. Damit kann nun XML-RPC ueber den gleichen TCP-Port (8080) gemacht werden, wo auch die restlichen Webfrontends laufen -> spart einen TCP-Port und skaliert besser wegen Multi-Threading-Support in Jetty
+ *
  * Revision 1.20  2007/12/06 13:34:22  willuhn
  * *** empty log message ***
  *
