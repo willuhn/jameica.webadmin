@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
-<plugin name="jameica.webadmin" version="1.0" class="de.willuhn.jameica.webadmin.Plugin">
+<plugin name="jameica.webadmin" version="1.1" class="de.willuhn.jameica.webadmin.Plugin">
 
   <description>Plugin, um Jameica mittels Embedded HTTP-Server administrieren zu koennen</description>
   <url></url>
