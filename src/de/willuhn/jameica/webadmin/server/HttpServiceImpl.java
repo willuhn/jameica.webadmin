@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/server/HttpServiceImpl.java,v $
- * $Revision: 1.21 $
- * $Date: 2008/04/04 00:16:58 $
+ * $Revision: 1.22 $
+ * $Date: 2008/04/10 13:02:29 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -19,12 +19,8 @@ import java.rmi.server.UnicastRemoteObject;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Server;
-import org.mortbay.jetty.handler.ContextHandlerCollection;
-import org.mortbay.jetty.handler.HandlerCollection;
 
-import de.willuhn.jameica.system.Application;
 import de.willuhn.jameica.webadmin.Settings;
-import de.willuhn.jameica.webadmin.deploy.Deployer;
 import de.willuhn.jameica.webadmin.rmi.HttpService;
 import de.willuhn.logging.Logger;
 
@@ -34,7 +30,7 @@ import de.willuhn.logging.Logger;
  */
 public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
 {
-  private Worker worker = null;
+  private Server server = null;
 
   /**
    * @throws RemoteException
@@ -42,6 +38,28 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
   public HttpServiceImpl() throws RemoteException
   {
     super();
+  }
+
+  /**
+   * @see de.willuhn.jameica.webadmin.rmi.HttpService#addHandler(org.mortbay.jetty.Handler)
+   */
+  public void addHandler(Handler handler) throws RemoteException
+  {
+    if (!this.isStarted())
+      throw new RemoteException("unable to add handler, server not started");
+
+    this.server.addHandler(handler);
+    try
+    {
+      if (this.server.isStarted())
+        this.server.stop();
+      this.server.start();
+      Logger.info("handler added: " + handler.getClass().getName());
+    }
+    catch (Exception e)
+    {
+      throw new RemoteException("unable to start handler",e);
+    }
   }
 
   /**
@@ -65,7 +83,7 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
    */
   public boolean isStarted() throws RemoteException
   {
-    return this.worker != null;
+    return this.server != null;
   }
 
   /**
@@ -79,8 +97,18 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
       return;
     }
 
-    worker = new Worker();
-    worker.start();
+    // Logging zu uns umleiten
+    System.setProperty("org.mortbay.log.class",JettyLogger.class.getName());
+
+    Logger.info("started webserver at port " + Settings.getPort());
+    this.server = new Server(Settings.getPort());
+    
+    this.server.setStopAtShutdown(false);
+    if (Settings.getUseSSL())
+      this.server.setConnectors(new Connector[]{new JameicaSocketConnector()});
+
+    // Wir wollen keinen Default-Handler.
+    // this.server.addHandler(new DefaultHandler());
   }
 
   /**
@@ -95,7 +123,7 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
     }
     try
     {
-      this.worker.interrupt();
+      this.server.stop();
     }
     catch (Exception e)
     {
@@ -103,104 +131,7 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
     }
     finally
     {
-      this.worker = null;
-    }
-  }
-  
-  
-  private class Worker extends Thread
-  {
-    private Server server = null;
-
-    private Worker()
-    {
-      // Ich weiss nicht warum, aber Jetty braucht das so
-      ClassLoader cl = HttpServiceImpl.this.getClass().getClassLoader();
-      setContextClassLoader(cl);
-    }
-    
-    /**
-     * @see java.lang.Thread#run()
-     */
-    public void run()
-    {
-      try
-      {
-        // Logging zu uns umleiten
-        System.setProperty("org.mortbay.log.class",JettyLogger.class.getName());
-
-        Logger.info("started webserver at port " + Settings.getPort());
-        this.server = new Server(Settings.getPort());
-        this.server.setStopAtShutdown(false);
-        if (Settings.getUseSSL())
-          this.server.setConnectors(new Connector[]{new JameicaSocketConnector()});
-
-        ContextHandlerCollection collection = new ContextHandlerCollection();
-
-        try
-        {
-          Class[] cl = Application.getClassLoader().getClassFinder().findImplementors(Deployer.class);
-          for (int i=0;i<cl.length;++i)
-          {
-            try
-            {
-              Logger.info("init deployer " + cl[i].getName());
-              Deployer d = (Deployer) cl[i].newInstance();
-              Handler[] handlers = d.deploy();
-              if (handlers == null || handlers.length == 0)
-              {
-                Logger.info("skipping deployer " + d.getClass() + " - contains no handlers");
-              }
-              for (int k=0;k<handlers.length;++k)
-              {
-                collection.addHandler(handlers[k]);
-              }
-              
-            }
-            catch (Exception e)
-            {
-              Logger.error("error while loading deployer " + cl[i].getName() + ", skipping",e);
-            }
-          }
-        }
-        catch (ClassNotFoundException e)
-        {
-          Logger.warn("no deployers found, skipping http-server");
-          return;
-        }
-        
-        // Wir erzeugen eine Handler-Collection mit Default-Handler.
-        HandlerCollection handlers = new HandlerCollection();
-        handlers.addHandler(collection);
-        
-        // Liefert eine Liste der verfuegbaren Contexte auf der Startseite (Information-Leak)
-        // handlers.addHandler(new DefaultHandler());
-        
-        this.server.setHandler(handlers);
-
-        this.server.start();
-        this.server.join();
-      }
-      catch (InterruptedException ie)
-      {
-        Logger.info("http-server stopped");
-        try
-        {
-          this.server.stop();
-        }
-        catch (Exception e)
-        {
-          Logger.error("unable to stop http-server",e);
-        }
-        finally
-        {
-          this.server = null;
-        }
-      }
-      catch (Exception e)
-      {
-        Logger.error("unable to init http-server",e);
-      }
+      this.server = null;
     }
   }
 }
@@ -208,6 +139,11 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
 
 /**********************************************************************
  * $Log: HttpServiceImpl.java,v $
+ * Revision 1.22  2008/04/10 13:02:29  willuhn
+ * @N Zweischritt-Deployment. Der Server wird zwar sofort initialisiert, wenn der Jameica-Service startet, gestartet wird er aber erst, wenn die ersten Handler resgistriert werden
+ * @N damit koennen auch nachtraeglich zur Laufzeit weitere Handler hinzu registriert werden
+ * @R separater Worker in HttpServiceImpl entfernt. Der Classloader wird nun direkt von den Deployern gesetzt. Das ist wichtig, da Jetty fuer die Webanwendungen sonst den System-Classloader nutzt, welcher die Plugins nicht kennt
+ *
  * Revision 1.21  2008/04/04 00:16:58  willuhn
  * @N Apache XML-RPC von 3.0 auf 3.1 aktualisiert
  * @N jameica.xmlrpc ist jetzt von jameica.webadmin abhaengig

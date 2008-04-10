@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/deploy/WarDeployer.java,v $
- * $Revision: 1.5 $
- * $Date: 2007/12/04 18:43:27 $
+ * $Revision: 1.6 $
+ * $Date: 2008/04/10 13:02:29 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -64,7 +64,12 @@ public class WarDeployer implements Deployer
 
         try
         {
-          handlers.add(new WebAppContext(path,context));
+          final WebAppContext ctx = new WebAppContext(path,context);
+
+          // Classloader explizit angeben. Sonst verwendet Jetty den System-Classloader, der nichts kennt
+          ctx.setClassLoader(plugin.getResources().getClassLoader());
+
+          handlers.add(ctx);
         }
         catch (Exception e)
         {
@@ -80,6 +85,11 @@ public class WarDeployer implements Deployer
 
 /*********************************************************************
  * $Log: WarDeployer.java,v $
+ * Revision 1.6  2008/04/10 13:02:29  willuhn
+ * @N Zweischritt-Deployment. Der Server wird zwar sofort initialisiert, wenn der Jameica-Service startet, gestartet wird er aber erst, wenn die ersten Handler resgistriert werden
+ * @N damit koennen auch nachtraeglich zur Laufzeit weitere Handler hinzu registriert werden
+ * @R separater Worker in HttpServiceImpl entfernt. Der Classloader wird nun direkt von den Deployern gesetzt. Das ist wichtig, da Jetty fuer die Webanwendungen sonst den System-Classloader nutzt, welcher die Plugins nicht kennt
+ *
  * Revision 1.5  2007/12/04 18:43:27  willuhn
  * @N Update auf Jetty 6.1.6
  * @N request.getRemoteUser() geht!!

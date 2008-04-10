@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/deploy/AbstractServletDeployer.java,v $
- * $Revision: 1.1 $
- * $Date: 2008/04/04 00:16:58 $
+ * $Revision: 1.2 $
+ * $Date: 2008/04/10 13:02:29 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -46,6 +46,9 @@ public abstract class AbstractServletDeployer implements Deployer
 
     ContextHandler handler = new ContextHandler(context);
     handler.setHandler(sv);
+    
+    // Classloader explizit angeben. Sonst verwendet Jetty den System-Classloader, der nichts kennt
+    handler.setClassLoader(this.getClass().getClassLoader());
 
     if (! Settings.getUseAuth())
       return new Handler[]{handler};
@@ -74,6 +77,7 @@ public abstract class AbstractServletDeployer implements Deployer
     sh.setUserRealm(realm);
     sh.setConstraintMappings(new ConstraintMapping[]{cm});
     sh.setHandler(handler);
+
     return new Handler[]{sh};
   }
   
@@ -117,6 +121,11 @@ public abstract class AbstractServletDeployer implements Deployer
 
 /*********************************************************************
  * $Log: AbstractServletDeployer.java,v $
+ * Revision 1.2  2008/04/10 13:02:29  willuhn
+ * @N Zweischritt-Deployment. Der Server wird zwar sofort initialisiert, wenn der Jameica-Service startet, gestartet wird er aber erst, wenn die ersten Handler resgistriert werden
+ * @N damit koennen auch nachtraeglich zur Laufzeit weitere Handler hinzu registriert werden
+ * @R separater Worker in HttpServiceImpl entfernt. Der Classloader wird nun direkt von den Deployern gesetzt. Das ist wichtig, da Jetty fuer die Webanwendungen sonst den System-Classloader nutzt, welcher die Plugins nicht kennt
+ *
  * Revision 1.1  2008/04/04 00:16:58  willuhn
  * @N Apache XML-RPC von 3.0 auf 3.1 aktualisiert
  * @N jameica.xmlrpc ist jetzt von jameica.webadmin abhaengig

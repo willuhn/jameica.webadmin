@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/servlets/Attic/ResourceServlet.java,v $
- * $Revision: 1.3 $
- * $Date: 2007/05/15 11:21:12 $
+ * $Revision: 1.4 $
+ * $Date: 2008/04/10 13:02:29 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -61,7 +61,7 @@ public class ResourceServlet extends HttpServlet
       is = Application.getClassLoader().getResourceAsStream(name);
       if (is == null)
       {
-        Logger.warn("404: unable to find " + name);
+        Logger.warn(HttpServletResponse.SC_NOT_FOUND + ": unable to find " + name);
         response.sendError(HttpServletResponse.SC_NOT_FOUND);
         return;
       }
@@ -92,6 +92,11 @@ public class ResourceServlet extends HttpServlet
 
 /**********************************************************************
  * $Log: ResourceServlet.java,v $
+ * Revision 1.4  2008/04/10 13:02:29  willuhn
+ * @N Zweischritt-Deployment. Der Server wird zwar sofort initialisiert, wenn der Jameica-Service startet, gestartet wird er aber erst, wenn die ersten Handler resgistriert werden
+ * @N damit koennen auch nachtraeglich zur Laufzeit weitere Handler hinzu registriert werden
+ * @R separater Worker in HttpServiceImpl entfernt. Der Classloader wird nun direkt von den Deployern gesetzt. Das ist wichtig, da Jetty fuer die Webanwendungen sonst den System-Classloader nutzt, welcher die Plugins nicht kennt
+ *
  * Revision 1.3  2007/05/15 11:21:12  willuhn
  * *** empty log message ***
  *
