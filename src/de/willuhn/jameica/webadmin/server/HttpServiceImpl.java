@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/server/HttpServiceImpl.java,v $
- * $Revision: 1.22 $
- * $Date: 2008/04/10 13:02:29 $
+ * $Revision: 1.23 $
+ * $Date: 2008/04/10 13:32:17 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -15,6 +15,7 @@ package de.willuhn.jameica.webadmin.server;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
 
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Handler;
@@ -30,7 +31,8 @@ import de.willuhn.logging.Logger;
  */
 public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
 {
-  private Server server = null;
+  private Server server      = null;
+  private ArrayList handlers = new ArrayList();
 
   /**
    * @throws RemoteException
@@ -45,21 +47,9 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
    */
   public void addHandler(Handler handler) throws RemoteException
   {
-    if (!this.isStarted())
-      throw new RemoteException("unable to add handler, server not started");
-
-    this.server.addHandler(handler);
-    try
-    {
-      if (this.server.isStarted())
-        this.server.stop();
-      this.server.start();
-      Logger.info("handler added: " + handler.getClass().getName());
-    }
-    catch (Exception e)
-    {
-      throw new RemoteException("unable to start handler",e);
-    }
+    this.handlers.add(handler);
+    this.stop(true);
+    this.start();
   }
 
   /**
@@ -91,7 +81,7 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
    */
   public void start() throws RemoteException
   {
-    if (isStarted())
+    if (this.isStarted())
     {
       Logger.warn("service allready started, skipping request");
       return;
@@ -100,15 +90,36 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
     // Logging zu uns umleiten
     System.setProperty("org.mortbay.log.class",JettyLogger.class.getName());
 
-    Logger.info("started webserver at port " + Settings.getPort());
     this.server = new Server(Settings.getPort());
-    
     this.server.setStopAtShutdown(false);
     if (Settings.getUseSSL())
       this.server.setConnectors(new Connector[]{new JameicaSocketConnector()});
-
+    
     // Wir wollen keinen Default-Handler.
     // this.server.addHandler(new DefaultHandler());
+
+    for (int i=0;i<this.handlers.size();++i)
+    {
+      Handler h = (Handler) this.handlers.get(i);
+      this.server.removeHandler(h);
+      this.server.addHandler(h);
+    }
+
+    if (this.handlers.size() == 0)
+    {
+      Logger.info("no handlers, skip server socket");
+      return;
+    }
+
+    try
+    {
+      this.server.start();
+      Logger.info("started webserver at port " + Settings.getPort());
+    }
+    catch (Exception e)
+    {
+      throw new RemoteException("unable to start handler",e);
+    }
   }
 
   /**
@@ -116,11 +127,12 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
    */
   public void stop(boolean arg0) throws RemoteException
   {
-    if (!isStarted())
+    if (!this.isStarted())
     {
       Logger.warn("service not started, skipping request");
       return;
     }
+
     try
     {
       this.server.stop();
@@ -139,6 +151,9 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
 
 /**********************************************************************
  * $Log: HttpServiceImpl.java,v $
+ * Revision 1.23  2008/04/10 13:32:17  willuhn
+ * @N HTTP-Service samt allen Handlern restartfaehig
+ *
  * Revision 1.22  2008/04/10 13:02:29  willuhn
  * @N Zweischritt-Deployment. Der Server wird zwar sofort initialisiert, wenn der Jameica-Service startet, gestartet wird er aber erst, wenn die ersten Handler resgistriert werden
  * @N damit koennen auch nachtraeglich zur Laufzeit weitere Handler hinzu registriert werden
