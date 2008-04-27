@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/server/HttpServiceImpl.java,v $
- * $Revision: 1.23 $
- * $Date: 2008/04/10 13:32:17 $
+ * $Revision: 1.24 $
+ * $Date: 2008/04/27 23:32:02 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -87,9 +87,6 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
       return;
     }
 
-    // Logging zu uns umleiten
-    System.setProperty("org.mortbay.log.class",JettyLogger.class.getName());
-
     this.server = new Server(Settings.getPort());
     this.server.setStopAtShutdown(false);
     if (Settings.getUseSSL())
@@ -151,6 +148,9 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
 
 /**********************************************************************
  * $Log: HttpServiceImpl.java,v $
+ * Revision 1.24  2008/04/27 23:32:02  willuhn
+ * @N SLF4J-Logger-Adapter von Markus uebernommen
+ *
  * Revision 1.23  2008/04/10 13:32:17  willuhn
  * @N HTTP-Service samt allen Handlern restartfaehig
  *
