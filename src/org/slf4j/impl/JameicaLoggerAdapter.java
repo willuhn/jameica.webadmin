@@ -1,5 +1,5 @@
 /**
- * $Id: JameicaLoggerAdapter.java,v 1.1 2008/04/27 23:32:02 willuhn Exp $
+ * $Id: JameicaLoggerAdapter.java,v 1.2 2008/05/30 11:55:37 willuhn Exp $
  */
 package org.slf4j.impl;
 
@@ -475,28 +475,32 @@ public class JameicaLoggerAdapter implements org.slf4j.Logger {
 	}
 
   /**
-   * @param s
-   * @param params
-   * @return
+   * Fuellt Platzhalter.
+   * @param s Text mit Platzhaltern.
+   * @param param Wert 1 fuer die Platzhalter.
+   * @return der ersetzte Text.
    */
   private String replace(String s, Object param) {
     return replace(s,new Object[]{param});
   }
 
   /**
-   * @param s
-   * @param params
-   * @return
+   * Fuellt Platzhalter.
+   * @param s Text mit Platzhaltern.
+   * @param param1 Wert 1 fuer die Platzhalter.
+   * @param param2 Wert 1 fuer die Platzhalter.
+   * @return der ersetzte Text.
    */
   private String replace(String s, Object param1, Object param2) {
     return replace(s,new Object[]{param1,param2});
   }
 
-	/**
-	 * @param s
-	 * @param params
-	 * @return
-	 */
+  /**
+   * Fuellt Platzhalter.
+   * @param s Text mit Platzhaltern.
+   * @param params Werte fuer die Platzhalter.
+   * @return der ersetzte Text.
+   */
 	private String replace(String s, Object[] params) {
 		for (int i=0;i<params.length;++i) {
 			String v = "";

@@ -1,5 +1,5 @@
 /**
- * $Id: StaticLoggerBinder.java,v 1.1 2008/04/27 23:32:02 willuhn Exp $
+ * $Id: StaticLoggerBinder.java,v 1.2 2008/05/30 11:55:37 willuhn Exp $
  */
 package org.slf4j.impl;
 
@@ -11,6 +11,9 @@ import org.slf4j.spi.LoggerFactoryBinder;
  */
 public class StaticLoggerBinder implements LoggerFactoryBinder {
 
+	/**
+	 * Singleton.
+	 */
 	public static final StaticLoggerBinder SINGLETON = new StaticLoggerBinder();
 
 	private final ILoggerFactory loggerFactory = new JameicaLoggerFactory();
