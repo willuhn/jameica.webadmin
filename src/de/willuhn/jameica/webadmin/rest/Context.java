@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Attic/Context.java,v $
- * $Revision: 1.1 $
- * $Date: 2008/06/13 14:11:04 $
+ * $Revision: 1.2 $
+ * $Date: 2008/06/13 15:11:01 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -22,6 +22,7 @@ public class Context
 {
   private HttpServletRequest request   = null;
   private HttpServletResponse response = null;
+  private String params                = null;
 
   /**
    * ct
@@ -52,11 +53,34 @@ public class Context
     return this.response;
   }
 
+  /**
+   * Liefert zusaetzliche Parameter - insofern vorhanden.
+   * @return die zusaetzlichen Parameter.
+   */
+  public String getParams()
+  {
+    return this.params;
+  }
+
+  /**
+   * Speichert zusaetzliche Parameter.
+   * @param params zusaetzliche Parameter.
+   */
+  public void setParams(String params)
+  {
+    this.params = params;
+  }
+  
+  
+
 }
 
 
 /*********************************************************************
  * $Log: Context.java,v $
+ * Revision 1.2  2008/06/13 15:11:01  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.1  2008/06/13 14:11:04  willuhn
  * @N Mini REST-API
  *

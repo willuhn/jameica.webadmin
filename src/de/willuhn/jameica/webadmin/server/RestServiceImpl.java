@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/server/RestServiceImpl.java,v $
- * $Revision: 1.1 $
- * $Date: 2008/06/13 14:11:04 $
+ * $Revision: 1.2 $
+ * $Date: 2008/06/13 15:11:01 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -54,14 +54,24 @@ public class RestServiceImpl implements RestService
 
     if (command.length() == 0)
       throw new IOException("missing REST command");
-      
+
+    // Wenn immer noch ein Slash enthalten ist, ist der Rest hinter dem
+    // Kommando ein Parameter-Teil fuer das Kommando
+    Context context = new Context(request,response);
+    
+    int pos = command.indexOf("/");
+    if (pos != -1)
+    {
+      context.setParams(command.substring(pos+1));
+      command = command.substring(0,pos);
+    }
     // Mal schauen, ob wir ein Kommando haben
     Command c = (Command) this.registry.get(command);
     if (c == null)
       throw new IOException("REST command not found: " + command);
 
     Logger.debug("executing command " + command + ", class " + c.getClass().getName());
-    c.execute(new Context(request,response));
+    c.execute(context);
   }
 
   /**
@@ -156,6 +166,9 @@ public class RestServiceImpl implements RestService
 
 /*********************************************************************
  * $Log: RestServiceImpl.java,v $
+ * Revision 1.2  2008/06/13 15:11:01  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.1  2008/06/13 14:11:04  willuhn
  * @N Mini REST-API
  *
