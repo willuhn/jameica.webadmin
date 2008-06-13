@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE taglib PUBLIC "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.2//EN"
+  "http://java.sun.com/dtd/web-jsptaglibrary_1_2.dtd">
+<taglib>
+  <tlib-version>1.0</tlib-version>
+  <jsp-version>1.2</jsp-version>
+  <short-name>jam</short-name>
+  <uri>http://www.willuhn.de/projects/jameica/taglib</uri>
+  <display-name>Jameica Taglib</display-name>
+  <description></description>
+
+  <tag>
+    <name>page</name>
+    <tag-class>de.willuhn.jameica.taglib.PageTag</tag-class>
+    <body-content>JSP</body-content>
+    <display-name>page</display-name>
+    <attribute>
+      <name>plugin</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+      <description>Name des zu benutzenden Plugins</description>
+    </attribute>
+    <attribute>
+      <name>header</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+      <description>Dateiname eines zu includierenden JSP-Headers</description>
+    </attribute>
+    <attribute>
+      <name>footer</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+      <description>Dateiname eines zu includierenden JSP-Footers</description>
+    </attribute>
+  </tag>
+  
+  <tag>
+    <name>list</name>
+    <tag-class>de.willuhn.jameica.taglib.ListTag</tag-class>
+    <body-content>JSP</body-content>
+    <display-name>list</display-name>
+    <attribute>
+      <name>service</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+      <description>Name des Services</description>
+    </attribute>
+    <attribute>
+      <name>type</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+      <description>Klassenname des zu ladenden Objekt-Typs.</description>
+    </attribute>
+    <attribute>
+      <name>selected</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+      <description>
+        ID des zu selektierenden Objektes. Tritt ein Objekt mit dieser
+        ID in der Liste auf, wird das Property "selected" mit dem
+        Wert "selected" versehen, sonst mit dem Wert "".
+      </description>
+    </attribute>
+    <attribute>
+      <name>order</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+      <description>Optionale Angabe eines Spaltennamens, nach dem sortiert werden soll.</description>
+    </attribute>
+  </tag>
+  <tag>
+    <name>loop</name>
+    <tag-class>de.willuhn.jameica.taglib.LoopTag</tag-class>
+    <body-content>JSP</body-content>
+    <display-name>loop</display-name>
+  </tag>
+
+  <tag>
+    <name>object</name>
+    <tag-class>de.willuhn.jameica.taglib.ObjectTag</tag-class>
+    <body-content>JSP</body-content>
+    <display-name>object</display-name>
+    <attribute>
+      <name>service</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+      <description>Name des Services</description>
+    </attribute>
+    <attribute>
+      <name>type</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+      <description>Klassenname des zu ladenden Objekt-Typs.</description>
+    </attribute>
+    <attribute>
+      <name>id</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+      <description>Name des Parameters, in dem sich die ID des zu ladenden Objektes befindet</description>
+    </attribute>
+  </tag>
+
+  <tag>
+    <name>form</name>
+    <tag-class>de.willuhn.jameica.taglib.FormTag</tag-class>
+    <body-content>JSP</body-content>
+    <display-name>form</display-name>
+    <attribute>
+      <name>controller</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+      <description>Name der Klasse des Controllers. Muss das Interface de.willuhn.jameica.gui.Action implementieren.</description>
+    </attribute>
+  </tag>
+
+  <tag>
+    <name>button</name>
+    <tag-class>de.willuhn.jameica.taglib.ButtonTag</tag-class>
+    <body-content>JSP</body-content>
+    <display-name>button</display-name>
+    <attribute>
+      <name>action</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+      <description>Name der auszufuehrenden Aktion</description>
+    </attribute>
+    <attribute>
+      <name>id</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+      <description>Optionale Angabe einer ID, mit der der Button versehen werden soll</description>
+    </attribute>
+    <attribute>
+      <name>name</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+      <description>Name des Buttons</description>
+    </attribute>
+  </tag>
+
+  <tag>
+    <name>parameter</name>
+    <tag-class>de.willuhn.jameica.taglib.ParameterTag</tag-class>
+    <body-content>JSP</body-content>
+    <display-name>parameter</display-name>
+    <attribute>
+      <name>name</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+      <description>Name des Parameters.</description>
+    </attribute>
+    <attribute>
+      <name>value</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+      <description>Wert des Parameters. Wenn er nicht definiert ist, wird im PageContext nach moeglichen Werten gesucht</description>
+    </attribute>
+  </tag>
+
+
+</taglib>
