@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/server/RestServiceImpl.java,v $
- * $Revision: 1.2 $
- * $Date: 2008/06/13 15:11:01 $
+ * $Revision: 1.3 $
+ * $Date: 2008/06/15 22:48:24 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -15,7 +15,10 @@ package de.willuhn.jameica.webadmin.server;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
+import java.util.Arrays;
 import java.util.Hashtable;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -54,24 +57,45 @@ public class RestServiceImpl implements RestService
 
     if (command.length() == 0)
       throw new IOException("missing REST command");
-
-    // Wenn immer noch ein Slash enthalten ist, ist der Rest hinter dem
-    // Kommando ein Parameter-Teil fuer das Kommando
-    Context context = new Context(request,response);
     
-    int pos = command.indexOf("/");
-    if (pos != -1)
-    {
-      context.setParams(command.substring(pos+1));
-      command = command.substring(0,pos);
-    }
-    // Mal schauen, ob wir ein Kommando haben
-    Command c = (Command) this.registry.get(command);
-    if (c == null)
-      throw new IOException("REST command not found: " + command);
+    // Ein REST-Command sieht z.Bsp. so aus:
+    // (http://server:8080/webadmin/) "plugins/hibiscus/services/database"
+    // Die Verzeichnisses sind also immer im Wechsel Kommando und dann Parameter.
+    // In dem Fall also erst ein Kommando "plugins" mit dem Parameter "hibiscus"
+    // und dann ein Kommando "plugins" mit dem Parameter "database" innerhalb
+    // des Context "plugins". Wir rufen die Commandos daher als Chain in
+    // dieser Reihenfolge auf.
+    
+    String[] values = command.split("/");
+    List queue = new LinkedList();
+    queue.addAll(Arrays.asList(values));
 
-    Logger.debug("executing command " + command + ", class " + c.getClass().getName());
-    c.execute(context);
+    Command c = null;
+    
+    for (int i=0;i<100;++i)
+    {
+      if (queue.size() == 0)
+        return; // end of chain
+      
+      final Context context = new Context(request,response);
+      context.setParent(c);
+
+      String current = (String) queue.remove(0);
+
+      // Mal schauen, ob wir ein Kommando haben
+      c = (Command) this.registry.get(current);
+      if (c == null)
+        throw new IOException("REST command not found: " + command);
+
+      // Es haengt noch ein Kommando dran
+      if (queue.size() > 0)
+        context.setParameter((String)queue.remove(0));
+
+      Logger.debug("executing command " + command + ", class " + c.getClass().getName());
+      c.execute(context);
+    }
+
+
   }
 
   /**
@@ -166,6 +190,9 @@ public class RestServiceImpl implements RestService
 
 /*********************************************************************
  * $Log: RestServiceImpl.java,v $
+ * Revision 1.3  2008/06/15 22:48:24  willuhn
+ * @N Command-Chains
+ *
  * Revision 1.2  2008/06/13 15:11:01  willuhn
  * *** empty log message ***
  *

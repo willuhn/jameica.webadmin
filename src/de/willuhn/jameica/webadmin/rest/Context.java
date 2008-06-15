@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Attic/Context.java,v $
- * $Revision: 1.2 $
- * $Date: 2008/06/13 15:11:01 $
+ * $Revision: 1.3 $
+ * $Date: 2008/06/15 22:48:23 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -22,7 +22,8 @@ public class Context
 {
   private HttpServletRequest request   = null;
   private HttpServletResponse response = null;
-  private String params                = null;
+  private Command parent               = null;
+  private String parameter             = null;
 
   /**
    * ct
@@ -54,23 +55,40 @@ public class Context
   }
 
   /**
-   * Liefert zusaetzliche Parameter - insofern vorhanden.
-   * @return die zusaetzlichen Parameter.
+   * Liefert einen zusaetzlichen Parameter - insofern vorhanden.
+   * @return der zusaetzliche Parameter.
    */
-  public String getParams()
+  public String getParameter()
   {
-    return this.params;
+    return this.parameter;
   }
 
   /**
-   * Speichert zusaetzliche Parameter.
-   * @param params zusaetzliche Parameter.
+   * Speichert einen zusaetzlichen Parameter.
+   * @param params zusaetzlicher Parameter.
    */
-  public void setParams(String params)
+  public void setParameter(String parameter)
   {
-    this.params = params;
+    this.parameter = parameter;
+  }
+
+  /**
+   * Liefert das vorherige Kommando, insofern eines existierte.
+   * @return das vorherige Kommando oder <code>null</code>.
+   */
+  public Command getParent()
+  {
+    return this.parent;
   }
   
+  /**
+   * Speichert das vorherige Kommando.
+   * @param parent das vorherige Kommando.
+   */
+  public void setParent(Command parent)
+  {
+    this.parent = parent;
+  }
   
 
 }
@@ -78,6 +96,9 @@ public class Context
 
 /*********************************************************************
  * $Log: Context.java,v $
+ * Revision 1.3  2008/06/15 22:48:23  willuhn
+ * @N Command-Chains
+ *
  * Revision 1.2  2008/06/13 15:11:01  willuhn
  * *** empty log message ***
  *
