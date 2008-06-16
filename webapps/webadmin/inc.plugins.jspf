@@ -1,3 +1,27 @@
+<%-- <%@page import="de.willuhn.jameica.system.Application"%>
+<%@page import="de.willuhn.jameica.webadmin.rest.JSONClient"%>
+
+<h2>Installierte Plugins</h2>
+<div id="pluginlist"></div>
+
+<script type="text/javascript">
+  var json = <%= JSONClient.execute("https://localhost:8080/webadmin/rest/plugins/list","admin", Application.getCallback().getPassword()) %>;
+
+  var out = "<table class='data'><tr><th>Name</th><th>Version</th><th>Beschreibung</th></tr>";
+  for (i=0;i<json.length;++i)
+  {
+    out += "<tr onmouseover='change_to(this);' onmouseout='change_back(this);'>";
+	  out += "  <td><a title='Klicken für Details' href='plugin.jsp?plugin=" + json[i].name + "'>" + json[i].name + "</a></td>";
+		out += "  <td>" + json[i].version + " [Build " + json[i].buildnumber + "]</td>";
+	  out += "  <td>" + json[i].description + "</td>";
+    out += "</tr>";
+  }
+	out += "</tr></table>";
+	document.getElementById("pluginlist").innerHTML = out;
+</script>
+--%>
+
+
 <%@page import="de.willuhn.jameica.system.Application"%>
 <%@page import="java.util.List"%>
 

@@ -2,7 +2,6 @@
 
 <%@page import="java.util.List"%>
 <%@page import="de.willuhn.datasource.Service"%>
-<%@page import="de.willuhn.jameica.plugin.AbstractPlugin"%>
 <%@page import="de.willuhn.jameica.plugin.Manifest"%>
 <%@page import="de.willuhn.jameica.plugin.ServiceDescriptor"%>
 
