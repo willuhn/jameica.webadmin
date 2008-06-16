@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Attic/Context.java,v $
- * $Revision: 1.3 $
- * $Date: 2008/06/15 22:48:23 $
+ * $Revision: 1.4 $
+ * $Date: 2008/06/16 14:22:11 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -22,8 +22,6 @@ public class Context
 {
   private HttpServletRequest request   = null;
   private HttpServletResponse response = null;
-  private Command parent               = null;
-  private String parameter             = null;
 
   /**
    * ct
@@ -53,49 +51,14 @@ public class Context
   {
     return this.response;
   }
-
-  /**
-   * Liefert einen zusaetzlichen Parameter - insofern vorhanden.
-   * @return der zusaetzliche Parameter.
-   */
-  public String getParameter()
-  {
-    return this.parameter;
-  }
-
-  /**
-   * Speichert einen zusaetzlichen Parameter.
-   * @param params zusaetzlicher Parameter.
-   */
-  public void setParameter(String parameter)
-  {
-    this.parameter = parameter;
-  }
-
-  /**
-   * Liefert das vorherige Kommando, insofern eines existierte.
-   * @return das vorherige Kommando oder <code>null</code>.
-   */
-  public Command getParent()
-  {
-    return this.parent;
-  }
-  
-  /**
-   * Speichert das vorherige Kommando.
-   * @param parent das vorherige Kommando.
-   */
-  public void setParent(Command parent)
-  {
-    this.parent = parent;
-  }
-  
-
 }
 
 
 /*********************************************************************
  * $Log: Context.java,v $
+ * Revision 1.4  2008/06/16 14:22:11  willuhn
+ * @N Mapping der REST-URLs via Property-Datei
+ *
  * Revision 1.3  2008/06/15 22:48:23  willuhn
  * @N Command-Chains
  *

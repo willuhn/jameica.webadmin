@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Echo.java,v $
- * $Revision: 1.1 $
- * $Date: 2008/06/13 14:11:04 $
+ * $Revision: 1.2 $
+ * $Date: 2008/06/16 14:22:11 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -15,39 +15,53 @@ package de.willuhn.jameica.webadmin.rest;
 
 import java.io.IOException;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import de.willuhn.logging.Logger;
 
 /**
  * Test-Command, welches den uebergebenen QueryString zurueckschickt.
  * Schreibt die uebergebene Nachricht ins lokale Log.
  */
-public class Echo implements Command
+public class Echo
 {
+  private Context context = null;
+  
   /**
-   * @see de.willuhn.jameica.webadmin.rest.Command#getName()
+   * Fuehrt das Echo aus.
+   * @param echo zurueckzuliefernder Text.
+   * @throws IOException
    */
-  public String getName()
+  public void echo(String echo) throws IOException
   {
-    return "echo";
+    try
+    {
+      context.getResponse().getWriter().print(new JSONObject().put("echo",echo).toString());
+    }
+    catch (JSONException e)
+    {
+      Logger.error("unable to encode via json",e);
+      throw new IOException("error while encoding into json");
+    }
   }
-
+  
   /**
-   * @see de.willuhn.jameica.webadmin.rest.Command#execute(de.willuhn.jameica.webadmin.rest.Context)
+   * Speichert den Context des Aufrufs.
+   * @param context Context.
    */
-  public void execute(Context context) throws IOException
+  public void setContext(Context context)
   {
-    HttpServletRequest request   = context.getRequest();
-    HttpServletResponse response = context.getResponse();
-   
-    String query = request.getQueryString();
-    response.getWriter().print("QUERY-STRING: " + (query == null ? "<none>" : query));
+    this.context = context;
   }
 }
 
 
 /*********************************************************************
  * $Log: Echo.java,v $
+ * Revision 1.2  2008/06/16 14:22:11  willuhn
+ * @N Mapping der REST-URLs via Property-Datei
+ *
  * Revision 1.1  2008/06/13 14:11:04  willuhn
  * @N Mini REST-API
  *

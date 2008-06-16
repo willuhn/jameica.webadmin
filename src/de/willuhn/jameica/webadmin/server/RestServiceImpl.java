@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/server/RestServiceImpl.java,v $
- * $Revision: 1.3 $
- * $Date: 2008/06/15 22:48:24 $
+ * $Revision: 1.4 $
+ * $Date: 2008/06/16 14:22:11 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -15,29 +15,25 @@ package de.willuhn.jameica.webadmin.server;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
-import java.util.Arrays;
-import java.util.Hashtable;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import de.willuhn.datasource.BeanUtil;
 import de.willuhn.jameica.system.Application;
-import de.willuhn.jameica.webadmin.Plugin;
-import de.willuhn.jameica.webadmin.rest.Command;
+import de.willuhn.jameica.system.Settings;
 import de.willuhn.jameica.webadmin.rest.Context;
 import de.willuhn.jameica.webadmin.rmi.RestService;
 import de.willuhn.logging.Logger;
-import de.willuhn.util.ClassFinder;
-import de.willuhn.util.MultipleClassLoader;
 
 /**
  * Implementierung des REST-Services.
  */
 public class RestServiceImpl implements RestService
 {
-  private Hashtable registry = null;
+  private Settings settings = null;
   
   /**
    * @see de.willuhn.jameica.webadmin.rmi.RestService#handleRequest(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
@@ -50,52 +46,64 @@ public class RestServiceImpl implements RestService
     String command = request.getPathInfo();
     if (command == null)
       throw new IOException("missing REST command");
-  
-    // Slash am Anfang abschneiden
-    if (command.startsWith("/"))
-      command = command.substring(1);
+    
+    String[] patterns = settings.getAttributes();
+    if (patterns == null || patterns.length == 0)
+      throw new IOException("no REST urls defined");
 
-    if (command.length() == 0)
-      throw new IOException("missing REST command");
-    
-    // Ein REST-Command sieht z.Bsp. so aus:
-    // (http://server:8080/webadmin/) "plugins/hibiscus/services/database"
-    // Die Verzeichnisses sind also immer im Wechsel Kommando und dann Parameter.
-    // In dem Fall also erst ein Kommando "plugins" mit dem Parameter "hibiscus"
-    // und dann ein Kommando "plugins" mit dem Parameter "database" innerhalb
-    // des Context "plugins". Wir rufen die Commandos daher als Chain in
-    // dieser Reihenfolge auf.
-    
-    String[] values = command.split("/");
-    List queue = new LinkedList();
-    queue.addAll(Arrays.asList(values));
-
-    Command c = null;
-    
-    for (int i=0;i<100;++i)
+    try
     {
-      if (queue.size() == 0)
-        return; // end of chain
-      
-      final Context context = new Context(request,response);
-      context.setParent(c);
+      Context context = new Context(request,response);
+      for (int i=0;i<patterns.length;++i)
+      {
+        Pattern pattern = Pattern.compile(patterns[i]);
+        Matcher match = pattern.matcher(command);
+        
+        if (match.matches())
+        {
+          String[] params = new String[match.groupCount()];
+          for (int k=0;k<params.length;++k)
+            params[k] = match.group(k+1); // wir fangen bei "1" an, weil an Pos. 0 der Pattern selbst steht
 
-      String current = (String) queue.remove(0);
+          String s = settings.getString(patterns[i],null);
+          if (s == null || s.length() == 0)
+          {
+            Logger.warn("no command defined for REST url " + patterns[i]);
+            continue;
+          }
+          
+          int pos = s.lastIndexOf('.');
+          if (pos == -1)
+            throw new IOException("invalid command defined for command " + command);
 
-      // Mal schauen, ob wir ein Kommando haben
-      c = (Command) this.registry.get(current);
-      if (c == null)
-        throw new IOException("REST command not found: " + command);
-
-      // Es haengt noch ein Kommando dran
-      if (queue.size() > 0)
-        context.setParameter((String)queue.remove(0));
-
-      Logger.debug("executing command " + command + ", class " + c.getClass().getName());
-      c.execute(context);
+          Object bean = Application.getClassLoader().load(s.substring(0,pos)).newInstance();
+          String method = s.substring(pos+1);
+          
+          try
+          {
+            Logger.debug("trying to apply context");
+            BeanUtil.set(bean,"context",context);
+          } catch (Exception e) {
+            Logger.debug("failed, skipping context");
+          }
+          
+          Logger.debug("executing command " + command + ", class " + bean.getClass().getName() + "." + method);
+          BeanUtil.invoke(bean,method,params);
+          return;
+        }
+      }
     }
-
-
+    catch (IOException e)
+    {
+      throw e;
+    }
+    catch (Exception e2)
+    {
+      Logger.error("error while executing command " + command,e2);
+      throw new IOException("error while executing command " + command);
+    }
+    
+    throw new IOException("no command found for REST url " + command);
   }
 
   /**
@@ -119,7 +127,7 @@ public class RestServiceImpl implements RestService
    */
   public boolean isStarted() throws RemoteException
   {
-    return this.registry != null;
+    return this.settings != null;
   }
 
   /**
@@ -134,41 +142,8 @@ public class RestServiceImpl implements RestService
     }
     
     Logger.info("init REST registry");
-
-    this.registry = new Hashtable();
-    try
-    {
-      MultipleClassLoader loader = Application.getPluginLoader().getPlugin(Plugin.class).getResources().getClassLoader();
-      ClassFinder finder = loader.getClassFinder();
-      Class[] commands = finder.findImplementors(Command.class);
-      StringBuffer sb = new StringBuffer();
-      
-      if (commands != null && commands.length > 0)
-      {
-        for (int i=0;i<commands.length;++i)
-        {
-          try
-          {
-            Command c = (Command) commands[i].newInstance();
-            String name = c.getName();
-            Logger.debug("register REST command: " + name + ", class: " + c.getClass().getName());
-            registry.put(name,c);
-            sb.append(name);
-            if (i < commands.length - 1)
-              sb.append(", ");
-          }
-          catch (Exception e)
-          {
-            Logger.error("unable to load command " + commands[i] + " - skipping",e);
-          }
-        }
-        Logger.info("available REST commands: " + sb.toString());
-      }
-    }
-    catch (ClassNotFoundException e)
-    {
-      Logger.warn("no REST commands found");
-    }
+    this.settings = new Settings(RestService.class);
+    this.settings.setStoreWhenRead(false);
   }
 
   /**
@@ -183,13 +158,26 @@ public class RestServiceImpl implements RestService
     }
     
     Logger.info("REST service stopped");
-    this.registry = null;
+    this.settings = null;
+  }
+
+  /**
+   * @see de.willuhn.jameica.webadmin.rmi.RestService#register(java.lang.String, java.lang.String)
+   */
+  public void register(String urlPattern, String command) throws RemoteException
+  {
+    if (!isStarted())
+      throw new RemoteException("REST service not started");
+    this.settings.setAttribute(urlPattern,command);
   }
 }
 
 
 /*********************************************************************
  * $Log: RestServiceImpl.java,v $
+ * Revision 1.4  2008/06/16 14:22:11  willuhn
+ * @N Mapping der REST-URLs via Property-Datei
+ *
  * Revision 1.3  2008/06/15 22:48:24  willuhn
  * @N Command-Chains
  *

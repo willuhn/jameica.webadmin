@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Service.java,v $
- * $Revision: 1.1 $
- * $Date: 2008/06/15 22:48:23 $
+ * $Revision: 1.2 $
+ * $Date: 2008/06/16 14:22:11 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -14,93 +14,134 @@
 package de.willuhn.jameica.webadmin.rest;
 
 import java.io.IOException;
+import java.util.List;
+
+import org.json.JSONObject;
 
 import de.willuhn.jameica.plugin.AbstractPlugin;
-import de.willuhn.jameica.plugin.Manifest;
-import de.willuhn.jameica.plugin.ServiceDescriptor;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.logging.Logger;
 
-
 /**
- * REST-Kommando fuer einen Service.
+ * REST-Kommandos zum Starten und Stoppen von Services.
  */
-public class Service implements Command
+public class Service
 {
-  private de.willuhn.datasource.Service service = null;
+  private Context context = null;
 
   /**
-   * @see de.willuhn.jameica.webadmin.rest.Command#execute(de.willuhn.jameica.webadmin.rest.Context)
+   * Startet den Service.
+   * @param plugin Name des Plugins.
+   * @param service Name des Services.
+   * @throws IOException
    */
-  public void execute(Context context) throws IOException
+  public void start(String plugin, String service) throws IOException
   {
-    Command c = context.getParent();
-    if (c == null || !(c instanceof Plugin))
-      throw new IOException("no plugin given");
-
-    AbstractPlugin plugin = ((Plugin) c).getPlugin();
-    String service        = context.getParameter();
-    
-
-    // Service angegeben?
-    if (service != null && service.length() > 0)
+    try
     {
-      try
-      {
-        this.service = Application.getServiceFactory().lookup(plugin.getClass(),service);
-        return;
-      }
-      catch (Exception e)
-      {
-        Logger.error("unable to load service",e);
-        throw new IOException("unable to load service " + service);
-      }
+      de.willuhn.datasource.Service s = find(plugin,service);
+      s.start();
+      context.getResponse().getWriter().print(new JSONObject().put("started","true").toString());
     }
-
-    // Kein Service angegeben. Auflisten
-    Manifest mf = plugin.getManifest();
-    ServiceDescriptor[] services = mf.getServices();
-    
-    StringBuffer names = new StringBuffer();
-    if (services != null)
+    catch (IOException e)
     {
-      for (int i=0;i<services.length;++i)
-      {
-        String name = services[i].getName();
-        if (name == null || name.length() == 0)
-          continue;
-        
-        names.append(name);
-        if (i<services.length-1)
-          names.append(",");
-      }
+      throw e;
     }
-    context.getResponse().getWriter().print(names.toString());
-  }
-
-  /**
-   * @see de.willuhn.jameica.webadmin.rest.Command#getName()
-   */
-  public String getName()
-  {
-    return "services";
+    catch (Exception e2)
+    {
+      Logger.error("unable to start service",e2);
+      throw new IOException("unable to start service");
+    }
   }
   
   /**
-   * Liefert den ausgewaehlten Service.
-   * @return der ausgewaehlte Service.
+   * Stoppt den Service.
+   * @param plugin Name des Plugins.
+   * @param service Name des Services.
+   * @throws IOException
    */
-  de.willuhn.datasource.Service getService()
+  public void stop(String plugin, String service) throws IOException
   {
-    return this.service;
+    try
+    {
+      de.willuhn.datasource.Service s = find(plugin,service);
+      s.stop(false);
+      context.getResponse().getWriter().print(new JSONObject().put("started","false").toString());
+    }
+    catch (IOException e)
+    {
+      throw e;
+    }
+    catch (Exception e2)
+    {
+      Logger.error("unable to stop service",e2);
+      throw new IOException("unable to stop service");
+    }
+  }
+
+  /**
+   * Liefert den Service-Status.
+   * @param plugin Name des Plugins.
+   * @param service Name des Services.
+   * @throws IOException
+   */
+  public void status(String plugin, String service) throws IOException
+  {
+    try
+    {
+      de.willuhn.datasource.Service s = find(plugin,service);
+      context.getResponse().getWriter().print(new JSONObject().put("started",s.isStarted() ? "true" : "false").toString());
+    }
+    catch (IOException e)
+    {
+      throw e;
+    }
+    catch (Exception e2)
+    {
+      Logger.error("unable to get service status",e2);
+      throw new IOException("unable to get service status");
+    }
+  }
+
+  /**
+   * Sucht den angegebenen Service im Plugin.
+   * @param plugin das Plugin.
+   * @param service der Service-Name.
+   * @return Instanz des Services.
+   * @throws Exception
+   */
+  private de.willuhn.datasource.Service find(String plugin, String service) throws Exception
+  {
+    List plugins = Application.getPluginLoader().getInstalledPlugins();
+    for (int i=0;i<plugins.size();++i)
+    {
+      AbstractPlugin p = (AbstractPlugin) plugins.get(i);
+      String name = p.getManifest().getName();
+      if (name == null || name.length() == 0)
+        continue;
+      
+      if (name.equals(plugin))
+        return Application.getServiceFactory().lookup(p.getClass(),service);
+    }
+    
+    throw new IOException("service not found");
+  }
+
+  /**
+   * Speichert den Context des Aufrufs.
+   * @param context Context.
+   */
+  public void setContext(Context context)
+  {
+    this.context = context;
   }
 
 }
 
 
-/**********************************************************************
+/*********************************************************************
  * $Log: Service.java,v $
- * Revision 1.1  2008/06/15 22:48:23  willuhn
- * @N Command-Chains
+ * Revision 1.2  2008/06/16 14:22:11  willuhn
+ * @N Mapping der REST-URLs via Property-Datei
  *
  **********************************************************************/

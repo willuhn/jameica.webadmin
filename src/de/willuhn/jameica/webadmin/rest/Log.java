@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Log.java,v $
- * $Revision: 1.1 $
- * $Date: 2008/06/13 14:11:04 $
+ * $Revision: 1.2 $
+ * $Date: 2008/06/16 14:22:11 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -15,8 +15,6 @@ package de.willuhn.jameica.webadmin.rest;
 
 import java.io.IOException;
 
-import javax.servlet.http.HttpServletRequest;
-
 import de.willuhn.logging.Level;
 import de.willuhn.logging.Logger;
 
@@ -24,43 +22,75 @@ import de.willuhn.logging.Logger;
  * Logger-Command.
  * Schreibt die uebergebene Nachricht ins lokale Log.
  */
-public class Log implements Command
+public class Log
 {
+  private Context context = null;
+  
   /**
-   * @see de.willuhn.jameica.webadmin.rest.Command#getName()
+   * Loggt die Nachricht als INFO.
+   * @param clazz Ausloesende Klasse.
+   * @param method Ausloesende Methode.
+   * @param text zu loggender Text.
+   * @throws IOException
    */
-  public String getName()
+  public void info(String clazz, String method, String text) throws IOException
   {
-    return "log";
+    write(Level.INFO,clazz,method,text);
   }
 
   /**
-   * @see de.willuhn.jameica.webadmin.rest.Command#execute(de.willuhn.jameica.webadmin.rest.Context)
+   * Loggt die Nachricht als Warnung.
+   * @param clazz Ausloesende Klasse.
+   * @param method Ausloesende Methode.
+   * @param text zu loggender Text.
+   * @throws IOException
    */
-  public void execute(Context context) throws IOException
+  public void warn(String clazz, String method, String text) throws IOException
   {
-    HttpServletRequest request = context.getRequest();
+    write(Level.WARN,clazz,method,text);
+  }
 
-    // Ohne Text koennen wir gleich aufhoeren
-    String text = request.getParameter("text");
-    if (text == null || text.length() == 0)
-      return;
+  /**
+   * Loggt die Nachricht als Fehler.
+   * @param clazz Ausloesende Klasse.
+   * @param method Ausloesende Methode.
+   * @param text zu loggender Text.
+   * @throws IOException
+   */
+  public void error(String clazz, String method, String text) throws IOException
+  {
+    write(Level.ERROR,clazz,method,text);
+  }
 
-    String level  = request.getParameter("level");
-    String host   = request.getRemoteHost();
-    String clazz  = request.getParameter("class");
-    String method = request.getParameter("method");
+  /**
+   * Loggt die Nachricht.
+   * @param level Log-Level.
+   * @param clazz Ausloesende Klasse.
+   * @param method Ausloesende Methode.
+   * @param text zu loggender Text.
+   * @throws IOException
+   */
+  private void write(Level level, String clazz, String method, String text) throws IOException
+  {
+    Logger.write(level,context.getRequest().getRemoteHost(),clazz,method,text,null);
+  }
 
-    Level l = Level.findByName(level != null ? level : Level.DEFAULT.getName());
-    if (l == null) l = Level.DEFAULT;
-    
-    Logger.write(l,host,clazz,method,text,null);
+  /**
+   * Speichert den Context.
+   * @param context der Context.
+   */
+  public void setContext(Context context)
+  {
+    this.context = context;
   }
 }
 
 
 /*********************************************************************
  * $Log: Log.java,v $
+ * Revision 1.2  2008/06/16 14:22:11  willuhn
+ * @N Mapping der REST-URLs via Property-Datei
+ *
  * Revision 1.1  2008/06/13 14:11:04  willuhn
  * @N Mini REST-API
  *
