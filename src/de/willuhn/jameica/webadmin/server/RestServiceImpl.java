@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/server/RestServiceImpl.java,v $
- * $Revision: 1.4 $
- * $Date: 2008/06/16 14:22:11 $
+ * $Revision: 1.5 $
+ * $Date: 2008/06/16 22:31:53 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -13,6 +13,7 @@
 
 package de.willuhn.jameica.webadmin.server;
 
+import java.io.File;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.regex.Matcher;
@@ -23,10 +24,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import de.willuhn.datasource.BeanUtil;
 import de.willuhn.jameica.system.Application;
-import de.willuhn.jameica.system.Settings;
+import de.willuhn.jameica.webadmin.Plugin;
 import de.willuhn.jameica.webadmin.rest.Context;
 import de.willuhn.jameica.webadmin.rmi.RestService;
 import de.willuhn.logging.Logger;
+import de.willuhn.util.Settings;
 
 /**
  * Implementierung des REST-Services.
@@ -142,7 +144,7 @@ public class RestServiceImpl implements RestService
     }
     
     Logger.info("init REST registry");
-    this.settings = new Settings(RestService.class);
+    this.settings = new RestSettings();
     this.settings.setStoreWhenRead(false);
   }
 
@@ -170,11 +172,31 @@ public class RestServiceImpl implements RestService
       throw new RemoteException("REST service not started");
     this.settings.setAttribute(urlPattern,command);
   }
+  
+  /**
+   * Ueberschrieben, um die properties-Datei aus dem
+   * Plugin-Verzeichnis als System-Preset zu verwenden.
+   */
+  private class RestSettings extends de.willuhn.util.Settings
+  {
+    /**
+     * ct.
+     */
+    public RestSettings()
+    {
+      super(Application.getPluginLoader().getPlugin(Plugin.class).getResources().getPath() + File.separator + "cfg",
+            Application.getConfig().getConfigDir(),
+            RestService.class);
+    }
+  }
 }
 
 
 /*********************************************************************
  * $Log: RestServiceImpl.java,v $
+ * Revision 1.5  2008/06/16 22:31:53  willuhn
+ * @N weitere REST-Kommandos
+ *
  * Revision 1.4  2008/06/16 14:22:11  willuhn
  * @N Mapping der REST-URLs via Property-Datei
  *
