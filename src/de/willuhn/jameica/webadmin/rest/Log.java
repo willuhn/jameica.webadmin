@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Log.java,v $
- * $Revision: 1.2 $
- * $Date: 2008/06/16 14:22:11 $
+ * $Revision: 1.3 $
+ * $Date: 2008/06/20 13:24:29 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -14,9 +14,15 @@
 package de.willuhn.jameica.webadmin.rest;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.json.JSONArray;
 
 import de.willuhn.logging.Level;
 import de.willuhn.logging.Logger;
+import de.willuhn.logging.Message;
 
 /**
  * Logger-Command.
@@ -25,6 +31,50 @@ import de.willuhn.logging.Logger;
 public class Log
 {
   private Context context = null;
+  
+  /**
+   * Liefert die letzten Zeilen des Logs.
+   * @throws IOException
+   */
+  public void last() throws IOException
+  {
+    last(null);
+  }
+  
+  /**
+   * Liefert die letzten Zeilen des Logs.
+   * @param lines Anzahl der Zeilen.
+   * @throws IOException
+   */
+  public void last(String lines) throws IOException
+  {
+    int last = -1;
+    try
+    {
+      last = Integer.parseInt(lines);
+    } catch (Exception e) {}
+    
+    ArrayList json = new ArrayList();
+
+    int count = last;
+    
+    Message[] msg = Logger.getLastLines();
+    for (int i=msg.length-1;i>=0;--i)
+    {
+      if (last > 0 && count-- <= 0)
+        break;
+
+      Map data = new HashMap();
+      data.put("date",  msg[i].getDate());
+      data.put("host",  msg[i].getHost());
+      data.put("level", msg[i].getLevel().getName());
+      data.put("class", msg[i].getLoggingClass());
+      data.put("method",msg[i].getLoggingMethod());
+      data.put("text",  msg[i].getText());
+      json.add(data);
+    }
+    context.getResponse().getWriter().print(new JSONArray(json).toString());
+  }
   
   /**
    * Loggt die Nachricht als INFO.
@@ -88,6 +138,9 @@ public class Log
 
 /*********************************************************************
  * $Log: Log.java,v $
+ * Revision 1.3  2008/06/20 13:24:29  willuhn
+ * @N REST-Command zum Abrufen der letzten Log-Zeilen
+ *
  * Revision 1.2  2008/06/16 14:22:11  willuhn
  * @N Mapping der REST-URLs via Property-Datei
  *
