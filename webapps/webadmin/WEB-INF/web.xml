@@ -19,11 +19,4 @@
     <url-pattern>/rest/*</url-pattern>
   </servlet-mapping>
 
-  <taglib>
-    <taglib-uri>
-      http://www.willuhn.de/projects/jameica/taglib
-    </taglib-uri>
-    <taglib-location>/WEB-INF/jameica.taglib.tld</taglib-location>
-  </taglib>
-  
 </web-app>
