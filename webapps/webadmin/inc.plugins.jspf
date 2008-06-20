@@ -1,7 +1,5 @@
-<%@page import="de.willuhn.jameica.system.Application"%>
-<%@page import="java.util.List"%>
+<jsp:useBean id="plugin" class="de.willuhn.jameica.webadmin.beans.Plugin"/>
 
-<%@page import="de.willuhn.jameica.plugin.Manifest"%>
 <h2>Installierte Plugins</h2>
 <table class="data">
   <tr>
@@ -9,18 +7,11 @@
     <th>Version</th>
     <th>Beschreibung</th>
   </tr>
-  <%
-    List manifests = Application.getPluginLoader().getInstalledManifests();
-    for (int i=0;i<manifests.size();++i)
-    {
-      Manifest mf = (Manifest) manifests.get(i);
-      %>
-		    <tr onmouseover="change_to(this);" onmouseout="change_back(this);">
-		      <td><a title="Klicken für Details" href="plugin.jsp?plugin=<%= mf.getName() %>"><%= mf.getName() %></a></td>
-		      <td><%= mf.getVersion() %> [Build <%= mf.getBuildnumber() %>]</td>
-		      <td><%= mf.getDescription() %></td>
-		    </tr>
-      <%
-    }
-  %>
+  <c:forEach var="p" items="${plugin.plugins}">
+     <tr>
+       <td>${p.name}</td>
+       <td>${p.version}</td>
+       <td>${p.description}</td>
+     </tr>
+  </c:forEach>
 </table>
