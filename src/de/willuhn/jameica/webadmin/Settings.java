@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/Settings.java,v $
- * $Revision: 1.1 $
- * $Date: 2007/04/12 13:35:17 $
+ * $Revision: 1.2 $
+ * $Date: 2008/07/02 17:43:00 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -19,6 +19,7 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.UnknownHostException;
 
+import de.willuhn.jameica.security.Wallet;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.logging.Logger;
 import de.willuhn.util.ApplicationException;
@@ -28,6 +29,8 @@ import de.willuhn.util.ApplicationException;
  */
 public class Settings
 {
+  private static Wallet wallet = null;
+  
   /**
    * Die Einstellungen des Plugins.
    */
@@ -155,12 +158,67 @@ public class Settings
   {
     SETTINGS.setAttribute("listener.http.auth",auth);
   }
+  
+  
+  /**
+   * Liefert eine Liste von URLs mit Jameica-Installationen, die administriert werden sollen.
+   * @return Liste mit URLs von Jameica-Installationen.
+   */
+  public static String[] getJameicaInstances()
+  {
+    return SETTINGS.getList("jameica.instance",new String[0]);
+  }
+  
+  /**
+   * Speichert eine Liste von remote zu verwaltenden Jameica-Installationen.
+   * @param urls Liste mit Jameica-URLs.
+   */
+  public static void setJameicaInstances(String[] urls)
+  {
+    SETTINGS.setAttribute("jameica.instance",urls);
+  }
+  
+  /**
+   * Liefert das zu verwendende Passwort fuer die Jameica-Instanz.
+   * @param jameicaUrl URL der Jameica-Instanz.
+   * @return Passwort.
+   * @throws Exception
+   */
+  public static String getJameicaInstancePassword(String jameicaUrl) throws Exception
+  {
+    return (String) getWallet().get(jameicaUrl + ".password");
+  }
 
+  /**
+   * Speichert das zu verwendende Passwort fuer die Jameica-Instanz.
+   * @param jameicaUrl URL der Jameica-Instanz.
+   * @param password das Passwort.
+   * @throws Exception
+   */
+  public static void setJameicaInstancePassword(String jameicaUrl, String password) throws Exception
+  {
+    getWallet().set(jameicaUrl + ".password",password);
+  }
+  
+  /**
+   * Liefert ein Wallet zum verschluesselten Speichern der Passwoerter.
+   * @return Wallet.
+   * @throws Exception
+   */
+  private static synchronized Wallet getWallet() throws Exception
+  {
+    if (wallet == null)
+      wallet = new Wallet(Settings.class);
+    return wallet;
+  }
 }
 
 
 /*********************************************************************
  * $Log: Settings.java,v $
+ * Revision 1.2  2008/07/02 17:43:00  willuhn
+ * @N Remote-Administrierbarkeit
+ *
  * Revision 1.1  2007/04/12 13:35:17  willuhn
  * @N SSL-Support
  * @N Authentifizierung

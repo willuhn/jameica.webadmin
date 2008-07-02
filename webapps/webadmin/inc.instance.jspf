@@ -1,0 +1,108 @@
+<%@page import="java.util.Arrays"%>
+<%@page import="java.util.List"%>
+<%@page import="java.util.ArrayList"%>
+<%@page import="java.util.Map"%>
+<%@page import="de.willuhn.jameica.webadmin.Settings"%>
+<%@page import="de.willuhn.jameica.system.Application"%>
+<%@page import="de.willuhn.jameica.messaging.StatusBarMessage"%>
+<%@page import="de.willuhn.jameica.webadmin.JSONClient"%>
+
+<%
+  String host = request.getParameter("host");
+  if (host != null && host.length() > 0)
+  {
+    boolean ssl = (request.getParameter("ssl") != null);
+    int port = 8080;
+    try
+    {
+      port = Integer.parseInt(request.getParameter("port"));
+    } catch (Exception e) {/*ignore*/}
+    if (port <= 0)
+      port = 8080;
+    
+    host = "http" + (ssl ? "s" : "") + "://" + host + ":" + port + "/webadmin";
+    ArrayList servers = new ArrayList(Arrays.asList(Settings.getJameicaInstances()));
+    servers.add(host);
+    Settings.setJameicaInstances((String[]) servers.toArray(new String[servers.size()]));
+    Settings.setJameicaInstancePassword(host,request.getParameter("password"));
+    
+    Application.getMessagingFactory().sendMessage(new StatusBarMessage("Server hinzugefügt",StatusBarMessage.TYPE_SUCCESS));
+    response.sendRedirect("/webadmin/"); // Damit beim Reload nicht erneut abgesendet wird
+  }
+%>
+
+
+<h2>Weitere Jameica-Server</h2>
+
+<table class="data">
+  <tr>
+    <th colspan="2">Verbundene Server</th>
+  </tr>
+  <tr>
+    <td>
+      <script type="text/javascript" language="JavaScript">
+        a = new dTree('a');
+        a.config.useCookies=true;
+        a.add(0,-1,'Katalog','');
+      
+        <%
+          String[] urls = Settings.getJameicaInstances();
+          for (int i=0;i<urls.length;++i)
+          {
+            %>
+              a.add(<%=i+100%>,0,'<%=urls[i]%>','<%=urls[i]%>');
+            <%
+
+            List plugins = JSONClient.asList(urls[i],"/rest/plugins/list");
+            for (int k=0;k<plugins.size();++k)
+            {
+              Map plugin = (Map) plugins.get(k);
+              %>
+                a.add(<%=i+100+k+10%>,<%=i+100%>,'<%=plugin.get("name")%>','<%=urls[i]%>/plugin.jsp?plugin=<%=plugin.get("name")%>');
+              <%
+
+              List services = JSONClient.asList(urls[i],"/rest/plugins/" + plugin.get("name") + "/services/list");
+              for (int m=0;m<services.size();++m)
+              {
+                Map service = (Map) services.get(m);
+                %>
+                  a.add(<%=i+100+k+10+m+1%>,<%=i+100+k+10%>,'<%=service.get("name")%>','<%=urls[i]%>/service.jsp?name=<%=service.get("name")%>');
+                <%
+              }
+            }
+          }
+        %>
+        document.write(a);
+        a.openAll();
+      </script>
+    </td>
+  </tr>
+</table>
+
+<br/>
+<form method="post">
+  <table class="data">
+    <tr>
+      <th colspan="2">Server hinzufügen</th>
+    </tr>
+    <tr>
+      <td>Hostname</td>
+      <td><input type="text" name="host"></td>
+    </tr>
+    <tr>
+      <td>TCP-Port</td>
+      <td><input type="text" name="port" value="8080"></td>
+    </tr>
+    <tr>
+      <td>Master-Passwort</td>
+      <td><input type="password" name="password"></td>
+    </tr>
+    <tr>
+      <td>SSL verwenden?</td>
+      <td><input name="ssl" type="checkbox" checked></td>
+    </tr>
+    <tr>
+      <td colspan="2"><input type="submit" value="Speichern"/></td>
+    </tr>
+  </table>
+</form>

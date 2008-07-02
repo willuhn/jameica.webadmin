@@ -154,3 +154,31 @@ div.note {
 	font-size                : 8pt;
 }
 
+
+
+/* js navigation tree */
+.dtree {
+  font-family             : Sans, Verdana, Helvetica, Arial;
+  white-space             : nowrap;
+}
+
+.dtree img {
+  border                  : 0px;
+  vertical-align          : middle;
+}
+
+.dtree a.node, .dtree a.nodeSel {
+  white-space             : nowrap;
+  padding                 : 1px 2px 1px 2px;
+}
+
+.dtree a.nodeSel {
+  color                   : darkblue;
+  /* background-color        : #c0d2ec; */
+  font-style              : bold;
+}
+
+.dtree .clip {
+  overflow                : hidden;
+}
+
