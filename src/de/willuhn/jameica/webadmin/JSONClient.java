@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/JSONClient.java,v $
- * $Revision: 1.1 $
- * $Date: 2008/07/02 17:43:00 $
+ * $Revision: 1.2 $
+ * $Date: 2008/07/08 14:26:59 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -105,8 +105,10 @@ public class JSONClient
   }
   
   /**
-   * @param url
-   * @return Liste 
+   * Ruft einen JSON-Service auf und liefert das Ergebnis als Liste von Objekten zurueck.
+   * @param url Basis-URL des JSON-Services.
+   * @param restCommand das REST-Kommando.
+   * @return Liste der Datensaetze.
    * @throws Exception
    */
   public static List asList(String url, String restCommand) throws Exception
@@ -185,6 +187,9 @@ public class JSONClient
 
 /**********************************************************************
  * $Log: JSONClient.java,v $
+ * Revision 1.2  2008/07/08 14:26:59  willuhn
+ * @D javadoc
+ *
  * Revision 1.1  2008/07/02 17:43:00  willuhn
  * @N Remote-Administrierbarkeit
  *
