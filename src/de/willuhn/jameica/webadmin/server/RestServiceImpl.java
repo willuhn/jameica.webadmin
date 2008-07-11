@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/server/RestServiceImpl.java,v $
- * $Revision: 1.5 $
- * $Date: 2008/06/16 22:31:53 $
+ * $Revision: 1.6 $
+ * $Date: 2008/07/11 15:38:55 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -170,9 +170,21 @@ public class RestServiceImpl implements RestService
   {
     if (!isStarted())
       throw new RemoteException("REST service not started");
+    Logger.info("register REST command " + command + ", URL pattern: " + urlPattern);
     this.settings.setAttribute(urlPattern,command);
   }
   
+  /**
+   * @see de.willuhn.jameica.webadmin.rmi.RestService#unregister(java.lang.String)
+   */
+  public void unregister(String urlPattern) throws RemoteException
+  {
+    if (!isStarted())
+      throw new RemoteException("REST service not started");
+    Logger.info("un-register URL pattern: " + urlPattern);
+    this.settings.setAttribute(urlPattern,(String) null);
+  }
+
   /**
    * Ueberschrieben, um die properties-Datei aus dem
    * Plugin-Verzeichnis als System-Preset zu verwenden.
@@ -194,6 +206,9 @@ public class RestServiceImpl implements RestService
 
 /*********************************************************************
  * $Log: RestServiceImpl.java,v $
+ * Revision 1.6  2008/07/11 15:38:55  willuhn
+ * @N Service-Deployment
+ *
  * Revision 1.5  2008/06/16 22:31:53  willuhn
  * @N weitere REST-Kommandos
  *

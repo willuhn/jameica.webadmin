@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/server/HttpServiceImpl.java,v $
- * $Revision: 1.24 $
- * $Date: 2008/04/27 23:32:02 $
+ * $Revision: 1.25 $
+ * $Date: 2008/07/11 15:38:55 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -21,6 +21,8 @@ import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Server;
 
+import de.willuhn.jameica.messaging.TextMessage;
+import de.willuhn.jameica.system.Application;
 import de.willuhn.jameica.webadmin.Settings;
 import de.willuhn.jameica.webadmin.rmi.HttpService;
 import de.willuhn.logging.Logger;
@@ -111,6 +113,7 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
     try
     {
       this.server.start();
+      Application.getMessagingFactory().getMessagingQueue("jameica.webadmin.started").sendMessage(new TextMessage("web server deployed"));
       Logger.info("started webserver at port " + Settings.getPort());
     }
     catch (Exception e)
@@ -148,6 +151,9 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
 
 /**********************************************************************
  * $Log: HttpServiceImpl.java,v $
+ * Revision 1.25  2008/07/11 15:38:55  willuhn
+ * @N Service-Deployment
+ *
  * Revision 1.24  2008/04/27 23:32:02  willuhn
  * @N SLF4J-Logger-Adapter von Markus uebernommen
  *

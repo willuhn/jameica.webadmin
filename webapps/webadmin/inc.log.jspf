@@ -37,12 +37,15 @@
       for (int i=__logLines.length-1;i>=0;--i)
       {
         String loggingClass = __logLines[i].getLoggingClass();
-        loggingClass = loggingClass.substring(loggingClass.lastIndexOf('.')+1);
+        loggingClass        = loggingClass.substring(loggingClass.lastIndexOf('.')+1);
+
+        String text         = __logLines[i].getText();
+        text                = text.replaceAll("<","&lt;").replaceAll(">","&gt;");
         %>
 		      <tr onmouseover="change_to(this);" onmouseout="change_back(this);" class="<%= __logLines[i].getLevel().getName() %>">
 		        <td style="white-space:nowrap;"><pre><%= __logDf.format(__logLines[i].getDate()) %></pre></td>
 		        <td><pre><%= loggingClass %></pre></td>
-		        <td><pre><%= __logLines[i].getText() %></pre></td>
+		        <td><pre><%= text %></pre></td>
 		      </tr>
         <%
       }

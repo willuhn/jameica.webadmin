@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rmi/RestService.java,v $
- * $Revision: 1.2 $
- * $Date: 2008/06/16 14:22:11 $
+ * $Revision: 1.3 $
+ * $Date: 2008/07/11 15:38:55 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -41,11 +41,22 @@ public interface RestService extends Service
    * @throws RemoteException
    */
   public void register(String urlPattern, String command) throws RemoteException;
+
+
+  /**
+   * De-Registriert ein Kommando auf eine URL.
+   * @param urlPattern Pattern mit der URL.
+   * @throws RemoteException
+   */
+  public void unregister(String urlPattern) throws RemoteException;
 }
 
 
 /*********************************************************************
  * $Log: RestService.java,v $
+ * Revision 1.3  2008/07/11 15:38:55  willuhn
+ * @N Service-Deployment
+ *
  * Revision 1.2  2008/06/16 14:22:11  willuhn
  * @N Mapping der REST-URLs via Property-Datei
  *
