@@ -1,7 +1,10 @@
 /**
- * $Id: JameicaLoggerAdapter.java,v 1.2 2008/05/30 11:55:37 willuhn Exp $
+ * $Id: JameicaLoggerAdapter.java,v 1.3 2008/08/08 11:24:48 willuhn Exp $
  */
 package org.slf4j.impl;
+
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Handler;
 
 import org.slf4j.Marker;
 
@@ -12,6 +15,27 @@ import de.willuhn.logging.Logger;
  * @author Markus Wolf <markus@emedia-solutions-wolf.de>
  */
 public class JameicaLoggerAdapter implements org.slf4j.Logger {
+  static
+  {
+    // Wir deaktivieren den Console-Logger aus, weil wir
+    // die ganzen Ausgaben durch Jameica ohnehin schon dort
+    // haben und sonst doppelt haetten
+    java.util.logging.Logger logger = java.util.logging.Logger.getLogger("");
+    Handler[] handlers = logger.getHandlers();
+    if (handlers != null)
+    {
+      for (int i=0;i<handlers.length;++i)
+      {
+        if (handlers[i] == null)
+          continue;
+        if (handlers[i] instanceof ConsoleHandler)
+        {
+          Logger.info("disable console logging for java logging");
+          handlers[i].setLevel(java.util.logging.Level.OFF);
+        }
+      }
+    }
+  }
 
 	/**
 	 * @see org.slf4j.Logger#debug(org.slf4j.Marker, java.lang.String,
@@ -242,7 +266,7 @@ public class JameicaLoggerAdapter implements org.slf4j.Logger {
 	 * @see org.slf4j.Logger#info(java.lang.String)
 	 */
 	public void info(String s) {
-		Logger.info(s);
+		Logger.debug(s);
 	}
 
 	/**
