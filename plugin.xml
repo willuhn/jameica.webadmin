@@ -10,6 +10,8 @@
   <homepage>http://www.willuhn.de/projects/jameica</homepage>
   <license>GPL - http://www.gnu.org/copyleft/gpl.html</license>
 
+  <requires jameica="1.6+"/>
+
   <classfinder>
     <include>jameica\.webadmin\.jar</include>
     <include>.*\.class</include>
