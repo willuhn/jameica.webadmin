@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/server/RestServiceImpl.java,v $
- * $Revision: 1.6 $
- * $Date: 2008/07/11 15:38:55 $
+ * $Revision: 1.7 $
+ * $Date: 2008/09/09 14:40:09 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -45,6 +45,31 @@ public class RestServiceImpl implements RestService
     if (!this.isStarted())
       throw new IOException("REST service not started");
 
+    // Wie Umlaute im Query-String (also URL+GET-Parameter) codiert sind,
+    // ist nirgends so richtig spezifiziert. Also schicken es die
+    // Browser unterschiedlich. Jetty interpretiert es als UTF-8.
+    // Wenn man auf dem Client jedoch ISO-8859-15 als Zeichensatz
+    // eingestellt hat, schickt es auch der Browser damit.
+    // Effekt: Der Server weiss nicht, wie er die Umlaute interpretieren soll.
+    // Das fuehrt bisweilen soweit, dass nicht nur die Umlaute in request.getParameter(name)
+    // kaputt sind sondern ggf. auch noch die Buchstaben hinter dem Umlaut
+    // verloren gehen.
+    // Immerhin bietet Jetty eine Funktion an, um das Encoding
+    // vorzugeben. Das gaenge mit explizit mit:
+    // ((org.mortbay.jetty.Request)request).setQueryEncoding(String);
+    // oder implizit via (damit muss der Request nicht auf org.mortbay.jetty.Request gecastet werden:
+    // request.setAttribute("org.mortbay.jetty.Request.queryEncoding","String");
+    
+    // siehe hierzu auch
+    // http://jira.codehaus.org/browse/JETTY-113
+    // http://jetty.mortbay.org/jetty5/faq/faq_s_900-Content_t_International.html
+    String queryencoding = de.willuhn.jameica.webadmin.Settings.SETTINGS.getString("http.queryencoding",null);
+    if (queryencoding != null)
+    {
+      Logger.debug("query encoding: " + queryencoding);
+      request.setAttribute("org.mortbay.jetty.Request.queryEncoding",queryencoding);
+    }
+    
     String command = request.getPathInfo();
     if (command == null)
       throw new IOException("missing REST command");
@@ -206,6 +231,9 @@ public class RestServiceImpl implements RestService
 
 /*********************************************************************
  * $Log: RestServiceImpl.java,v $
+ * Revision 1.7  2008/09/09 14:40:09  willuhn
+ * @D Hinweise zum Encoding. Siehe auch http://www.willuhn.de/blog/index.php?/archives/415-Umlaute-in-URLs-sind-Mist.html
+ *
  * Revision 1.6  2008/07/11 15:38:55  willuhn
  * @N Service-Deployment
  *
