@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/server/RestServiceImpl.java,v $
- * $Revision: 1.7 $
- * $Date: 2008/09/09 14:40:09 $
+ * $Revision: 1.8 $
+ * $Date: 2008/10/07 23:45:16 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -23,6 +23,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import de.willuhn.datasource.BeanUtil;
+import de.willuhn.jameica.messaging.Message;
+import de.willuhn.jameica.messaging.MessageConsumer;
+import de.willuhn.jameica.messaging.QueryMessage;
+import de.willuhn.jameica.messaging.TextMessage;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.jameica.webadmin.Plugin;
 import de.willuhn.jameica.webadmin.rest.Context;
@@ -35,7 +39,9 @@ import de.willuhn.util.Settings;
  */
 public class RestServiceImpl implements RestService
 {
-  private Settings settings = null;
+  private Settings settings          = null;
+  private MessageConsumer register   = new RestConsumer(true);
+  private MessageConsumer unregister = new RestConsumer(false);
   
   /**
    * @see de.willuhn.jameica.webadmin.rmi.RestService#handleRequest(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
@@ -171,6 +177,8 @@ public class RestServiceImpl implements RestService
     Logger.info("init REST registry");
     this.settings = new RestSettings();
     this.settings.setStoreWhenRead(false);
+    Application.getMessagingFactory().getMessagingQueue("jameica.webadmin.rest.register").registerMessageConsumer(this.register);
+    Application.getMessagingFactory().getMessagingQueue("jameica.webadmin.rest.unregister").registerMessageConsumer(this.unregister);
   }
 
   /**
@@ -184,6 +192,8 @@ public class RestServiceImpl implements RestService
       return;
     }
     
+    Application.getMessagingFactory().getMessagingQueue("jameica.webadmin.rest.register").unRegisterMessageConsumer(this.register);
+    Application.getMessagingFactory().getMessagingQueue("jameica.webadmin.rest.unregister").unRegisterMessageConsumer(this.unregister);
     Logger.info("REST service stopped");
     this.settings = null;
   }
@@ -226,11 +236,89 @@ public class RestServiceImpl implements RestService
             RestService.class);
     }
   }
+  
+  /**
+   * Hilfsklasse zum Registrieren von REST-Kommandos via Messaging
+   */
+  private class RestConsumer implements MessageConsumer
+  {
+    private boolean register = false;
+    
+    /**
+     * @param register true zum Registrieren, false zum De-Registrieren.
+     */
+    private RestConsumer(boolean register)
+    {
+      this.register = register;
+    }
+    /**
+     * @see de.willuhn.jameica.messaging.MessageConsumer#autoRegister()
+     */
+    public boolean autoRegister()
+    {
+      return false;
+    }
+
+    /**
+     * @see de.willuhn.jameica.messaging.MessageConsumer#getExpectedMessageTypes()
+     */
+    public Class[] getExpectedMessageTypes()
+    {
+      return new Class[]{QueryMessage.class, TextMessage.class};
+    }
+
+    /**
+     * @see de.willuhn.jameica.messaging.MessageConsumer#handleMessage(de.willuhn.jameica.messaging.Message)
+     */
+    public void handleMessage(Message message) throws Exception
+    {
+      String pattern = null;
+      String command = null;
+      
+      if (message instanceof QueryMessage)
+      {
+        QueryMessage m = (QueryMessage) message;
+        pattern = m.getName();
+        Object data = m.getData();
+        if (data != null)
+          command = data.toString();
+      }
+      else if (message instanceof TextMessage)
+      {
+        TextMessage m = (TextMessage) message;
+        pattern = m.getTitle();
+        command = m.getText();
+      }
+
+      if (pattern == null || pattern.length() == 0)
+      {
+        Logger.warn("no pattern given: " + pattern);
+        return;
+      }
+      
+      if (register)
+      {
+        if (command == null || command.length() == 0)
+        {
+          Logger.warn("no command given: " + command);
+          return;
+        }
+        register(pattern,command);
+      }
+      else
+      {
+        unregister(pattern);
+      }
+    }
+  }
 }
 
 
 /*********************************************************************
  * $Log: RestServiceImpl.java,v $
+ * Revision 1.8  2008/10/07 23:45:16  willuhn
+ * @N Registrieren/Deregistrieren von REST-Commands via Messaging
+ *
  * Revision 1.7  2008/09/09 14:40:09  willuhn
  * @D Hinweise zum Encoding. Siehe auch http://www.willuhn.de/blog/index.php?/archives/415-Umlaute-in-URLs-sind-Mist.html
  *
