@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Echo.java,v $
- * $Revision: 1.2 $
- * $Date: 2008/06/16 14:22:11 $
+ * $Revision: 1.3 $
+ * $Date: 2008/10/08 16:01:38 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -14,10 +14,12 @@
 package de.willuhn.jameica.webadmin.rest;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import de.willuhn.jameica.webadmin.rest.annotation.Writer;
 import de.willuhn.logging.Logger;
 
 /**
@@ -26,8 +28,9 @@ import de.willuhn.logging.Logger;
  */
 public class Echo
 {
-  private Context context = null;
-  
+  @Writer
+  private PrintWriter writer = null;
+
   /**
    * Fuehrt das Echo aus.
    * @param echo zurueckzuliefernder Text.
@@ -37,7 +40,7 @@ public class Echo
   {
     try
     {
-      context.getResponse().getWriter().print(new JSONObject().put("echo",echo).toString());
+      writer.print(new JSONObject().put("echo",echo).toString());
     }
     catch (JSONException e)
     {
@@ -45,20 +48,14 @@ public class Echo
       throw new IOException("error while encoding into json");
     }
   }
-  
-  /**
-   * Speichert den Context des Aufrufs.
-   * @param context Context.
-   */
-  public void setContext(Context context)
-  {
-    this.context = context;
-  }
 }
 
 
 /*********************************************************************
  * $Log: Echo.java,v $
+ * Revision 1.3  2008/10/08 16:01:38  willuhn
+ * @N REST-Services via Injection (mittels Annotation) mit Context-Daten befuellen
+ *
  * Revision 1.2  2008/06/16 14:22:11  willuhn
  * @N Mapping der REST-URLs via Property-Datei
  *

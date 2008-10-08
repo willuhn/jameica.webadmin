@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Log.java,v $
- * $Revision: 1.3 $
- * $Date: 2008/06/20 13:24:29 $
+ * $Revision: 1.4 $
+ * $Date: 2008/10/08 16:01:38 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -14,12 +14,17 @@
 package de.willuhn.jameica.webadmin.rest;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.json.JSONArray;
 
+import de.willuhn.jameica.webadmin.rest.annotation.Request;
+import de.willuhn.jameica.webadmin.rest.annotation.Writer;
 import de.willuhn.logging.Level;
 import de.willuhn.logging.Logger;
 import de.willuhn.logging.Message;
@@ -30,7 +35,11 @@ import de.willuhn.logging.Message;
  */
 public class Log
 {
-  private Context context = null;
+  @Writer
+  private PrintWriter writer = null;
+  
+  @Request
+  private HttpServletRequest request = null;
   
   /**
    * Liefert die letzten Zeilen des Logs.
@@ -73,7 +82,7 @@ public class Log
       data.put("text",  msg[i].getText());
       json.add(data);
     }
-    context.getResponse().getWriter().print(new JSONArray(json).toString());
+    writer.print(new JSONArray(json).toString());
   }
   
   /**
@@ -122,22 +131,16 @@ public class Log
    */
   private void write(Level level, String clazz, String method, String text) throws IOException
   {
-    Logger.write(level,context.getRequest().getRemoteHost(),clazz,method,text,null);
-  }
-
-  /**
-   * Speichert den Context.
-   * @param context der Context.
-   */
-  public void setContext(Context context)
-  {
-    this.context = context;
+    Logger.write(level,request.getRemoteHost(),clazz,method,text,null);
   }
 }
 
 
 /*********************************************************************
  * $Log: Log.java,v $
+ * Revision 1.4  2008/10/08 16:01:38  willuhn
+ * @N REST-Services via Injection (mittels Annotation) mit Context-Daten befuellen
+ *
  * Revision 1.3  2008/06/20 13:24:29  willuhn
  * @N REST-Command zum Abrufen der letzten Log-Zeilen
  *

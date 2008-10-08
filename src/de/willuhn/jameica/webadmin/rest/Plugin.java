@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Plugin.java,v $
- * $Revision: 1.3 $
- * $Date: 2008/06/16 22:31:53 $
+ * $Revision: 1.4 $
+ * $Date: 2008/10/08 16:01:38 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -14,6 +14,7 @@
 package de.willuhn.jameica.webadmin.rest;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +24,7 @@ import org.json.JSONArray;
 
 import de.willuhn.jameica.plugin.Manifest;
 import de.willuhn.jameica.system.Application;
+import de.willuhn.jameica.webadmin.rest.annotation.Writer;
 
 
 /**
@@ -30,7 +32,8 @@ import de.willuhn.jameica.system.Application;
  */
 public class Plugin
 {
-  private Context context = null;
+  @Writer
+  private PrintWriter writer = null;
   
   /**
    * Listet die installierten Plugins auf.
@@ -57,23 +60,16 @@ public class Plugin
       data.put("version",     Double.toString(mf.getVersion()));
       json.add(data);
     }
-    context.getResponse().getWriter().print(new JSONArray(json).toString());
+    writer.print(new JSONArray(json).toString());
   }
-  
-  /**
-   * Speichert den Context.
-   * @param context der Context.
-   */
-  public void setContext(Context context)
-  {
-    this.context = context;
-  }
-
 }
 
 
 /**********************************************************************
  * $Log: Plugin.java,v $
+ * Revision 1.4  2008/10/08 16:01:38  willuhn
+ * @N REST-Services via Injection (mittels Annotation) mit Context-Daten befuellen
+ *
  * Revision 1.3  2008/06/16 22:31:53  willuhn
  * @N weitere REST-Kommandos
  *

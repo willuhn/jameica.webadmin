@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/server/RestServiceImpl.java,v $
- * $Revision: 1.8 $
- * $Date: 2008/10/07 23:45:16 $
+ * $Revision: 1.9 $
+ * $Date: 2008/10/08 16:01:38 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -15,6 +15,7 @@ package de.willuhn.jameica.webadmin.server;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.rmi.RemoteException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -29,7 +30,12 @@ import de.willuhn.jameica.messaging.QueryMessage;
 import de.willuhn.jameica.messaging.TextMessage;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.jameica.webadmin.Plugin;
-import de.willuhn.jameica.webadmin.rest.Context;
+import de.willuhn.jameica.webadmin.rest.annotation.InputStream;
+import de.willuhn.jameica.webadmin.rest.annotation.OutputStream;
+import de.willuhn.jameica.webadmin.rest.annotation.Reader;
+import de.willuhn.jameica.webadmin.rest.annotation.Request;
+import de.willuhn.jameica.webadmin.rest.annotation.Response;
+import de.willuhn.jameica.webadmin.rest.annotation.Writer;
 import de.willuhn.jameica.webadmin.rmi.RestService;
 import de.willuhn.logging.Logger;
 import de.willuhn.util.Settings;
@@ -75,7 +81,6 @@ public class RestServiceImpl implements RestService
       Logger.debug("query encoding: " + queryencoding);
       request.setAttribute("org.mortbay.jetty.Request.queryEncoding",queryencoding);
     }
-    
     String command = request.getPathInfo();
     if (command == null)
       throw new IOException("missing REST command");
@@ -86,7 +91,6 @@ public class RestServiceImpl implements RestService
 
     try
     {
-      Context context = new Context(request,response);
       for (int i=0;i<patterns.length;++i)
       {
         Pattern pattern = Pattern.compile(patterns[i]);
@@ -107,19 +111,12 @@ public class RestServiceImpl implements RestService
           
           int pos = s.lastIndexOf('.');
           if (pos == -1)
-            throw new IOException("invalid command defined for command " + command);
+            throw new IOException("invalid command defined for " + command);
 
           Object bean = Application.getClassLoader().load(s.substring(0,pos)).newInstance();
+          applyAnnotations(bean, request, response);
+
           String method = s.substring(pos+1);
-          
-          try
-          {
-            Logger.debug("trying to apply context");
-            BeanUtil.set(bean,"context",context);
-          } catch (Exception e) {
-            Logger.debug("failed, skipping context");
-          }
-          
           Logger.debug("executing command " + command + ", class " + bean.getClass().getName() + "." + method);
           BeanUtil.invoke(bean,method,params);
           return;
@@ -139,6 +136,40 @@ public class RestServiceImpl implements RestService
     throw new IOException("no command found for REST url " + command);
   }
 
+  /**
+   * Injiziert die Annotations.
+   * @param bean die Bean.
+   * @throws IOException
+   */
+  private void applyAnnotations(Object bean, HttpServletRequest request, HttpServletResponse response) throws IOException
+  {
+    Field[] fields = bean.getClass().getDeclaredFields();
+    for (Field f:fields)
+    {
+      Object value = null;
+      if (f.getAnnotation(InputStream.class) != null)       value = request.getInputStream();
+      else if (f.getAnnotation(OutputStream.class) != null) value = response.getOutputStream();
+      else if (f.getAnnotation(Reader.class) != null)       value = request.getReader();
+      else if (f.getAnnotation(Request.class) != null)      value = request;
+      else if (f.getAnnotation(Response.class) != null)     value = response;
+      else if (f.getAnnotation(Writer.class) != null)       value = response.getWriter();
+      
+      if (value == null)
+        return;
+      
+      try
+      {
+        f.setAccessible(true);
+        f.set(bean,value);
+      }
+      catch (Exception e)
+      {
+        Logger.error("unable to inject context",e);
+        throw new IOException("unable to inject context");
+      }
+    }
+  }
+  
   /**
    * @see de.willuhn.datasource.Service#getName()
    */
@@ -194,6 +225,7 @@ public class RestServiceImpl implements RestService
     
     Application.getMessagingFactory().getMessagingQueue("jameica.webadmin.rest.register").unRegisterMessageConsumer(this.register);
     Application.getMessagingFactory().getMessagingQueue("jameica.webadmin.rest.unregister").unRegisterMessageConsumer(this.unregister);
+    Application.getMessagingFactory().getMessagingQueue("jameica.webadmin.rest.ready").sendMessage(new QueryMessage());
     Logger.info("REST service stopped");
     this.settings = null;
   }
@@ -242,14 +274,14 @@ public class RestServiceImpl implements RestService
    */
   private class RestConsumer implements MessageConsumer
   {
-    private boolean register = false;
+    private boolean r = false;
     
     /**
      * @param register true zum Registrieren, false zum De-Registrieren.
      */
     private RestConsumer(boolean register)
     {
-      this.register = register;
+      this.r = register;
     }
     /**
      * @see de.willuhn.jameica.messaging.MessageConsumer#autoRegister()
@@ -296,7 +328,7 @@ public class RestServiceImpl implements RestService
         return;
       }
       
-      if (register)
+      if (r)
       {
         if (command == null || command.length() == 0)
         {
@@ -316,6 +348,9 @@ public class RestServiceImpl implements RestService
 
 /*********************************************************************
  * $Log: RestServiceImpl.java,v $
+ * Revision 1.9  2008/10/08 16:01:38  willuhn
+ * @N REST-Services via Injection (mittels Annotation) mit Context-Daten befuellen
+ *
  * Revision 1.8  2008/10/07 23:45:16  willuhn
  * @N Registrieren/Deregistrieren von REST-Commands via Messaging
  *
