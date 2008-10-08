@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/server/RestServiceImpl.java,v $
- * $Revision: 1.10 $
- * $Date: 2008/10/08 17:54:32 $
+ * $Revision: 1.11 $
+ * $Date: 2008/10/08 21:38:23 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -30,12 +30,8 @@ import de.willuhn.jameica.messaging.QueryMessage;
 import de.willuhn.jameica.messaging.TextMessage;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.jameica.webadmin.Plugin;
-import de.willuhn.jameica.webadmin.rest.annotation.InputStream;
-import de.willuhn.jameica.webadmin.rest.annotation.OutputStream;
-import de.willuhn.jameica.webadmin.rest.annotation.Reader;
 import de.willuhn.jameica.webadmin.rest.annotation.Request;
 import de.willuhn.jameica.webadmin.rest.annotation.Response;
-import de.willuhn.jameica.webadmin.rest.annotation.Writer;
 import de.willuhn.jameica.webadmin.rmi.RestService;
 import de.willuhn.logging.Logger;
 import de.willuhn.util.Settings;
@@ -147,12 +143,8 @@ public class RestServiceImpl implements RestService
     for (Field f:fields)
     {
       Object value = null;
-      if (f.getAnnotation(InputStream.class) != null)       value = request.getInputStream();
-      else if (f.getAnnotation(OutputStream.class) != null) value = response.getOutputStream();
-      else if (f.getAnnotation(Reader.class) != null)       value = request.getReader();
-      else if (f.getAnnotation(Request.class) != null)      value = request;
-      else if (f.getAnnotation(Response.class) != null)     value = response;
-      else if (f.getAnnotation(Writer.class) != null)       value = response.getWriter();
+      if (f.getAnnotation(Request.class) != null)       value = request;
+      else if (f.getAnnotation(Response.class) != null) value = response;
       
       if (value == null)
         return;
@@ -349,6 +341,9 @@ public class RestServiceImpl implements RestService
 
 /*********************************************************************
  * $Log: RestServiceImpl.java,v $
+ * Revision 1.11  2008/10/08 21:38:23  willuhn
+ * @C Nur noch zwei Annotations "Request" und "Response"
+ *
  * Revision 1.10  2008/10/08 17:54:32  willuhn
  * @B message an der falschen Stelle geschickt
  *

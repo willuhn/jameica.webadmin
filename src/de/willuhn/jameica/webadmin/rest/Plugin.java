@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Plugin.java,v $
- * $Revision: 1.4 $
- * $Date: 2008/10/08 16:01:38 $
+ * $Revision: 1.5 $
+ * $Date: 2008/10/08 21:38:23 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -14,17 +14,18 @@
 package de.willuhn.jameica.webadmin.rest;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.json.JSONArray;
 
 import de.willuhn.jameica.plugin.Manifest;
 import de.willuhn.jameica.system.Application;
-import de.willuhn.jameica.webadmin.rest.annotation.Writer;
+import de.willuhn.jameica.webadmin.rest.annotation.Response;
 
 
 /**
@@ -32,8 +33,8 @@ import de.willuhn.jameica.webadmin.rest.annotation.Writer;
  */
 public class Plugin
 {
-  @Writer
-  private PrintWriter writer = null;
+  @Response
+  private HttpServletResponse response = null;
   
   /**
    * Listet die installierten Plugins auf.
@@ -60,13 +61,16 @@ public class Plugin
       data.put("version",     Double.toString(mf.getVersion()));
       json.add(data);
     }
-    writer.print(new JSONArray(json).toString());
+    response.getWriter().print(new JSONArray(json).toString());
   }
 }
 
 
 /**********************************************************************
  * $Log: Plugin.java,v $
+ * Revision 1.5  2008/10/08 21:38:23  willuhn
+ * @C Nur noch zwei Annotations "Request" und "Response"
+ *
  * Revision 1.4  2008/10/08 16:01:38  willuhn
  * @N REST-Services via Injection (mittels Annotation) mit Context-Daten befuellen
  *

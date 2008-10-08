@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Service.java,v $
- * $Revision: 1.4 $
- * $Date: 2008/10/08 16:01:38 $
+ * $Revision: 1.5 $
+ * $Date: 2008/10/08 21:38:23 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -14,11 +14,12 @@
 package de.willuhn.jameica.webadmin.rest;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -26,7 +27,7 @@ import org.json.JSONObject;
 import de.willuhn.jameica.plugin.AbstractPlugin;
 import de.willuhn.jameica.plugin.ServiceDescriptor;
 import de.willuhn.jameica.system.Application;
-import de.willuhn.jameica.webadmin.rest.annotation.Writer;
+import de.willuhn.jameica.webadmin.rest.annotation.Response;
 import de.willuhn.logging.Logger;
 
 /**
@@ -34,8 +35,8 @@ import de.willuhn.logging.Logger;
  */
 public class Service
 {
-  @Writer
-  private PrintWriter writer = null;
+  @Response
+  private HttpServletResponse response = null;
   
   /**
    * Startet den Service.
@@ -49,7 +50,7 @@ public class Service
     {
       de.willuhn.datasource.Service s = find(plugin,service);
       s.start();
-      writer.print(new JSONObject().put("started","true").toString());
+      response.getWriter().print(new JSONObject().put("started","true").toString());
     }
     catch (IOException e)
     {
@@ -74,7 +75,7 @@ public class Service
     {
       de.willuhn.datasource.Service s = find(plugin,service);
       s.stop(false);
-      writer.print(new JSONObject().put("started","false").toString());
+      response.getWriter().print(new JSONObject().put("started","false").toString());
     }
     catch (IOException e)
     {
@@ -98,7 +99,7 @@ public class Service
     try
     {
       de.willuhn.datasource.Service s = find(plugin,service);
-      writer.print(new JSONObject().put("started",s.isStarted() ? "true" : "false").toString());
+      response.getWriter().print(new JSONObject().put("started",s.isStarted() ? "true" : "false").toString());
     }
     catch (IOException e)
     {
@@ -185,13 +186,16 @@ public class Service
         Logger.error("unable to load service " + services[i].getName(),e);
       }
     }
-    writer.print(new JSONArray(json).toString());
+    response.getWriter().print(new JSONArray(json).toString());
   }
 }
 
 
 /*********************************************************************
  * $Log: Service.java,v $
+ * Revision 1.5  2008/10/08 21:38:23  willuhn
+ * @C Nur noch zwei Annotations "Request" und "Response"
+ *
  * Revision 1.4  2008/10/08 16:01:38  willuhn
  * @N REST-Services via Injection (mittels Annotation) mit Context-Daten befuellen
  *

@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Log.java,v $
- * $Revision: 1.4 $
- * $Date: 2008/10/08 16:01:38 $
+ * $Revision: 1.5 $
+ * $Date: 2008/10/08 21:38:23 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -14,17 +14,17 @@
 package de.willuhn.jameica.webadmin.rest;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONArray;
 
 import de.willuhn.jameica.webadmin.rest.annotation.Request;
-import de.willuhn.jameica.webadmin.rest.annotation.Writer;
+import de.willuhn.jameica.webadmin.rest.annotation.Response;
 import de.willuhn.logging.Level;
 import de.willuhn.logging.Logger;
 import de.willuhn.logging.Message;
@@ -35,11 +35,11 @@ import de.willuhn.logging.Message;
  */
 public class Log
 {
-  @Writer
-  private PrintWriter writer = null;
+  @Response
+  private HttpServletResponse response = null;
   
   @Request
-  private HttpServletRequest request = null;
+  private HttpServletRequest request   = null;
   
   /**
    * Liefert die letzten Zeilen des Logs.
@@ -82,7 +82,7 @@ public class Log
       data.put("text",  msg[i].getText());
       json.add(data);
     }
-    writer.print(new JSONArray(json).toString());
+    response.getWriter().print(new JSONArray(json).toString());
   }
   
   /**
@@ -138,6 +138,9 @@ public class Log
 
 /*********************************************************************
  * $Log: Log.java,v $
+ * Revision 1.5  2008/10/08 21:38:23  willuhn
+ * @C Nur noch zwei Annotations "Request" und "Response"
+ *
  * Revision 1.4  2008/10/08 16:01:38  willuhn
  * @N REST-Services via Injection (mittels Annotation) mit Context-Daten befuellen
  *

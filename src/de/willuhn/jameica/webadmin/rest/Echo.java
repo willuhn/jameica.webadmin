@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Echo.java,v $
- * $Revision: 1.3 $
- * $Date: 2008/10/08 16:01:38 $
+ * $Revision: 1.4 $
+ * $Date: 2008/10/08 21:38:23 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -14,12 +14,13 @@
 package de.willuhn.jameica.webadmin.rest;
 
 import java.io.IOException;
-import java.io.PrintWriter;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import de.willuhn.jameica.webadmin.rest.annotation.Writer;
+import de.willuhn.jameica.webadmin.rest.annotation.Response;
 import de.willuhn.logging.Logger;
 
 /**
@@ -28,8 +29,8 @@ import de.willuhn.logging.Logger;
  */
 public class Echo
 {
-  @Writer
-  private PrintWriter writer = null;
+  @Response
+  private HttpServletResponse response = null;
 
   /**
    * Fuehrt das Echo aus.
@@ -40,7 +41,7 @@ public class Echo
   {
     try
     {
-      writer.print(new JSONObject().put("echo",echo).toString());
+      response.getWriter().print(new JSONObject().put("echo",echo).toString());
     }
     catch (JSONException e)
     {
@@ -53,6 +54,9 @@ public class Echo
 
 /*********************************************************************
  * $Log: Echo.java,v $
+ * Revision 1.4  2008/10/08 21:38:23  willuhn
+ * @C Nur noch zwei Annotations "Request" und "Response"
+ *
  * Revision 1.3  2008/10/08 16:01:38  willuhn
  * @N REST-Services via Injection (mittels Annotation) mit Context-Daten befuellen
  *
