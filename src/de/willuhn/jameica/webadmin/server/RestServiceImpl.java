@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/server/RestServiceImpl.java,v $
- * $Revision: 1.9 $
- * $Date: 2008/10/08 16:01:38 $
+ * $Revision: 1.10 $
+ * $Date: 2008/10/08 17:54:32 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -210,6 +210,7 @@ public class RestServiceImpl implements RestService
     this.settings.setStoreWhenRead(false);
     Application.getMessagingFactory().getMessagingQueue("jameica.webadmin.rest.register").registerMessageConsumer(this.register);
     Application.getMessagingFactory().getMessagingQueue("jameica.webadmin.rest.unregister").registerMessageConsumer(this.unregister);
+    Application.getMessagingFactory().getMessagingQueue("jameica.webadmin.rest.start").sendMessage(new QueryMessage());
   }
 
   /**
@@ -225,7 +226,7 @@ public class RestServiceImpl implements RestService
     
     Application.getMessagingFactory().getMessagingQueue("jameica.webadmin.rest.register").unRegisterMessageConsumer(this.register);
     Application.getMessagingFactory().getMessagingQueue("jameica.webadmin.rest.unregister").unRegisterMessageConsumer(this.unregister);
-    Application.getMessagingFactory().getMessagingQueue("jameica.webadmin.rest.ready").sendMessage(new QueryMessage());
+    Application.getMessagingFactory().getMessagingQueue("jameica.webadmin.rest.stop").sendMessage(new QueryMessage());
     Logger.info("REST service stopped");
     this.settings = null;
   }
@@ -348,6 +349,9 @@ public class RestServiceImpl implements RestService
 
 /*********************************************************************
  * $Log: RestServiceImpl.java,v $
+ * Revision 1.10  2008/10/08 17:54:32  willuhn
+ * @B message an der falschen Stelle geschickt
+ *
  * Revision 1.9  2008/10/08 16:01:38  willuhn
  * @N REST-Services via Injection (mittels Annotation) mit Context-Daten befuellen
  *
