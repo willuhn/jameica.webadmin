@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Log.java,v $
- * $Revision: 1.5 $
- * $Date: 2008/10/08 21:38:23 $
+ * $Revision: 1.6 $
+ * $Date: 2008/10/21 22:33:47 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONArray;
 
+import de.willuhn.jameica.webadmin.rest.annotation.Path;
 import de.willuhn.jameica.webadmin.rest.annotation.Request;
 import de.willuhn.jameica.webadmin.rest.annotation.Response;
 import de.willuhn.logging.Level;
@@ -45,6 +46,7 @@ public class Log
    * Liefert die letzten Zeilen des Logs.
    * @throws IOException
    */
+  @Path("/log/last$")
   public void last() throws IOException
   {
     last(null);
@@ -55,6 +57,7 @@ public class Log
    * @param lines Anzahl der Zeilen.
    * @throws IOException
    */
+  @Path("/log/last/([0-9]{1,2})$")
   public void last(String lines) throws IOException
   {
     int last = -1;
@@ -92,6 +95,7 @@ public class Log
    * @param text zu loggender Text.
    * @throws IOException
    */
+  @Path("/log/info/(.*?)/(.*?)/(.*?)")
   public void info(String clazz, String method, String text) throws IOException
   {
     write(Level.INFO,clazz,method,text);
@@ -104,6 +108,7 @@ public class Log
    * @param text zu loggender Text.
    * @throws IOException
    */
+  @Path("/log/warn/(.*?)/(.*?)/(.*?)")
   public void warn(String clazz, String method, String text) throws IOException
   {
     write(Level.WARN,clazz,method,text);
@@ -116,6 +121,7 @@ public class Log
    * @param text zu loggender Text.
    * @throws IOException
    */
+  @Path("/log/error/(.*?)/(.*?)/(.*?)")
   public void error(String clazz, String method, String text) throws IOException
   {
     write(Level.ERROR,clazz,method,text);
@@ -138,6 +144,9 @@ public class Log
 
 /*********************************************************************
  * $Log: Log.java,v $
+ * Revision 1.6  2008/10/21 22:33:47  willuhn
+ * @N Markieren der zu registrierenden REST-Kommandos via Annotation
+ *
  * Revision 1.5  2008/10/08 21:38:23  willuhn
  * @C Nur noch zwei Annotations "Request" und "Response"
  *

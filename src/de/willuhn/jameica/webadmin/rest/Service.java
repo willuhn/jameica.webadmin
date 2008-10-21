@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Service.java,v $
- * $Revision: 1.5 $
- * $Date: 2008/10/08 21:38:23 $
+ * $Revision: 1.6 $
+ * $Date: 2008/10/21 22:33:47 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -27,6 +27,7 @@ import org.json.JSONObject;
 import de.willuhn.jameica.plugin.AbstractPlugin;
 import de.willuhn.jameica.plugin.ServiceDescriptor;
 import de.willuhn.jameica.system.Application;
+import de.willuhn.jameica.webadmin.rest.annotation.Path;
 import de.willuhn.jameica.webadmin.rest.annotation.Response;
 import de.willuhn.logging.Logger;
 
@@ -44,6 +45,7 @@ public class Service
    * @param service Name des Services.
    * @throws IOException
    */
+  @Path("/plugins/(.*?)/services/(.*?)/start$")
   public void start(String plugin, String service) throws IOException
   {
     try
@@ -69,6 +71,7 @@ public class Service
    * @param service Name des Services.
    * @throws IOException
    */
+  @Path("/plugins/(.*?)/services/(.*?)/stop$")
   public void stop(String plugin, String service) throws IOException
   {
     try
@@ -94,6 +97,7 @@ public class Service
    * @param service Name des Services.
    * @throws IOException
    */
+  @Path("/plugins/(.*?)/services/(.*?)/status$")
   public void status(String plugin, String service) throws IOException
   {
     try
@@ -113,35 +117,11 @@ public class Service
   }
 
   /**
-   * Sucht den angegebenen Service im Plugin.
-   * @param plugin das Plugin.
-   * @param service der Service-Name.
-   * @return Instanz des Services.
-   * @throws Exception
-   */
-  private de.willuhn.datasource.Service find(String plugin, String service) throws Exception
-  {
-    List plugins = Application.getPluginLoader().getInstalledPlugins();
-    for (int i=0;i<plugins.size();++i)
-    {
-      AbstractPlugin p = (AbstractPlugin) plugins.get(i);
-      String name = p.getManifest().getName();
-      if (name == null || name.length() == 0)
-        continue;
-      
-      if (name.equals(plugin))
-        return Application.getServiceFactory().lookup(p.getClass(),service);
-    }
-    
-    throw new IOException("service not found");
-  }
-
-  
-  /**
    * Listet die Services eines Plugins auf.
    * @param plugin Name des Plugins.
    * @throws IOException
    */
+  @Path("/plugins/(.*?)/services/list$")
   public void list(String plugin) throws IOException
   {
     if (plugin == null || plugin.length() == 0)
@@ -188,11 +168,38 @@ public class Service
     }
     response.getWriter().print(new JSONArray(json).toString());
   }
+
+  /**
+   * Sucht den angegebenen Service im Plugin.
+   * @param plugin das Plugin.
+   * @param service der Service-Name.
+   * @return Instanz des Services.
+   * @throws Exception
+   */
+  private de.willuhn.datasource.Service find(String plugin, String service) throws Exception
+  {
+    List plugins = Application.getPluginLoader().getInstalledPlugins();
+    for (int i=0;i<plugins.size();++i)
+    {
+      AbstractPlugin p = (AbstractPlugin) plugins.get(i);
+      String name = p.getManifest().getName();
+      if (name == null || name.length() == 0)
+        continue;
+      
+      if (name.equals(plugin))
+        return Application.getServiceFactory().lookup(p.getClass(),service);
+    }
+    
+    throw new IOException("service not found");
+  }
 }
 
 
 /*********************************************************************
  * $Log: Service.java,v $
+ * Revision 1.6  2008/10/21 22:33:47  willuhn
+ * @N Markieren der zu registrierenden REST-Kommandos via Annotation
+ *
  * Revision 1.5  2008/10/08 21:38:23  willuhn
  * @C Nur noch zwei Annotations "Request" und "Response"
  *

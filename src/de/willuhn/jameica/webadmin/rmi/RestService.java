@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rmi/RestService.java,v $
- * $Revision: 1.3 $
- * $Date: 2008/07/11 15:38:55 $
+ * $Revision: 1.4 $
+ * $Date: 2008/10/21 22:33:47 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -35,25 +35,29 @@ public interface RestService extends Service
   public void handleRequest(HttpServletRequest request, HttpServletResponse response) throws IOException;
   
   /**
-   * Registriert ein Kommando auf eine URL.
-   * @param urlPattern Pattern mit einer URL.
-   * @param command zugehoerige Klasse und Methode, die aufgerufen werden soll.
+   * Registriert eine Bean.
+   * @param bean die zu registrierende Bean.
+   * Die Bean muss einen parameterlosen Konstruktor mit public-Modifier besitzen
+   * und mindestens eine Annotation "Path("/gewuenschte/url")" besitzen, um
+   * korrekt registriert zu werden.
    * @throws RemoteException
    */
-  public void register(String urlPattern, String command) throws RemoteException;
-
+  public void register(Object bean) throws RemoteException;
 
   /**
-   * De-Registriert ein Kommando auf eine URL.
-   * @param urlPattern Pattern mit der URL.
+   * Deregistriert die Bean.
+   * @param bean die Bean.
    * @throws RemoteException
    */
-  public void unregister(String urlPattern) throws RemoteException;
+  public void unregister(Object bean) throws RemoteException;
 }
 
 
 /*********************************************************************
  * $Log: RestService.java,v $
+ * Revision 1.4  2008/10/21 22:33:47  willuhn
+ * @N Markieren der zu registrierenden REST-Kommandos via Annotation
+ *
  * Revision 1.3  2008/07/11 15:38:55  willuhn
  * @N Service-Deployment
  *

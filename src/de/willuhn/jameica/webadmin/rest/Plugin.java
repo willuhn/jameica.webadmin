@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Plugin.java,v $
- * $Revision: 1.5 $
- * $Date: 2008/10/08 21:38:23 $
+ * $Revision: 1.6 $
+ * $Date: 2008/10/21 22:33:47 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -25,6 +25,7 @@ import org.json.JSONArray;
 
 import de.willuhn.jameica.plugin.Manifest;
 import de.willuhn.jameica.system.Application;
+import de.willuhn.jameica.webadmin.rest.annotation.Path;
 import de.willuhn.jameica.webadmin.rest.annotation.Response;
 
 
@@ -40,6 +41,7 @@ public class Plugin
    * Listet die installierten Plugins auf.
    * @throws IOException
    */
+  @Path("/plugins/list$")
   public void list() throws IOException
   {
     ArrayList json = new ArrayList();
@@ -68,6 +70,9 @@ public class Plugin
 
 /**********************************************************************
  * $Log: Plugin.java,v $
+ * Revision 1.6  2008/10/21 22:33:47  willuhn
+ * @N Markieren der zu registrierenden REST-Kommandos via Annotation
+ *
  * Revision 1.5  2008/10/08 21:38:23  willuhn
  * @C Nur noch zwei Annotations "Request" und "Response"
  *

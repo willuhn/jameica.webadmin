@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Echo.java,v $
- * $Revision: 1.4 $
- * $Date: 2008/10/08 21:38:23 $
+ * $Revision: 1.5 $
+ * $Date: 2008/10/21 22:33:47 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import de.willuhn.jameica.webadmin.rest.annotation.Path;
 import de.willuhn.jameica.webadmin.rest.annotation.Response;
 import de.willuhn.logging.Logger;
 
@@ -37,6 +38,7 @@ public class Echo
    * @param echo zurueckzuliefernder Text.
    * @throws IOException
    */
+  @Path("/echo/(.*)")
   public void echo(String echo) throws IOException
   {
     try
@@ -54,6 +56,9 @@ public class Echo
 
 /*********************************************************************
  * $Log: Echo.java,v $
+ * Revision 1.5  2008/10/21 22:33:47  willuhn
+ * @N Markieren der zu registrierenden REST-Kommandos via Annotation
+ *
  * Revision 1.4  2008/10/08 21:38:23  willuhn
  * @C Nur noch zwei Annotations "Request" und "Response"
  *

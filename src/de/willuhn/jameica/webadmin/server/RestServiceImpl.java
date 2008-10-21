@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/server/RestServiceImpl.java,v $
- * $Revision: 1.11 $
- * $Date: 2008/10/08 21:38:23 $
+ * $Revision: 1.12 $
+ * $Date: 2008/10/21 22:33:47 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -13,37 +13,41 @@
 
 package de.willuhn.jameica.webadmin.server;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.rmi.RemoteException;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import de.willuhn.datasource.BeanUtil;
 import de.willuhn.jameica.messaging.Message;
 import de.willuhn.jameica.messaging.MessageConsumer;
 import de.willuhn.jameica.messaging.QueryMessage;
-import de.willuhn.jameica.messaging.TextMessage;
 import de.willuhn.jameica.system.Application;
-import de.willuhn.jameica.webadmin.Plugin;
+import de.willuhn.jameica.webadmin.rest.Echo;
+import de.willuhn.jameica.webadmin.rest.Log;
+import de.willuhn.jameica.webadmin.rest.Plugin;
+import de.willuhn.jameica.webadmin.rest.Service;
+import de.willuhn.jameica.webadmin.rest.annotation.Path;
 import de.willuhn.jameica.webadmin.rest.annotation.Request;
 import de.willuhn.jameica.webadmin.rest.annotation.Response;
 import de.willuhn.jameica.webadmin.rmi.RestService;
 import de.willuhn.logging.Logger;
-import de.willuhn.util.Settings;
 
 /**
  * Implementierung des REST-Services.
  */
 public class RestServiceImpl implements RestService
 {
-  private Settings settings          = null;
-  private MessageConsumer register   = new RestConsumer(true);
-  private MessageConsumer unregister = new RestConsumer(false);
+  private Map<String,Method> commands = null;
+  private MessageConsumer register    = new RestConsumer(true);
+  private MessageConsumer unregister  = new RestConsumer(false);
   
   /**
    * @see de.willuhn.jameica.webadmin.rmi.RestService#handleRequest(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
@@ -81,40 +85,29 @@ public class RestServiceImpl implements RestService
     if (command == null)
       throw new IOException("missing REST command");
     
-    String[] patterns = settings.getAttributes();
-    if (patterns == null || patterns.length == 0)
-      throw new IOException("no REST urls defined");
+    Iterator<String> patterns = this.commands.keySet().iterator();
 
     try
     {
-      for (int i=0;i<patterns.length;++i)
+      while (patterns.hasNext())
       {
-        Pattern pattern = Pattern.compile(patterns[i]);
-        Matcher match = pattern.matcher(command);
+        String path     = patterns.next();
+        Method method   = this.commands.get(path);
+
+        Pattern pattern = Pattern.compile(path);
+        Matcher match   = pattern.matcher(command);
         
         if (match.matches())
         {
-          String[] params = new String[match.groupCount()];
+          Object[] params = new Object[match.groupCount()];
           for (int k=0;k<params.length;++k)
             params[k] = match.group(k+1); // wir fangen bei "1" an, weil an Pos. 0 der Pattern selbst steht
 
-          String s = settings.getString(patterns[i],null);
-          if (s == null || s.length() == 0)
-          {
-            Logger.warn("no command defined for REST url " + patterns[i]);
-            continue;
-          }
-          
-          int pos = s.lastIndexOf('.');
-          if (pos == -1)
-            throw new IOException("invalid command defined for " + command);
-
-          Object bean = Application.getClassLoader().load(s.substring(0,pos)).newInstance();
+          Object bean = method.getDeclaringClass().newInstance();
           applyAnnotations(bean, request, response);
 
-          String method = s.substring(pos+1);
-          Logger.debug("executing command " + command + ", class " + bean.getClass().getName() + "." + method);
-          BeanUtil.invoke(bean,method,params);
+          Logger.debug("applying command " + path + " to " + method);
+          method.invoke(bean,params);
           return;
         }
       }
@@ -130,6 +123,81 @@ public class RestServiceImpl implements RestService
     }
     
     throw new IOException("no command found for REST url " + command);
+  }
+
+  /**
+   * @see de.willuhn.jameica.webadmin.rmi.RestService#register(java.lang.Object)
+   */
+  public void register(Object bean) throws RemoteException
+  {
+    if (!isStarted())
+      throw new RemoteException("REST service not started");
+
+    Hashtable<String,Method> found = eval(bean);
+    if (found.size() > 0)
+    {
+      Logger.info("register REST commands for " + bean.getClass());
+      this.commands.putAll(found);
+    }
+    else
+    {
+      Logger.warn(bean.getClass() + " contains no valid annotated methods, skip bean");
+    }
+  }
+
+  /**
+   * @see de.willuhn.jameica.webadmin.rmi.RestService#unregister(java.lang.Object)
+   */
+  public void unregister(Object bean) throws RemoteException
+  {
+    if (!isStarted())
+      throw new RemoteException("REST service not started");
+
+    Hashtable<String,Method> found = eval(bean);
+    if (found.size() > 0)
+    {
+      Logger.info("un-register REST commands for " + bean.getClass());
+      Iterator<String> s = found.keySet().iterator();
+      while (s.hasNext())
+        this.commands.remove(s.next());
+    }
+    else
+    {
+      Logger.warn(bean.getClass() + " contains no valid annotated methods, skip bean");
+    }
+  }
+  
+  /**
+   * Analysiert die Bean und deren Annotations und liefert sie zurueck.
+   * @param bean die zu evaluierende Bean.
+   * @return Hashtable mit den URLs und zugehoerigen Methoden.
+   * @throws RemoteException
+   */
+  private Hashtable<String,Method> eval(Object bean) throws RemoteException
+  {
+    if (bean == null)
+      throw new RemoteException("no REST bean given");
+
+    Hashtable<String,Method> found = new Hashtable<String,Method>();
+    Method[] methods = bean.getClass().getMethods();
+    for (Method m:methods)
+    {
+      Path path = m.getAnnotation(Path.class);
+      if (path == null)
+        continue;
+
+      String s = path.value();
+      if (s == null || s.length() == 0)
+      {
+        Logger.warn("no path specified for method " + m + ", skipping");
+        continue;
+      }
+
+      m.setAccessible(true);
+      Logger.debug("REST command " + m + ", URL pattern: " + s);
+      found.put(s,m);
+    }
+    return found;
   }
 
   /**
@@ -161,7 +229,7 @@ public class RestServiceImpl implements RestService
       }
     }
   }
-  
+
   /**
    * @see de.willuhn.datasource.Service#getName()
    */
@@ -183,7 +251,7 @@ public class RestServiceImpl implements RestService
    */
   public boolean isStarted() throws RemoteException
   {
-    return this.settings != null;
+    return this.commands != null;
   }
 
   /**
@@ -198,10 +266,18 @@ public class RestServiceImpl implements RestService
     }
     
     Logger.info("init REST registry");
-    this.settings = new RestSettings();
-    this.settings.setStoreWhenRead(false);
+    this.commands = new Hashtable<String,Method>();
+    
+    // eigene REST-Kommandos deployen
+    register(new Echo());
+    register(new Log());
+    register(new Plugin());
+    register(new Service());
+
     Application.getMessagingFactory().getMessagingQueue("jameica.webadmin.rest.register").registerMessageConsumer(this.register);
     Application.getMessagingFactory().getMessagingQueue("jameica.webadmin.rest.unregister").registerMessageConsumer(this.unregister);
+
+    // Fremdsysteme benachrichtigen, dass wir online sind.
     Application.getMessagingFactory().getMessagingQueue("jameica.webadmin.rest.start").sendMessage(new QueryMessage());
   }
 
@@ -216,51 +292,19 @@ public class RestServiceImpl implements RestService
       return;
     }
     
-    Application.getMessagingFactory().getMessagingQueue("jameica.webadmin.rest.register").unRegisterMessageConsumer(this.register);
-    Application.getMessagingFactory().getMessagingQueue("jameica.webadmin.rest.unregister").unRegisterMessageConsumer(this.unregister);
-    Application.getMessagingFactory().getMessagingQueue("jameica.webadmin.rest.stop").sendMessage(new QueryMessage());
-    Logger.info("REST service stopped");
-    this.settings = null;
-  }
-
-  /**
-   * @see de.willuhn.jameica.webadmin.rmi.RestService#register(java.lang.String, java.lang.String)
-   */
-  public void register(String urlPattern, String command) throws RemoteException
-  {
-    if (!isStarted())
-      throw new RemoteException("REST service not started");
-    Logger.info("register REST command " + command + ", URL pattern: " + urlPattern);
-    this.settings.setAttribute(urlPattern,command);
-  }
-  
-  /**
-   * @see de.willuhn.jameica.webadmin.rmi.RestService#unregister(java.lang.String)
-   */
-  public void unregister(String urlPattern) throws RemoteException
-  {
-    if (!isStarted())
-      throw new RemoteException("REST service not started");
-    Logger.info("un-register URL pattern: " + urlPattern);
-    this.settings.setAttribute(urlPattern,(String) null);
-  }
-
-  /**
-   * Ueberschrieben, um die properties-Datei aus dem
-   * Plugin-Verzeichnis als System-Preset zu verwenden.
-   */
-  private class RestSettings extends de.willuhn.util.Settings
-  {
-    /**
-     * ct.
-     */
-    public RestSettings()
+    try
     {
-      super(Application.getPluginLoader().getPlugin(Plugin.class).getResources().getPath() + File.separator + "cfg",
-            Application.getConfig().getConfigDir(),
-            RestService.class);
+      Application.getMessagingFactory().getMessagingQueue("jameica.webadmin.rest.register").unRegisterMessageConsumer(this.register);
+      Application.getMessagingFactory().getMessagingQueue("jameica.webadmin.rest.unregister").unRegisterMessageConsumer(this.unregister);
+    }
+    finally
+    {
+      Logger.info("REST service stopped");
+      this.commands = null;
     }
   }
+
+
   
   /**
    * Hilfsklasse zum Registrieren von REST-Kommandos via Messaging
@@ -289,7 +333,7 @@ public class RestServiceImpl implements RestService
      */
     public Class[] getExpectedMessageTypes()
     {
-      return new Class[]{QueryMessage.class, TextMessage.class};
+      return new Class[]{QueryMessage.class};
     }
 
     /**
@@ -297,43 +341,15 @@ public class RestServiceImpl implements RestService
      */
     public void handleMessage(Message message) throws Exception
     {
-      String pattern = null;
-      String command = null;
-      
-      if (message instanceof QueryMessage)
-      {
-        QueryMessage m = (QueryMessage) message;
-        pattern = m.getName();
-        Object data = m.getData();
-        if (data != null)
-          command = data.toString();
-      }
-      else if (message instanceof TextMessage)
-      {
-        TextMessage m = (TextMessage) message;
-        pattern = m.getTitle();
-        command = m.getText();
-      }
-
-      if (pattern == null || pattern.length() == 0)
-      {
-        Logger.warn("no pattern given: " + pattern);
+      QueryMessage m = (QueryMessage) message;
+      Object bean = m.getData();
+      if (bean == null)
         return;
-      }
       
       if (r)
-      {
-        if (command == null || command.length() == 0)
-        {
-          Logger.warn("no command given: " + command);
-          return;
-        }
-        register(pattern,command);
-      }
+        register(bean);
       else
-      {
-        unregister(pattern);
-      }
+        unregister(bean);
     }
   }
 }
@@ -341,6 +357,9 @@ public class RestServiceImpl implements RestService
 
 /*********************************************************************
  * $Log: RestServiceImpl.java,v $
+ * Revision 1.12  2008/10/21 22:33:47  willuhn
+ * @N Markieren der zu registrierenden REST-Kommandos via Annotation
+ *
  * Revision 1.11  2008/10/08 21:38:23  willuhn
  * @C Nur noch zwei Annotations "Request" und "Response"
  *
