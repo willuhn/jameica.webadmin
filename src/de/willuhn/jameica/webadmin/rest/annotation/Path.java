@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/annotation/Attic/Path.java,v $
- * $Revision: 1.1 $
- * $Date: 2008/10/21 22:33:47 $
+ * $Revision: 1.2 $
+ * $Date: 2008/10/27 14:23:48 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -26,12 +26,20 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface Path {
+  
+  /**
+   * Der Path.
+   * @return Path.
+   */
   String value();
 }
 
 
 /*********************************************************************
  * $Log: Path.java,v $
+ * Revision 1.2  2008/10/27 14:23:48  willuhn
+ * @D javadoc
+ *
  * Revision 1.1  2008/10/21 22:33:47  willuhn
  * @N Markieren der zu registrierenden REST-Kommandos via Annotation
  *
