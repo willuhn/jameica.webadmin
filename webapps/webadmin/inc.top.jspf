@@ -3,6 +3,7 @@
 
 <%@page import="de.willuhn.jameica.system.Application"%>
 
+
 <html>
   <head>
     <title>Jameica  <%= Application.getManifest().getVersion() %> <%= Application.getManifest().getBuildnumber() %></title>
