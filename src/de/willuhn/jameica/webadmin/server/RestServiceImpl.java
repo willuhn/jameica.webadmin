@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/server/RestServiceImpl.java,v $
- * $Revision: 1.12 $
- * $Date: 2008/10/21 22:33:47 $
+ * $Revision: 1.13 $
+ * $Date: 2008/11/06 23:29:15 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -30,6 +30,7 @@ import de.willuhn.jameica.messaging.Message;
 import de.willuhn.jameica.messaging.MessageConsumer;
 import de.willuhn.jameica.messaging.QueryMessage;
 import de.willuhn.jameica.system.Application;
+import de.willuhn.jameica.webadmin.rest.Certificate;
 import de.willuhn.jameica.webadmin.rest.Echo;
 import de.willuhn.jameica.webadmin.rest.Log;
 import de.willuhn.jameica.webadmin.rest.Plugin;
@@ -215,7 +216,7 @@ public class RestServiceImpl implements RestService
       else if (f.getAnnotation(Response.class) != null) value = response;
       
       if (value == null)
-        return;
+        continue;
       
       try
       {
@@ -273,6 +274,7 @@ public class RestServiceImpl implements RestService
     register(new Log());
     register(new Plugin());
     register(new Service());
+    register(new Certificate());
 
     Application.getMessagingFactory().getMessagingQueue("jameica.webadmin.rest.register").registerMessageConsumer(this.register);
     Application.getMessagingFactory().getMessagingQueue("jameica.webadmin.rest.unregister").registerMessageConsumer(this.unregister);
@@ -357,6 +359,9 @@ public class RestServiceImpl implements RestService
 
 /*********************************************************************
  * $Log: RestServiceImpl.java,v $
+ * Revision 1.13  2008/11/06 23:29:15  willuhn
+ * @B s/return/continue/
+ *
  * Revision 1.12  2008/10/21 22:33:47  willuhn
  * @N Markieren der zu registrierenden REST-Kommandos via Annotation
  *
