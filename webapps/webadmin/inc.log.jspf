@@ -1,10 +1,7 @@
-<%@page import="de.willuhn.logging.Logger"%>
-<%@page import="de.willuhn.logging.Level"%>
-<%@page import="de.willuhn.logging.Message"%>
-<%@page import="java.text.DateFormat"%>
-<%@page import="java.text.SimpleDateFormat"%>
-<%@page import="java.util.Collections"%>
-<%@page import="java.lang.reflect.Array"%>
+<%@ taglib uri="http://java.sun.com/jstl/core_rt" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+
 <style>
     /* Log-Levels einfaerben */
     table.data tr.DEBUG td {
@@ -30,25 +27,13 @@
       <th>Quelle</th>
       <th>Text</th>
     </tr>
-    
-    <%
-      DateFormat __logDf   = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-      Message[] __logLines = Logger.getLastLines();
-      for (int i=__logLines.length-1;i>=0;--i)
-      {
-        String loggingClass = __logLines[i].getLoggingClass();
-        loggingClass        = loggingClass.substring(loggingClass.lastIndexOf('.')+1);
-
-        String text         = __logLines[i].getText();
-        text                = text.replaceAll("<","&lt;").replaceAll(">","&gt;");
-        %>
-		      <tr onmouseover="change_to(this);" onmouseout="change_back(this);" class="<%= __logLines[i].getLevel().getName() %>">
-		        <td style="white-space:nowrap;"><pre><%= __logDf.format(__logLines[i].getDate()) %></pre></td>
-		        <td><pre><%= loggingClass %></pre></td>
-		        <td><pre><%= text %></pre></td>
-		      </tr>
-        <%
-      }
-    %>
+    <c:forEach items="${system.log}" var="line">
+      <c:set var="source" value="${fn:split(line.loggingClass,'.')}" />
+      <tr onmouseover="change_to(this);" onmouseout="change_back(this);" class="${line.level.name}">
+        <td style="white-space:nowrap;"><pre><fmt:formatDate value="${line.date}" pattern="dd.MM.yyyy HH:mm:ss"/></pre></td>
+        <td><pre>${source[fn:length(source)-1]}:${fn:escapeXml(line.loggingMethod)}</pre></td>
+        <td><pre>${fn:escapeXml(line.text)}</pre></td>
+      </tr>
+    </c:forEach>
   </table>
 </div>

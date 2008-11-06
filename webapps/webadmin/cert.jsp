@@ -3,6 +3,7 @@
 <%@page import="java.security.cert.X509Certificate"%>
 <%@page import="de.willuhn.jameica.security.Certificate"%>
 <%@page import="de.willuhn.jameica.security.Principal"%>
+<%@page import="de.willuhn.jameica.system.Application"%>
 
 <%
   String __certFp = request.getParameter("cert");

@@ -1,26 +1,19 @@
-<%@page import="de.willuhn.jameica.system.Application"%>
+<%@ taglib uri="http://java.sun.com/jstl/core_rt" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
 <h2>System-Nachrichten</h2>
 
-<%
-  String[] __msgList = Application.getWelcomeMessages();
-  if (__msgList != null && __msgList.length > 0)
-  {
-    %>
-      
-      <table class="data">
-        <% for (int i=0;i<__msgList.length;++i) { %>
-			    <tr>
-			      <td><%= __msgList[i] %></td>
-			    </tr>
-        <% } %>
-      </table>
-    <%
-  }
-  else
-  {
-    %>
-      <table class="data"><tr><td>Keine System-Nachrichten</td></tr></table>
-    <%
-  }
-%>
+<table class="data">
+  <c:choose>
+    <c:when test="${fn:length(system.welcomeMessages) > 0}">
+      <c:forEach items="${system.welcomeMessages}" var="msg">
+        <tr>
+          <td>${msg}</td>
+        </tr>
+      </c:forEach>
+    </c:when>
+    <c:otherwise>
+      <tr><td>Keine System-Nachrichten</td></tr>
+    </c:otherwise>
+  </c:choose>
+</table>

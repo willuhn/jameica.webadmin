@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/beans/Attic/Application.java,v $
- * $Revision: 1.1 $
- * $Date: 2008/11/06 01:22:19 $
+ * $Revision: 1.2 $
+ * $Date: 2008/11/06 11:38:24 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -15,10 +15,15 @@ package de.willuhn.jameica.webadmin.beans;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import de.willuhn.jameica.plugin.Manifest;
 import de.willuhn.jameica.plugin.PluginLoader;
 import de.willuhn.jameica.system.Config;
+import de.willuhn.logging.Logger;
+import de.willuhn.logging.Message;
 
 /**
  * Bean zum Anzeigen von System-Infos.
@@ -83,11 +88,35 @@ public class Application
   {
     return de.willuhn.jameica.system.Application.getPluginLoader();
   }
+  
+  /**
+   * Liefert eine Liste der beim Systemstart aufgelaufenen Nachrichten.
+   * @return Welcome-Messages.
+   */
+  public String[] getWelcomeMessages()
+  {
+    return de.willuhn.jameica.system.Application.getWelcomeMessages();
+  }
+  
+  /**
+   * Liefert eine Liste der letzten Log-Nachrichten.
+   * Die Nachrichten sind in umgekehrt chronologischer Reihenfolge sortiert (also neueste zuerst).
+   * @return Liste der letzten Log-Nachrichten.
+   */
+  public Message[] getLog()
+  {
+    List<Message> list = Arrays.asList(Logger.getLastLines());
+    Collections.reverse(list);
+    return list.toArray(new Message[list.size()]);
+  }
 }
 
 
 /*********************************************************************
  * $Log: Application.java,v $
+ * Revision 1.2  2008/11/06 11:38:24  willuhn
+ * @N Schritt-fuer-Schritt-Umstellung auf JSTL
+ *
  * Revision 1.1  2008/11/06 01:22:19  willuhn
  * @R javafaces und richfaces entfernt. Bloat!
  *

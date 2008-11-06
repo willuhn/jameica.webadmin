@@ -4,6 +4,7 @@
 <%@page import="de.willuhn.datasource.Service"%>
 <%@page import="de.willuhn.jameica.plugin.Manifest"%>
 <%@page import="de.willuhn.jameica.plugin.ServiceDescriptor"%>
+<%@page import="de.willuhn.jameica.system.Application"%>
 
 <%
   String __pluginName = request.getParameter("plugin");
