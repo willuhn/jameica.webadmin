@@ -1,7 +1,7 @@
 /**********************************************************************
- * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/beans/Attic/Uptime.java,v $
+ * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/beans/Attic/Application.java,v $
  * $Revision: 1.1 $
- * $Date: 2007/05/15 15:33:17 $
+ * $Date: 2008/11/06 01:22:19 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -16,12 +16,14 @@ package de.willuhn.jameica.webadmin.beans;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
-import de.willuhn.jameica.system.Application;
+import de.willuhn.jameica.plugin.Manifest;
+import de.willuhn.jameica.plugin.PluginLoader;
+import de.willuhn.jameica.system.Config;
 
 /**
- * Bean zum Anzeigen der Uptime.
+ * Bean zum Anzeigen von System-Infos.
  */
-public class Uptime
+public class Application
 {
   private final static DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
 
@@ -31,7 +33,7 @@ public class Uptime
    */
   public String getStarted()
   {
-    return dateFormat.format(Application.getStartDate());
+    return dateFormat.format(de.willuhn.jameica.system.Application.getStartDate());
   }
   
   /**
@@ -40,7 +42,7 @@ public class Uptime
    */
   public String getUptime()
   {
-    long minutes = (System.currentTimeMillis() - Application.getStartDate().getTime()) / 1000L / 60L;
+    long minutes = (System.currentTimeMillis() - de.willuhn.jameica.system.Application.getStartDate().getTime()) / 1000L / 60L;
     long hours   = minutes / 60;
 
     minutes %= 60; // Restminuten abzueglich Stunden
@@ -54,11 +56,41 @@ public class Uptime
     long days = hours / 24;
     return days + " Tag(e), " + (hours % 24) + ":" + mins + " h";
   }
+  
+  /**
+   * Liefert das System-Manifest.
+   * @return das System-Manifest.
+   */
+  public Manifest getManifest()
+  {
+    return de.willuhn.jameica.system.Application.getManifest();
+  }
+  
+  /**
+   * Liefert die System-Config.
+   * @return System-Confif.
+   */
+  public Config getConfig()
+  {
+    return de.willuhn.jameica.system.Application.getConfig();
+  }
+  
+  /**
+   * Liefert den Pluginloader.
+   * @return der Pluginloader.
+   */
+  public PluginLoader getPluginLoader()
+  {
+    return de.willuhn.jameica.system.Application.getPluginLoader();
+  }
 }
 
 
 /*********************************************************************
- * $Log: Uptime.java,v $
+ * $Log: Application.java,v $
+ * Revision 1.1  2008/11/06 01:22:19  willuhn
+ * @R javafaces und richfaces entfernt. Bloat!
+ *
  * Revision 1.1  2007/05/15 15:33:17  willuhn
  * @N helloworld.war
  * @C Webadmin komplett auf JSP umgestellt

@@ -1,4 +1,4 @@
-<jsp:useBean id="plugin" class="de.willuhn.jameica.webadmin.beans.Plugin"/>
+<%@ taglib uri="http://java.sun.com/jstl/core_rt" prefix="c" %>
 
 <h2>Installierte Plugins</h2>
 <table class="data">
@@ -7,11 +7,11 @@
     <th>Version</th>
     <th>Beschreibung</th>
   </tr>
-  <c:forEach var="p" items="${plugin.plugins}">
-     <tr>
-       <td>${p.name}</td>
-       <td>${p.version}</td>
-       <td>${p.description}</td>
-     </tr>
+  <c:forEach items="${system.pluginLoader.installedManifests}" var="mf">
+    <tr onmouseover="change_to(this);" onmouseout="change_back(this);">
+      <td><a title="Klicken für Details" href="plugin.jsp?plugin=${mf.name}">${mf.name}</a></td>
+      <td>${mf.version} [Build ${mf.buildnumber}]</td>
+      <td>${mf.description}</td>
+    </tr>
   </c:forEach>
 </table>

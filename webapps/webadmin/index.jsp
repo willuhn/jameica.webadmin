@@ -1,4 +1,4 @@
-<%@ include file="inc.top.jspf" %>
+<jsp:include page="inc.top.jspf"/>
 
 <div id="breadcrumbs">
   <a href="/webadmin/">Index</a>
@@ -7,18 +7,18 @@
 <table style="width:100%">
   <tr>
     <td style="border-right:1px dotted #909090;padding-right: 20px;width:650px">
-      <%@ include file="inc.status.jspf" %>
-      <%@ include file="inc.plugins.jspf" %>
-      <%@ include file="inc.certs.jspf" %>
+    <jsp:include page="inc.status.jspf"/>
+    <jsp:include page="inc.plugins.jspf"/>
+    <jsp:include page="inc.certs.jspf"/>
     </td>
     <td style="padding-left: 20px;width:300px">
-      <%@ include file="inc.messages.jspf" %>
+      <jsp:include page="inc.messages.jspf"/>
     </td>
   </tr>
 </table>
 
 <div style="margin-top:20px">
-  <%@ include file="inc.log.jspf" %>
+  <jsp:include page="inc.log.jspf"/>
 </div>
 
-<%@ include file="inc.bottom.jspf" %>
+<jsp:include page="inc.bottom.jspf"/>
