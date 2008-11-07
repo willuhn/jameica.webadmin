@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/server/RestServiceImpl.java,v $
- * $Revision: 1.13 $
- * $Date: 2008/11/06 23:29:15 $
+ * $Revision: 1.14 $
+ * $Date: 2008/11/07 00:14:37 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -275,6 +275,7 @@ public class RestServiceImpl implements RestService
     register(new Plugin());
     register(new Service());
     register(new Certificate());
+    register(new de.willuhn.jameica.webadmin.rest.Application());
 
     Application.getMessagingFactory().getMessagingQueue("jameica.webadmin.rest.register").registerMessageConsumer(this.register);
     Application.getMessagingFactory().getMessagingQueue("jameica.webadmin.rest.unregister").registerMessageConsumer(this.unregister);
@@ -359,6 +360,9 @@ public class RestServiceImpl implements RestService
 
 /*********************************************************************
  * $Log: RestServiceImpl.java,v $
+ * Revision 1.14  2008/11/07 00:14:37  willuhn
+ * @N REST-Bean fuer Anzeige von System-Infos (Start-Zeit, Config)
+ *
  * Revision 1.13  2008/11/06 23:29:15  willuhn
  * @B s/return/continue/
  *
