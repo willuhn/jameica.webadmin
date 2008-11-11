@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Application.java,v $
- * $Revision: 1.1 $
- * $Date: 2008/11/07 00:14:37 $
+ * $Revision: 1.2 $
+ * $Date: 2008/11/11 01:06:22 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -16,6 +16,7 @@ package de.willuhn.jameica.webadmin.rest;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,15 +43,42 @@ public class Application
   private HttpServletResponse response = null;
 
   /**
-   * Liefert Datum und Uhrzeit des Systemstarts.
+   * Liefert die Uptime und Startzeit des Servers.
    * @throws IOException
    */
-  @Path("/system/started$")
-  public void started() throws IOException
+  @Path("/system/uptime$")
+  public void uptime() throws IOException
   {
+    Date started = de.willuhn.jameica.system.Application.getStartDate();
+
+    ////////////////////////////////////////////////////////////////////////////
+    // Uptime ausrechnen
+    long minutes = (System.currentTimeMillis() - started.getTime()) / 1000L / 60L;
+    long hours   = minutes / 60;
+
+    minutes %= 60; // Restminuten abzueglich Stunden
+
+    // ggf. ne "0" vorn dran schreiben
+    String mins = (minutes < 10 ? ("0" + minutes) : "" + minutes);
+
+    String uptime = null;
+    if (hours < 24) // weniger als 1 Tag?
+    {
+      uptime = hours + ":" + mins + " h";
+    }
+    else
+    {
+      long days = hours / 24;
+      uptime = days + " Tag(e), " + (hours % 24) + ":" + mins + " h";
+    }
+    ////////////////////////////////////////////////////////////////////////////
+    
     try
     {
-      response.getWriter().print(new JSONObject().put("started",DATEFORMAT.format(de.willuhn.jameica.system.Application.getStartDate())).toString());
+      JSONObject o = new JSONObject();
+      o.put("started",DATEFORMAT.format(started));
+      o.put("uptime",uptime);
+      response.getWriter().print(o.toString());
     }
     catch (JSONException e)
     {
@@ -59,6 +87,47 @@ public class Application
     }
   }
 
+  public JSONObject getUptime() throws IOException
+  {
+    Date started = de.willuhn.jameica.system.Application.getStartDate();
+
+    ////////////////////////////////////////////////////////////////////////////
+    // Uptime ausrechnen
+    long minutes = (System.currentTimeMillis() - started.getTime()) / 1000L / 60L;
+    long hours   = minutes / 60;
+
+    minutes %= 60; // Restminuten abzueglich Stunden
+
+    // ggf. ne "0" vorn dran schreiben
+    String mins = (minutes < 10 ? ("0" + minutes) : "" + minutes);
+
+    String uptime = null;
+    if (hours < 24) // weniger als 1 Tag?
+    {
+      uptime = hours + ":" + mins + " h";
+    }
+    else
+    {
+      long days = hours / 24;
+      uptime = days + " Tag(e), " + (hours % 24) + ":" + mins + " h";
+    }
+    ////////////////////////////////////////////////////////////////////////////
+    
+    try
+    {
+      JSONObject o = new JSONObject();
+      o.put("started",DATEFORMAT.format(started));
+      o.put("uptime",uptime);
+      return o;
+    }
+    catch (JSONException e)
+    {
+      Logger.error("unable to encode via json",e);
+      throw new IOException("error while encoding into json");
+    }
+  }
+
+  
   /**
    * Liefert die System-Konfiguration.
    * @throws IOException
@@ -122,11 +191,33 @@ public class Application
       throw new IOException("error while encoding into json");
     }
   }
+
+  /**
+   * Liefert eine Liste der beim Systemstart aufgelaufenen Nachrichten.
+   * @throws IOException
+   */
+  @Path("/system/welcome$")
+  public void welcome() throws IOException
+  {
+    try
+    {
+      response.getWriter().print(new JSONArray(de.willuhn.jameica.system.Application.getWelcomeMessages()).toString());
+    }
+    catch (JSONException e)
+    {
+      Logger.error("unable to encode via json",e);
+      throw new IOException("error while encoding into json");
+    }
+  }
+
 }
 
 
 /*********************************************************************
  * $Log: Application.java,v $
+ * Revision 1.2  2008/11/11 01:06:22  willuhn
+ * @N Mehr REST-Kommandos
+ *
  * Revision 1.1  2008/11/07 00:14:37  willuhn
  * @N REST-Bean fuer Anzeige von System-Infos (Start-Zeit, Config)
  *

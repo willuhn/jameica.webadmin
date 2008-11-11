@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Log.java,v $
- * $Revision: 1.7 $
- * $Date: 2008/11/07 00:17:16 $
+ * $Revision: 1.8 $
+ * $Date: 2008/11/11 01:06:22 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -14,6 +14,8 @@
 package de.willuhn.jameica.webadmin.rest;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,7 +24,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 
 import de.willuhn.jameica.webadmin.rest.annotation.Path;
 import de.willuhn.jameica.webadmin.rest.annotation.Request;
@@ -37,6 +38,8 @@ import de.willuhn.logging.Message;
  */
 public class Log
 {
+  private final static DateFormat DATEFORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+
   @Response
   private HttpServletResponse response = null;
   
@@ -51,24 +54,6 @@ public class Log
   public void last() throws IOException
   {
     last(null);
-  }
-
-  /**
-   * Liefert eine Liste der beim Systemstart aufgelaufenen Nachrichten.
-   * @throws IOException
-   */
-  @Path("/log/welcome$")
-  public void welcome() throws IOException
-  {
-    try
-    {
-      response.getWriter().print(new JSONArray(de.willuhn.jameica.system.Application.getWelcomeMessages()).toString());
-    }
-    catch (JSONException e)
-    {
-      Logger.error("unable to encode via json",e);
-      throw new IOException("error while encoding into json");
-    }
   }
 
   /**
@@ -96,7 +81,7 @@ public class Log
         break;
 
       Map data = new HashMap();
-      data.put("date",  msg[i].getDate());
+      data.put("date",  DATEFORMAT.format(msg[i].getDate()));
       data.put("host",  msg[i].getHost());
       data.put("level", msg[i].getLevel().getName());
       data.put("class", msg[i].getLoggingClass());
@@ -163,6 +148,9 @@ public class Log
 
 /*********************************************************************
  * $Log: Log.java,v $
+ * Revision 1.8  2008/11/11 01:06:22  willuhn
+ * @N Mehr REST-Kommandos
+ *
  * Revision 1.7  2008/11/07 00:17:16  willuhn
  * @N Welcome-Nachrichten
  *

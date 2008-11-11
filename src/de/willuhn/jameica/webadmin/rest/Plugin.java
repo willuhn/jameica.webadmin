@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Plugin.java,v $
- * $Revision: 1.6 $
- * $Date: 2008/10/21 22:33:47 $
+ * $Revision: 1.7 $
+ * $Date: 2008/11/11 01:06:22 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONArray;
 
+import de.willuhn.jameica.plugin.Dependency;
 import de.willuhn.jameica.plugin.Manifest;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.jameica.webadmin.rest.annotation.Path;
@@ -50,26 +51,53 @@ public class Plugin
     {
       Manifest mf = (Manifest) plugins.get(i);
       Map data = new HashMap();
-      data.put("name",        mf.getName());
-      data.put("builddate",   mf.getBuildDate());
-      data.put("buildnumber", mf.getBuildnumber());
-      data.put("dependencies",mf.getDependencies());
-      data.put("description", mf.getDescription());
-      data.put("homepage",    mf.getHomepage());
-      data.put("license",     mf.getLicense());
-      data.put("pluginclass", mf.getPluginClass());
-      data.put("plugindir",   mf.getPluginDir());
-      data.put("url",         mf.getURL());
-      data.put("version",     Double.toString(mf.getVersion()));
+      data.put("name",        notNull(mf.getName()));
+      data.put("builddate",   notNull(mf.getBuildDate()));
+      data.put("buildnumber", notNull(mf.getBuildnumber()));
+      data.put("description", notNull(mf.getDescription()));
+      data.put("homepage",    notNull(mf.getHomepage()));
+      data.put("license",     notNull(mf.getLicense()));
+      data.put("pluginclass", notNull(mf.getPluginClass()));
+      data.put("plugindir",   notNull(mf.getPluginDir()));
+      data.put("url",         notNull(mf.getURL()));
+      data.put("version",     notNull(Double.toString(mf.getVersion())));
+
+      ArrayList deps = new ArrayList();
+      Dependency[] d = mf.getDependencies();
+      if (d != null && d.length > 0)
+      {
+        for (int k=0;k<d.length;++k)
+        {
+          Map dep = new HashMap();
+          dep.put("name",d[k].getName());
+          dep.put("version",d[k].getVersion());
+          deps.add(dep);
+        }
+      }
+      data.put("dependencies",new JSONArray(deps));
+      
       json.add(data);
     }
     response.getWriter().print(new JSONArray(json).toString());
+  }
+  
+  /**
+   * Liefert einen Leerstring, wenn s = NULL.
+   * @param s String.
+   * @return String s oder Leerstring, niemals NULL.
+   */
+  private String notNull(String s)
+  {
+    return s == null ? "" : s;
   }
 }
 
 
 /**********************************************************************
  * $Log: Plugin.java,v $
+ * Revision 1.7  2008/11/11 01:06:22  willuhn
+ * @N Mehr REST-Kommandos
+ *
  * Revision 1.6  2008/10/21 22:33:47  willuhn
  * @N Markieren der zu registrierenden REST-Kommandos via Annotation
  *
