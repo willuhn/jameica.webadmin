@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Plugin.java,v $
- * $Revision: 1.7 $
- * $Date: 2008/11/11 01:06:22 $
+ * $Revision: 1.8 $
+ * $Date: 2008/11/11 23:59:22 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -39,13 +39,22 @@ public class Plugin
   private HttpServletResponse response = null;
   
   /**
-   * Listet die installierten Plugins auf.
+   * Schreibt die installierten Plugins in den Response-Writer.
    * @throws IOException
    */
   @Path("/plugins/list$")
   public void list() throws IOException
   {
-    ArrayList json = new ArrayList();
+    response.getWriter().print(new JSONArray(getList()).toString());
+  }
+  
+  /**
+   * Listet die installierten Plugins auf.
+   * @throws IOException
+   */
+  public List getList()
+  {
+    ArrayList list = new ArrayList();
     List plugins = Application.getPluginLoader().getInstalledManifests();
     for (int i=0;i<plugins.size();++i)
     {
@@ -74,12 +83,13 @@ public class Plugin
           deps.add(dep);
         }
       }
-      data.put("dependencies",new JSONArray(deps));
+      data.put("dependencies",deps);
       
-      json.add(data);
+      list.add(data);
     }
-    response.getWriter().print(new JSONArray(json).toString());
+    return list;
   }
+
   
   /**
    * Liefert einen Leerstring, wenn s = NULL.
@@ -95,6 +105,9 @@ public class Plugin
 
 /**********************************************************************
  * $Log: Plugin.java,v $
+ * Revision 1.8  2008/11/11 23:59:22  willuhn
+ * @N Dualer Aufruf (via JSON und Map/List)
+ *
  * Revision 1.7  2008/11/11 01:06:22  willuhn
  * @N Mehr REST-Kommandos
  *

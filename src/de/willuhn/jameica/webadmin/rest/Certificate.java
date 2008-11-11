@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Certificate.java,v $
- * $Revision: 1.1 $
- * $Date: 2008/11/06 23:36:43 $
+ * $Revision: 1.2 $
+ * $Date: 2008/11/11 23:59:22 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -19,6 +19,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
@@ -29,6 +30,8 @@ import de.willuhn.jameica.security.Principal;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.jameica.webadmin.rest.annotation.Path;
 import de.willuhn.jameica.webadmin.rest.annotation.Response;
+import de.willuhn.logging.Logger;
+import de.willuhn.util.ApplicationException;
 
 
 /**
@@ -42,23 +45,44 @@ public class Certificate
   private HttpServletResponse response = null;
   
   /**
-   * Listet die installierten Zertifikate auf.
+   * Schreibt die installierten Zertifikate in den Response-Writer.
    * @throws IOException
    */
   @Path("/certs/list$")
-  public void list() throws Exception
+  public void list() throws IOException
   {
-    ArrayList json = new ArrayList();
-    X509Certificate[] list = Application.getSSLFactory().getTrustedCertificates();
-    for (int i=0;i<list.length;++i)
+    try
     {
-      de.willuhn.jameica.security.Certificate cert = new de.willuhn.jameica.security.Certificate(list[i]);
+      response.getWriter().print(new JSONArray(getList()).toString());
+    }
+    catch (ApplicationException ae)
+    {
+      throw new IOException(ae.getMessage());
+    }
+    catch (Exception e)
+    {
+      Logger.error("unable to load certificates",e);
+      throw new IOException("unable to load certificates: " + e.getMessage());
+    }
+  }
+
+  /**
+   * Listet die installierten Zertifikate auf.
+   * @throws Exception
+   */
+  public List getList() throws Exception
+  {
+    ArrayList list = new ArrayList();
+    X509Certificate[] certs = Application.getSSLFactory().getTrustedCertificates();
+    for (int i=0;i<certs.length;++i)
+    {
+      de.willuhn.jameica.security.Certificate cert = new de.willuhn.jameica.security.Certificate(certs[i]);
 
       Map data = new HashMap();
 
       Map valid = new HashMap();
-      valid.put("from",DATEFORMAT.format(list[i].getNotBefore()));
-      valid.put("to",  DATEFORMAT.format(list[i].getNotAfter()));
+      valid.put("from",DATEFORMAT.format(certs[i].getNotBefore()));
+      valid.put("to",  DATEFORMAT.format(certs[i].getNotAfter()));
       data.put("valid",valid);
       
       Map subject = new HashMap();
@@ -84,20 +108,24 @@ public class Certificate
       data.put("issuer",issuer);
 
       Map certprops = new HashMap();
-      certprops.put("serial", list[i].getSerialNumber().toString());
+      certprops.put("serial", certs[i].getSerialNumber().toString());
       certprops.put("md5", cert.getMD5Fingerprint());
       certprops.put("sha1",cert.getSHA1Fingerprint());
       data.put("cert",certprops);
 
-      json.add(data);
+      list.add(data);
     }
-    response.getWriter().print(new JSONArray(json).toString());
+    return list;
   }
+
 }
 
 
 /**********************************************************************
  * $Log: Certificate.java,v $
+ * Revision 1.2  2008/11/11 23:59:22  willuhn
+ * @N Dualer Aufruf (via JSON und Map/List)
+ *
  * Revision 1.1  2008/11/06 23:36:43  willuhn
  * @N REST-Bean fuer Anzeige der installierten Zertifikate
  *

@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Application.java,v $
- * $Revision: 1.3 $
- * $Date: 2008/11/11 01:06:49 $
+ * $Revision: 1.4 $
+ * $Date: 2008/11/11 23:59:22 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -43,11 +43,19 @@ public class Application
   private HttpServletResponse response = null;
 
   /**
-   * Liefert die Uptime und Startzeit des Servers.
+   * Schreibt die Uptime und Startzeit des Servers in den Response-Writer.
    * @throws IOException
    */
   @Path("/system/uptime$")
   public void uptime() throws IOException
+  {
+    response.getWriter().print(new JSONObject(getUptime()).toString());
+  }
+
+  /**
+   * Liefert die Uptime und Startzeit des Servers.
+   */
+  public Map getUptime()
   {
     Date started = de.willuhn.jameica.system.Application.getStartDate();
 
@@ -73,22 +81,14 @@ public class Application
     }
     ////////////////////////////////////////////////////////////////////////////
     
-    try
-    {
-      JSONObject o = new JSONObject();
-      o.put("started",DATEFORMAT.format(started));
-      o.put("uptime",uptime);
-      response.getWriter().print(o.toString());
-    }
-    catch (JSONException e)
-    {
-      Logger.error("unable to encode via json",e);
-      throw new IOException("error while encoding into json");
-    }
+    Map o = new HashMap();
+    o.put("started",DATEFORMAT.format(started));
+    o.put("uptime",uptime);
+    return o;
   }
-
+  
   /**
-   * Liefert die System-Konfiguration.
+   * Schreibt die System-Konfiguration in den Response-Writer.
    * @throws IOException
    */
   @Path("/system/config$")
@@ -96,53 +96,75 @@ public class Application
   {
     try
     {
-      JSONObject json = new JSONObject();
-      Config config = de.willuhn.jameica.system.Application.getConfig();
-      
-      json.put("locale",config.getLocale().toString());
-      
-      Map rmi = new HashMap();
-      rmi.put("port",      String.valueOf(config.getRmiPort()));
-      rmi.put("ssl",       String.valueOf(config.getRmiSSL()));
-      rmi.put("clientauth",String.valueOf(config.getRmiUseClientAuth()));
-      json.put("rmi",rmi);
-
-      Map backup = new HashMap();
-      backup.put("dir",    config.getBackupDir());
-      backup.put("enabled",String.valueOf(config.getUseBackup()));
-      backup.put("count",  String.valueOf(config.getBackupCount()));
-      json.put("backup",backup);
-      
-      Map dir = new HashMap();
-      dir.put("config",config.getConfigDir());
-      dir.put("work",config.getWorkDir());
-      Map plugins = new HashMap();
-      plugins.put("system",config.getSystemPluginDir().getAbsolutePath());
-      plugins.put("user",config.getUserPluginDir().getAbsolutePath());
-      plugins.put("config",new JSONArray(config.getPluginDirs()));
-      dir.put("plugins",plugins);
-      json.put("dir",dir);
-      
-      Map log = new HashMap();
-      log.put("file",config.getLogFile());
-      log.put("level",config.getLogLevel());
-      json.put("log",log);
-      
-      Map proxy = new HashMap();
-      proxy.put("host",config.getProxyHost() == null ? "" : config.getProxyHost());
-      proxy.put("port",config.getProxyPort() == -1 ? "" : String.valueOf(config.getProxyPort()));
-      json.put("proxy",proxy);
-      
-      Map service = new HashMap();
-      service.put("multicastlookup",String.valueOf(config.getMulticastLookup()));
-      service.put("shareservices",String.valueOf(config.getShareServices()));
-      json.put("service",service);
-      
-      response.getWriter().print(json.toString());
+      response.getWriter().print(new JSONObject(getConfig()).toString());
     }
     catch (ApplicationException ae)
     {
       throw new IOException(ae.getMessage());
+    }
+  }
+
+  /**
+   * Liefert die System-Konfiguration.
+   */
+  public Map getConfig() throws ApplicationException
+  {
+    Map all = new HashMap();
+    
+    Config config = de.willuhn.jameica.system.Application.getConfig();
+    
+    all.put("locale",config.getLocale().toString());
+    
+    Map rmi = new HashMap();
+    rmi.put("port",      String.valueOf(config.getRmiPort()));
+    rmi.put("ssl",       String.valueOf(config.getRmiSSL()));
+    rmi.put("clientauth",String.valueOf(config.getRmiUseClientAuth()));
+    all.put("rmi",rmi);
+
+    Map backup = new HashMap();
+    backup.put("dir",    config.getBackupDir());
+    backup.put("enabled",String.valueOf(config.getUseBackup()));
+    backup.put("count",  String.valueOf(config.getBackupCount()));
+    all.put("backup",backup);
+    
+    Map dir = new HashMap();
+    dir.put("config",config.getConfigDir());
+    dir.put("work",config.getWorkDir());
+    Map plugins = new HashMap();
+    plugins.put("system",config.getSystemPluginDir().getAbsolutePath());
+    plugins.put("user",config.getUserPluginDir().getAbsolutePath());
+    plugins.put("config",config.getPluginDirs());
+    dir.put("plugins",plugins);
+    all.put("dir",dir);
+    
+    Map log = new HashMap();
+    log.put("file",config.getLogFile());
+    log.put("level",config.getLogLevel());
+    all.put("log",log);
+    
+    Map proxy = new HashMap();
+    proxy.put("host",config.getProxyHost() == null ? "" : config.getProxyHost());
+    proxy.put("port",config.getProxyPort() == -1 ? "" : String.valueOf(config.getProxyPort()));
+    all.put("proxy",proxy);
+    
+    Map service = new HashMap();
+    service.put("multicastlookup",String.valueOf(config.getMulticastLookup()));
+    service.put("shareservices",String.valueOf(config.getShareServices()));
+    all.put("service",service);
+    
+    return all;
+  }
+
+  /**
+   * Schreibt die Liste der beim Systemstart aufgelaufenen Nachrichten in den Response-Writer.
+   * @throws IOException
+   */
+  @Path("/system/welcome$")
+  public void welcome() throws IOException
+  {
+    try
+    {
+      response.getWriter().print(new JSONArray(getWelcome()).toString());
     }
     catch (JSONException e)
     {
@@ -155,18 +177,9 @@ public class Application
    * Liefert eine Liste der beim Systemstart aufgelaufenen Nachrichten.
    * @throws IOException
    */
-  @Path("/system/welcome$")
-  public void welcome() throws IOException
+  public String[] getWelcome()
   {
-    try
-    {
-      response.getWriter().print(new JSONArray(de.willuhn.jameica.system.Application.getWelcomeMessages()).toString());
-    }
-    catch (JSONException e)
-    {
-      Logger.error("unable to encode via json",e);
-      throw new IOException("error while encoding into json");
-    }
+    return de.willuhn.jameica.system.Application.getWelcomeMessages();
   }
 
 }
@@ -174,6 +187,9 @@ public class Application
 
 /*********************************************************************
  * $Log: Application.java,v $
+ * Revision 1.4  2008/11/11 23:59:22  willuhn
+ * @N Dualer Aufruf (via JSON und Map/List)
+ *
  * Revision 1.3  2008/11/11 01:06:49  willuhn
  * @R testcode entfernt
  *
