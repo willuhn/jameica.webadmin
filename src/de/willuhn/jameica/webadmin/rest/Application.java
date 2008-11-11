@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Application.java,v $
- * $Revision: 1.2 $
- * $Date: 2008/11/11 01:06:22 $
+ * $Revision: 1.3 $
+ * $Date: 2008/11/11 01:06:49 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -87,47 +87,6 @@ public class Application
     }
   }
 
-  public JSONObject getUptime() throws IOException
-  {
-    Date started = de.willuhn.jameica.system.Application.getStartDate();
-
-    ////////////////////////////////////////////////////////////////////////////
-    // Uptime ausrechnen
-    long minutes = (System.currentTimeMillis() - started.getTime()) / 1000L / 60L;
-    long hours   = minutes / 60;
-
-    minutes %= 60; // Restminuten abzueglich Stunden
-
-    // ggf. ne "0" vorn dran schreiben
-    String mins = (minutes < 10 ? ("0" + minutes) : "" + minutes);
-
-    String uptime = null;
-    if (hours < 24) // weniger als 1 Tag?
-    {
-      uptime = hours + ":" + mins + " h";
-    }
-    else
-    {
-      long days = hours / 24;
-      uptime = days + " Tag(e), " + (hours % 24) + ":" + mins + " h";
-    }
-    ////////////////////////////////////////////////////////////////////////////
-    
-    try
-    {
-      JSONObject o = new JSONObject();
-      o.put("started",DATEFORMAT.format(started));
-      o.put("uptime",uptime);
-      return o;
-    }
-    catch (JSONException e)
-    {
-      Logger.error("unable to encode via json",e);
-      throw new IOException("error while encoding into json");
-    }
-  }
-
-  
   /**
    * Liefert die System-Konfiguration.
    * @throws IOException
@@ -215,6 +174,9 @@ public class Application
 
 /*********************************************************************
  * $Log: Application.java,v $
+ * Revision 1.3  2008/11/11 01:06:49  willuhn
+ * @R testcode entfernt
+ *
  * Revision 1.2  2008/11/11 01:06:22  willuhn
  * @N Mehr REST-Kommandos
  *
