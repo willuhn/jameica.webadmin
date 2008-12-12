@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/JSONClient.java,v $
- * $Revision: 1.2 $
- * $Date: 2008/07/08 14:26:59 $
+ * $Revision: 1.3 $
+ * $Date: 2008/12/12 17:19:10 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -56,7 +56,7 @@ public class JSONClient
     AutoTrust trust = null;
     try
     {
-      if (url.startsWith("https://"))
+      if (Application.inServerMode() && url.startsWith("https://"))
       {
         trust = new AutoTrust(url);
         Application.getMessagingFactory().registerMessageConsumer(trust);
@@ -187,6 +187,9 @@ public class JSONClient
 
 /**********************************************************************
  * $Log: JSONClient.java,v $
+ * Revision 1.3  2008/12/12 17:19:10  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.2  2008/07/08 14:26:59  willuhn
  * @D javadoc
  *
