@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Plugin.java,v $
- * $Revision: 1.8 $
- * $Date: 2008/11/11 23:59:22 $
+ * $Revision: 1.9 $
+ * $Date: 2008/12/30 15:24:37 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -69,7 +69,7 @@ public class Plugin
       data.put("pluginclass", notNull(mf.getPluginClass()));
       data.put("plugindir",   notNull(mf.getPluginDir()));
       data.put("url",         notNull(mf.getURL()));
-      data.put("version",     notNull(Double.toString(mf.getVersion())));
+      data.put("version",     mf.getVersion().toString());
 
       ArrayList deps = new ArrayList();
       Dependency[] d = mf.getDependencies();
@@ -105,6 +105,9 @@ public class Plugin
 
 /**********************************************************************
  * $Log: Plugin.java,v $
+ * Revision 1.9  2008/12/30 15:24:37  willuhn
+ * @N Umstellung auf neue Versionierung
+ *
  * Revision 1.8  2008/11/11 23:59:22  willuhn
  * @N Dualer Aufruf (via JSON und Map/List)
  *
