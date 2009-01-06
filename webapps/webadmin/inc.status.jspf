@@ -1,8 +1,12 @@
 <h2>System-Status</h2>
 <table class="data">
   <tr>
+    <td>Host</td>
+    <td>${system.currentServer}</td>
+  </tr>
+  <tr>
     <td>Version</td>
-    <td>${system.manifest.version} ${system.manifest.buildnumber}</td>
+    <td>${system.manifest.version}</td>
   </tr>
   <tr>
     <td>Uptime</td>

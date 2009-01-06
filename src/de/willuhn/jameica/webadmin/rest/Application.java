@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Application.java,v $
- * $Revision: 1.4 $
- * $Date: 2008/11/11 23:59:22 $
+ * $Revision: 1.5 $
+ * $Date: 2009/01/06 01:44:14 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -116,15 +116,15 @@ public class Application
     all.put("locale",config.getLocale().toString());
     
     Map rmi = new HashMap();
-    rmi.put("port",      String.valueOf(config.getRmiPort()));
-    rmi.put("ssl",       String.valueOf(config.getRmiSSL()));
-    rmi.put("clientauth",String.valueOf(config.getRmiUseClientAuth()));
+    rmi.put("port",      config.getRmiPort());
+    rmi.put("ssl",       config.getRmiSSL());
+    rmi.put("clientauth",config.getRmiUseClientAuth());
     all.put("rmi",rmi);
 
     Map backup = new HashMap();
     backup.put("dir",    config.getBackupDir());
-    backup.put("enabled",String.valueOf(config.getUseBackup()));
-    backup.put("count",  String.valueOf(config.getBackupCount()));
+    backup.put("enabled",config.getUseBackup());
+    backup.put("count",  config.getBackupCount());
     all.put("backup",backup);
     
     Map dir = new HashMap();
@@ -132,7 +132,7 @@ public class Application
     dir.put("work",config.getWorkDir());
     Map plugins = new HashMap();
     plugins.put("system",config.getSystemPluginDir().getAbsolutePath());
-    plugins.put("user",config.getUserPluginDir().getAbsolutePath());
+    plugins.put("user",  config.getUserPluginDir().getAbsolutePath());
     plugins.put("config",config.getPluginDirs());
     dir.put("plugins",plugins);
     all.put("dir",dir);
@@ -143,13 +143,13 @@ public class Application
     all.put("log",log);
     
     Map proxy = new HashMap();
-    proxy.put("host",config.getProxyHost() == null ? "" : config.getProxyHost());
+    proxy.put("host",config.getProxyHost());
     proxy.put("port",config.getProxyPort() == -1 ? "" : String.valueOf(config.getProxyPort()));
     all.put("proxy",proxy);
     
     Map service = new HashMap();
-    service.put("multicastlookup",String.valueOf(config.getMulticastLookup()));
-    service.put("shareservices",String.valueOf(config.getShareServices()));
+    service.put("multicastlookup",config.getMulticastLookup());
+    service.put("shareservices",config.getShareServices());
     all.put("service",service);
     
     return all;
@@ -187,6 +187,9 @@ public class Application
 
 /*********************************************************************
  * $Log: Application.java,v $
+ * Revision 1.5  2009/01/06 01:44:14  willuhn
+ * @N Code zum Hinzufuegen von Servern erweitert
+ *
  * Revision 1.4  2008/11/11 23:59:22  willuhn
  * @N Dualer Aufruf (via JSON und Map/List)
  *

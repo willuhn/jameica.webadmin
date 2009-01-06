@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/Settings.java,v $
- * $Revision: 1.2 $
- * $Date: 2008/07/02 17:43:00 $
+ * $Revision: 1.3 $
+ * $Date: 2009/01/06 01:44:14 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -18,6 +18,8 @@ import java.net.BindException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
 
 import de.willuhn.jameica.security.Wallet;
 import de.willuhn.jameica.system.Application;
@@ -159,23 +161,59 @@ public class Settings
     SETTINGS.setAttribute("listener.http.auth",auth);
   }
   
-  
   /**
-   * Liefert eine Liste von URLs mit Jameica-Installationen, die administriert werden sollen.
-   * @return Liste mit URLs von Jameica-Installationen.
+   * Liefert die URL zu einem weiteren Jameica-Server.
+   * @param name Aliasname des Servers.
+   * @return URL oder NULL.
    */
-  public static String[] getJameicaInstances()
+  public static String getServer(String name)
   {
-    return SETTINGS.getList("jameica.instance",new String[0]);
+    if (name == null || name.length() == 0)
+      return null;
+    return SETTINGS.getString("jameica.server." + name,null);
   }
   
   /**
-   * Speichert eine Liste von remote zu verwaltenden Jameica-Installationen.
-   * @param urls Liste mit Jameica-URLs.
+   * Fuegt einen weiteren Jameica-Server hinzu.
+   * @param name Aliasname des Servers.
+   * @param url URL des Servers.
    */
-  public static void setJameicaInstances(String[] urls)
+  public static void addServer(String name, String url)
   {
-    SETTINGS.setAttribute("jameica.instance",urls);
+    if (name == null || url == null || name.length() == 0 || url.length() == 0)
+      return;
+    SETTINGS.setAttribute("jameica.server." + name,url);
+  }
+  
+  /**
+   * Entfernt den Server aus der Liste.
+   * @param name Aliasname des Servers.
+   */
+  public static void removeServer(String name)
+  {
+    if (name == null || name.length() == 0)
+      return;
+    SETTINGS.setAttribute("jameica.server." + name,(String) null);
+  }
+  
+  /**
+   * Liefert eine Liste aller Servernamen.
+   * @return Liste der Servernamen.
+   */
+  public static List<String> getServers()
+  {
+    String[] names = SETTINGS.getAttributes();
+    List<String> list = new ArrayList<String>();
+    if (names != null)
+    {
+      for (String name:names)
+      {
+        if (!name.startsWith("jameica.server."))
+          continue;
+        list.add(name.replaceFirst("jameica\\.server\\.",""));
+      }
+    }
+    return list;
   }
   
   /**
@@ -216,6 +254,9 @@ public class Settings
 
 /*********************************************************************
  * $Log: Settings.java,v $
+ * Revision 1.3  2009/01/06 01:44:14  willuhn
+ * @N Code zum Hinzufuegen von Servern erweitert
+ *
  * Revision 1.2  2008/07/02 17:43:00  willuhn
  * @N Remote-Administrierbarkeit
  *

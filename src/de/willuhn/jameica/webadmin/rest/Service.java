@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Service.java,v $
- * $Revision: 1.6 $
- * $Date: 2008/10/21 22:33:47 $
+ * $Revision: 1.7 $
+ * $Date: 2009/01/06 01:44:14 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -156,9 +156,9 @@ public class Service
         data.put("name",      services[i].getName());
         data.put("class",     services[i].getClassname());
         data.put("depends",   services[i].depends());
-        data.put("autostart", Boolean.toString(services[i].autostart()));
-        data.put("shared",    Boolean.toString(services[i].share()));
-        data.put("started",   Boolean.toString(s.isStarted()));
+        data.put("autostart", services[i].autostart());
+        data.put("shared",    services[i].share());
+        data.put("started",   s.isStarted());
         json.add(data);
       }
       catch (Exception e)
@@ -197,6 +197,9 @@ public class Service
 
 /*********************************************************************
  * $Log: Service.java,v $
+ * Revision 1.7  2009/01/06 01:44:14  willuhn
+ * @N Code zum Hinzufuegen von Servern erweitert
+ *
  * Revision 1.6  2008/10/21 22:33:47  willuhn
  * @N Markieren der zu registrierenden REST-Kommandos via Annotation
  *

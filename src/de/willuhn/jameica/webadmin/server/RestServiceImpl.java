@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/server/RestServiceImpl.java,v $
- * $Revision: 1.14 $
- * $Date: 2008/11/07 00:14:37 $
+ * $Revision: 1.15 $
+ * $Date: 2009/01/06 01:44:14 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -34,6 +34,7 @@ import de.willuhn.jameica.webadmin.rest.Certificate;
 import de.willuhn.jameica.webadmin.rest.Echo;
 import de.willuhn.jameica.webadmin.rest.Log;
 import de.willuhn.jameica.webadmin.rest.Plugin;
+import de.willuhn.jameica.webadmin.rest.Server;
 import de.willuhn.jameica.webadmin.rest.Service;
 import de.willuhn.jameica.webadmin.rest.annotation.Path;
 import de.willuhn.jameica.webadmin.rest.annotation.Request;
@@ -276,6 +277,7 @@ public class RestServiceImpl implements RestService
     register(new Service());
     register(new Certificate());
     register(new de.willuhn.jameica.webadmin.rest.Application());
+    register(new Server());
 
     Application.getMessagingFactory().getMessagingQueue("jameica.webadmin.rest.register").registerMessageConsumer(this.register);
     Application.getMessagingFactory().getMessagingQueue("jameica.webadmin.rest.unregister").registerMessageConsumer(this.unregister);
@@ -360,6 +362,9 @@ public class RestServiceImpl implements RestService
 
 /*********************************************************************
  * $Log: RestServiceImpl.java,v $
+ * Revision 1.15  2009/01/06 01:44:14  willuhn
+ * @N Code zum Hinzufuegen von Servern erweitert
+ *
  * Revision 1.14  2008/11/07 00:14:37  willuhn
  * @N REST-Bean fuer Anzeige von System-Infos (Start-Zeit, Config)
  *

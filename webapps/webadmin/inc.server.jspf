@@ -7,31 +7,6 @@
 <%@page import="de.willuhn.jameica.messaging.StatusBarMessage"%>
 <%@page import="de.willuhn.jameica.webadmin.JSONClient"%>
 
-<%
-  String host = request.getParameter("host");
-  if (host != null && host.length() > 0)
-  {
-    boolean ssl = (request.getParameter("ssl") != null);
-    int port = 8080;
-    try
-    {
-      port = Integer.parseInt(request.getParameter("port"));
-    } catch (Exception e) {/*ignore*/}
-    if (port <= 0)
-      port = 8080;
-    
-    host = "http" + (ssl ? "s" : "") + "://" + host + ":" + port + "/webadmin";
-    ArrayList servers = new ArrayList(Arrays.asList(Settings.getJameicaInstances()));
-    servers.add(host);
-    Settings.setJameicaInstances((String[]) servers.toArray(new String[servers.size()]));
-    Settings.setJameicaInstancePassword(host,request.getParameter("password"));
-    
-    Application.getMessagingFactory().sendMessage(new StatusBarMessage("Server hinzugefügt",StatusBarMessage.TYPE_SUCCESS));
-    response.sendRedirect("/webadmin/"); // Damit beim Reload nicht erneut abgesendet wird
-  }
-%>
-
-
 <h2>Weitere Jameica-Server</h2>
 
 <table class="data">
@@ -46,27 +21,31 @@
         a.add(0,-1,'Katalog','');
       
         <%
-          String[] urls = Settings.getJameicaInstances();
-          for (int i=0;i<urls.length;++i)
+          List<String> names = Settings.getServers();
+          for (int i=0;i<names.size();++i)
           {
+            String name = names.get(i);
+            String url = Settings.getServer(name);
             %>
-              a.add(<%=i+100%>,0,'<%=urls[i]%>','<%=urls[i]%>');
+              a.add(<%=i+100%>,0,'<%=name%>','<%=url%>');
             <%
 
-            List plugins = JSONClient.asList(urls[i],"/rest/plugins/list");
+            List plugins = JSONClient.asList(url,"/rest/plugins/list");
             for (int k=0;k<plugins.size();++k)
             {
               Map plugin = (Map) plugins.get(k);
               %>
-                a.add(<%=i+100+k+10%>,<%=i+100%>,'<%=plugin.get("name")%>','<%=urls[i]%>/plugin.jsp?plugin=<%=plugin.get("name")%>');
+                a.add(<%=i+100+k+10%>,<%=i+100%>,'<%=plugin.get("name")%>','<%=url%>/plugin.jsp?plugin=<%=plugin.get("name")%>');
               <%
 
-              List services = JSONClient.asList(urls[i],"/rest/plugins/" + plugin.get("name") + "/services/list");
+              List services = JSONClient.asList(url,"/rest/plugins/" + plugin.get("name") + "/services/list");
               for (int m=0;m<services.size();++m)
               {
                 Map service = (Map) services.get(m);
+                Boolean started = (Boolean) service.get("started");
+                String sName = (started.booleanValue() ? "" : "not ") + "started: " + service.get("name");
                 %>
-                  a.add(<%=i+100+k+10+m+1%>,<%=i+100+k+10%>,'<%=service.get("name")%>','<%=urls[i]%>/service.jsp?name=<%=service.get("name")%>');
+                  a.add(<%=i+100+k+10+m+1%>,<%=i+100+k+10%>,'<%=sName%>','');
                 <%
               }
             }
@@ -80,7 +59,7 @@
 </table>
 
 <br/>
-<form method="post">
+<form method="post" action="/webadmin/rest/server/add">
   <table class="data">
     <tr>
       <th colspan="2">Server hinzufügen</th>

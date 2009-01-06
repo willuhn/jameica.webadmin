@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/beans/Attic/Application.java,v $
- * $Revision: 1.2 $
- * $Date: 2008/11/06 11:38:24 $
+ * $Revision: 1.3 $
+ * $Date: 2009/01/06 01:44:14 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -31,6 +31,7 @@ import de.willuhn.logging.Message;
 public class Application
 {
   private final static DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+  private String server = null;
 
   /**
    * Liefert Startzeit und -datum des Serverstarts.
@@ -109,11 +110,34 @@ public class Application
     Collections.reverse(list);
     return list.toArray(new Message[list.size()]);
   }
+
+  /**
+   * Liefert den aktuell ausgewaehlten Server.
+   * @return der aktuell ausgewaehlte Server oder NULL.
+   */
+  public String getCurrentServer()
+  {
+    return this.server == null ? "localhost" : this.server;
+  }
+
+  /**
+   * Speichert den aktuell ausgewaehlten Server.
+   * @param server der aktuell ausgewaehlte Server.
+   */
+  public void setCurrentServer(String server)
+  {
+    this.server = "".equals(server) ? null : server;
+  }
+  
+  
 }
 
 
 /*********************************************************************
  * $Log: Application.java,v $
+ * Revision 1.3  2009/01/06 01:44:14  willuhn
+ * @N Code zum Hinzufuegen von Servern erweitert
+ *
  * Revision 1.2  2008/11/06 11:38:24  willuhn
  * @N Schritt-fuer-Schritt-Umstellung auf JSTL
  *
