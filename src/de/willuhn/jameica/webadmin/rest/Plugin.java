@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Plugin.java,v $
- * $Revision: 1.9 $
- * $Date: 2008/12/30 15:24:37 $
+ * $Revision: 1.10 $
+ * $Date: 2009/01/06 23:26:52 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -60,6 +60,7 @@ public class Plugin
     {
       Manifest mf = (Manifest) plugins.get(i);
       Map data = new HashMap();
+      Object version = mf.getVersion();
       data.put("name",        notNull(mf.getName()));
       data.put("builddate",   notNull(mf.getBuildDate()));
       data.put("buildnumber", notNull(mf.getBuildnumber()));
@@ -69,7 +70,7 @@ public class Plugin
       data.put("pluginclass", notNull(mf.getPluginClass()));
       data.put("plugindir",   notNull(mf.getPluginDir()));
       data.put("url",         notNull(mf.getURL()));
-      data.put("version",     mf.getVersion().toString());
+      data.put("version",     version.toString());
 
       ArrayList deps = new ArrayList();
       Dependency[] d = mf.getDependencies();
@@ -105,6 +106,9 @@ public class Plugin
 
 /**********************************************************************
  * $Log: Plugin.java,v $
+ * Revision 1.10  2009/01/06 23:26:52  willuhn
+ * @C Jameica 1.7 compatibility
+ *
  * Revision 1.9  2008/12/30 15:24:37  willuhn
  * @N Umstellung auf neue Versionierung
  *
