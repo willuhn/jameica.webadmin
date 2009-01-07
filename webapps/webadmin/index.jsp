@@ -13,8 +13,9 @@
     <jsp:include page="inc.certs.jspf"/>
     </td>
     <td style="padding-left: 20px;width:300px">
-      <jsp:include page="inc.server.jspf"/>
       <jsp:include page="inc.messages.jspf"/>
+      <br/>
+      <jsp:include page="inc.server.jspf"/>
     </td>
   </tr>
 </table>
