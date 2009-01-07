@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Server.java,v $
- * $Revision: 1.1 $
- * $Date: 2009/01/06 01:44:14 $
+ * $Revision: 1.2 $
+ * $Date: 2009/01/07 00:30:20 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -64,7 +64,7 @@ public class Server
         Settings.addServer(host,url);
         Settings.setJameicaInstancePassword(url,request.getParameter("password"));
         
-        de.willuhn.jameica.system.Application.getMessagingFactory().sendMessage(new StatusBarMessage(i18n.tr("Server hinzugefügt"),StatusBarMessage.TYPE_SUCCESS));
+        de.willuhn.jameica.system.Application.getMessagingFactory().sendMessage(new StatusBarMessage(i18n.tr("Server {0} hinzugefügt",host),StatusBarMessage.TYPE_SUCCESS));
         response.sendRedirect("/webadmin/"); // Damit beim Reload nicht erneut abgesendet wird
       }
     }
@@ -79,6 +79,10 @@ public class Server
 
 /*********************************************************************
  * $Log: Server.java,v $
+ * Revision 1.2  2009/01/07 00:30:20  willuhn
+ * @N Hinzufuegen weiterer Jameica-Server
+ * @N Auto-Host-Check
+ *
  * Revision 1.1  2009/01/06 01:44:14  willuhn
  * @N Code zum Hinzufuegen von Servern erweitert
  *

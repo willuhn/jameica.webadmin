@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/JSONClient.java,v $
- * $Revision: 1.3 $
- * $Date: 2008/12/12 17:19:10 $
+ * $Revision: 1.4 $
+ * $Date: 2009/01/07 00:30:20 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -35,6 +35,7 @@ import org.json.JSONTokener;
 import de.willuhn.jameica.messaging.CheckTrustMessage;
 import de.willuhn.jameica.messaging.Message;
 import de.willuhn.jameica.messaging.MessageConsumer;
+import de.willuhn.jameica.messaging.QueryMessage;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.logging.Logger;
 
@@ -53,13 +54,19 @@ public class JSONClient
    */
   private static String execute(String url, String restCommand) throws Exception
   {
-    AutoTrust trust = null;
+    AutoCertTrust certTrust = null;
+    AutoHostTrust hostTrust = null;
+    
     try
     {
+      // Nur registrieren, wenn wir keine Interaktionsmoeglichkeit via GUI haben
+      // und wir uns tatsaechlich mittels HTTPS verbinden
       if (Application.inServerMode() && url.startsWith("https://"))
       {
-        trust = new AutoTrust(url);
-        Application.getMessagingFactory().registerMessageConsumer(trust);
+        certTrust = new AutoCertTrust(url);
+        Application.getMessagingFactory().registerMessageConsumer(certTrust);
+        hostTrust = new AutoHostTrust(url);
+        Application.getMessagingFactory().getMessagingQueue("jameica.trust.hostname").registerMessageConsumer(hostTrust);
       }
       HttpURLConnection connection = (HttpURLConnection) new URL(url + restCommand).openConnection(); 
       connection.setDoOutput(true);
@@ -99,8 +106,10 @@ public class JSONClient
     }
     finally
     {
-      if (trust != null)
-        Application.getMessagingFactory().unRegisterMessageConsumer(trust);
+      if (certTrust != null)
+        Application.getMessagingFactory().unRegisterMessageConsumer(certTrust);
+      if (hostTrust != null)
+        Application.getMessagingFactory().getMessagingQueue("jameica.trust.hostname").unRegisterMessageConsumer(certTrust);
     }
   }
   
@@ -143,7 +152,7 @@ public class JSONClient
    * Gewaehrleistet die automatische Vertrauensstellung von fremden
    * Jameica-Zertifikaten, wenn sich der Admin explizit dorthin verbindet. 
    */
-  private static class AutoTrust implements MessageConsumer
+  private static class AutoCertTrust implements MessageConsumer
   {
     private String url = null;
     
@@ -151,7 +160,7 @@ public class JSONClient
      * ct
      * @param url
      */
-    private AutoTrust(String url)
+    private AutoCertTrust(String url)
     {
       this.url = url;
     }
@@ -180,6 +189,52 @@ public class JSONClient
       CheckTrustMessage msg = (CheckTrustMessage) message;
       msg.setTrusted(true,this.getClass().getName() + " at " + new Date().toString() + " for " + this.url);
     }
+  }
+  
+  /**
+   * Gewaehrleistet die automatische Vertrauensstellung von
+   * Jameica-Servern, wenn sich der Admin explizit dorthin verbindet. 
+   * Auch dann, wenn der Hostname nicht mit dem aus dem Zertifikat
+   * uebereinstimmt.
+   */
+  private static class AutoHostTrust implements MessageConsumer
+  {
+    private String url = null;
+    
+    /**
+     * ct
+     * @param url
+     */
+    private AutoHostTrust(String url)
+    {
+      this.url = url;
+    }
+
+    /**
+     * @see de.willuhn.jameica.messaging.MessageConsumer#autoRegister()
+     */
+    public boolean autoRegister()
+    {
+      return false;
+    }
+
+    /**
+     * @see de.willuhn.jameica.messaging.MessageConsumer#getExpectedMessageTypes()
+     */
+    public Class[] getExpectedMessageTypes()
+    {
+      return new Class[]{QueryMessage.class};
+    }
+
+    /**
+     * @see de.willuhn.jameica.messaging.MessageConsumer#handleMessage(de.willuhn.jameica.messaging.Message)
+     */
+    public void handleMessage(Message message) throws Exception
+    {
+      QueryMessage msg = (QueryMessage) message;
+      msg.setName(this.getClass().getName() + " at " + new Date().toString() + " for " + this.url);
+      msg.setData(Boolean.TRUE);
+    }
     
   }
 }
@@ -187,6 +242,10 @@ public class JSONClient
 
 /**********************************************************************
  * $Log: JSONClient.java,v $
+ * Revision 1.4  2009/01/07 00:30:20  willuhn
+ * @N Hinzufuegen weiterer Jameica-Server
+ * @N Auto-Host-Check
+ *
  * Revision 1.3  2008/12/12 17:19:10  willuhn
  * *** empty log message ***
  *

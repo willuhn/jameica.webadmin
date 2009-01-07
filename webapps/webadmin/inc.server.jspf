@@ -7,62 +7,58 @@
 <%@page import="de.willuhn.jameica.messaging.StatusBarMessage"%>
 <%@page import="de.willuhn.jameica.webadmin.JSONClient"%>
 
-<h2>Weitere Jameica-Server</h2>
-
-<table class="data">
-  <tr>
-    <th colspan="2">Verbundene Server</th>
-  </tr>
-  <tr>
-    <td>
-      <script type="text/javascript" language="JavaScript">
-        a = new dTree('a');
-        a.config.useCookies=true;
-        a.add(0,-1,'Katalog','');
-      
-        <%
-          List<String> names = Settings.getServers();
-          for (int i=0;i<names.size();++i)
-          {
-            String name = names.get(i);
-            String url = Settings.getServer(name);
-            %>
-              a.add(<%=i+100%>,0,'<%=name%>','<%=url%>');
-            <%
-
-            List plugins = JSONClient.asList(url,"/rest/plugins/list");
-            for (int k=0;k<plugins.size();++k)
-            {
-              Map plugin = (Map) plugins.get(k);
-              %>
-                a.add(<%=i+100+k+10%>,<%=i+100%>,'<%=plugin.get("name")%>','<%=url%>/plugin.jsp?plugin=<%=plugin.get("name")%>');
-              <%
-
-              List services = JSONClient.asList(url,"/rest/plugins/" + plugin.get("name") + "/services/list");
-              for (int m=0;m<services.size();++m)
-              {
-                Map service = (Map) services.get(m);
-                Boolean started = (Boolean) service.get("started");
-                String sName = (started.booleanValue() ? "" : "not ") + "started: " + service.get("name");
-                %>
-                  a.add(<%=i+100+k+10+m+1%>,<%=i+100+k+10%>,'<%=sName%>','');
-                <%
-              }
-            }
-          }
-        %>
-        document.write(a);
-        a.openAll();
-      </script>
-    </td>
-  </tr>
-</table>
-
-<br/>
 <form method="post" action="/webadmin/rest/server/add">
+
   <table class="data">
     <tr>
-      <th colspan="2">Server hinzufügen</th>
+      <th colspan="2">Weitere Jameica-Server</th>
+    </tr>
+    <tr>
+      <td colspan="2">
+        <script type="text/javascript" language="JavaScript">
+          a = new dTree('a');
+          a.config.useCookies=true;
+          a.add(0,-1,'Katalog','');
+        
+          <%
+            List<String> names = Settings.getServers();
+            for (int i=0;i<names.size();++i)
+            {
+              String name = names.get(i);
+              String url = Settings.getServer(name);
+              %>
+                a.add(<%=i+1%>00,0,'<%=name%>','<%=url%>');
+              <%
+  
+              List plugins = JSONClient.asList(url,"/rest/plugins/list");
+              for (int k=0;k<plugins.size();++k)
+              {
+                Map plugin = (Map) plugins.get(k);
+                %>
+                  a.add(<%=i+1%><%=k+1%>0,<%=i+1%>00,'plugin: <%=plugin.get("name")%>','<%=url%>/plugin.jsp?plugin=<%=plugin.get("name")%>');
+                <%
+  
+                List services = JSONClient.asList(url,"/rest/plugins/" + plugin.get("name") + "/services/list");
+                for (int m=0;m<services.size();++m)
+                {
+                  Map service = (Map) services.get(m);
+                  Boolean started = (Boolean) service.get("started");
+                  String sName = "service: " + service.get("name") + " [" + (started.booleanValue() ? "" : "not ") + "started]";
+                  %>
+                    a.add(<%=i+1%><%=k+1%><%=m+1%>,<%=i+1%><%=k+1%>0,'<%=sName%>','');
+                  <%
+                }
+              }
+            }
+          %>
+          document.write(a);
+          a.openAll();
+        </script>
+        <br/>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2"><b>Jameica-Server hinzufügen</b></td>
     </tr>
     <tr>
       <td>Hostname</td>
@@ -81,7 +77,8 @@
       <td><input name="ssl" type="checkbox" checked></td>
     </tr>
     <tr>
-      <td colspan="2"><input type="submit" value="Speichern"/></td>
+      <td>&nbsp;</td>
+      <td><input type="submit" value="Speichern"/></td>
     </tr>
   </table>
 </form>
