@@ -7,7 +7,8 @@
 <%@page import="de.willuhn.jameica.messaging.StatusBarMessage"%>
 <%@page import="de.willuhn.jameica.webadmin.JSONClient"%>
 
-<form method="post" action="/webadmin/rest/server/add">
+
+<%@page import="java.util.Collections"%><form method="post" action="/webadmin/rest/server/add">
 
   <table class="data">
     <tr>
@@ -42,7 +43,8 @@
                 for (int m=0;m<services.size();++m)
                 {
                   Map service = (Map) services.get(m);
-                  Boolean started = (Boolean) service.get("started");
+                  Object o = service.get("started");
+                  Boolean started = Boolean.valueOf(o == null ? "false" : o.toString());
                   String sName = "service: " + service.get("name") + " [" + (started.booleanValue() ? "" : "not ") + "started]";
                   %>
                     a.add(<%=i+1%><%=k+1%><%=m+1%>,<%=i+1%><%=k+1%>0,'<%=sName%>','');
@@ -51,8 +53,8 @@
               }
             }
           %>
+          a.closeAll();
           document.write(a);
-          a.openAll();
         </script>
         <br/>
       </td>
