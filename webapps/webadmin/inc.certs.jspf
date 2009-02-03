@@ -1,34 +1,18 @@
-<%@page import="de.willuhn.jameica.system.Application"%>
-
-<%@page import="java.security.cert.X509Certificate"%>
-<%@page import="de.willuhn.jameica.security.Principal"%>
-<%@page import="java.text.DateFormat"%>
-<%@page import="java.text.SimpleDateFormat"%>
-<%@page import="de.willuhn.jameica.security.Certificate"%>
+<%@ taglib uri="http://java.sun.com/jstl/core_rt" prefix="c" %>
+<jsp:useBean id="certs" class="de.willuhn.jameica.webadmin.rest.Certificate" scope="session"/>
 
 <h2>Installierte Zertifikate</h2>
 <table class="data">
   <tr>
     <th>Ausgestellt für</th>
+    <th>Ausgestellt von</th>
     <th>Gültigkeit</th>
   </tr>
-  <%
-    DateFormat __certDf = new SimpleDateFormat("dd.MM.yyyy");
-    X509Certificate[] __certList = Application.getSSLFactory().getTrustedCertificates();
-    for (int i=0;i<__certList.length;++i)
-    {
-      Certificate cert = new Certificate(__certList[i]);
-      %>
-		    <tr onmouseover="change_to(this);" onmouseout="change_back(this);">
-		      <td>
-		        <a title="Klicken für Details" href="cert.jsp?cert=<%= cert.getSHA1Fingerprint() %>"><%= cert.getSubject().getAttribute(Principal.COMMON_NAME)%></a>
-		      </td>
-		      <td>
-		        <%= __certDf.format(__certList[i].getNotBefore()) %> -
-		        <%= __certDf.format(__certList[i].getNotAfter()) %>
-		      </td>
-		    </tr>
-		  <%
-    }
-  %>
+  <c:forEach items="${certs.list}" var="cert">
+    <tr onmouseover="change_to(this);" onmouseout="change_back(this);">
+      <td><a title="Klicken für Details" href="cert.jsp?cert=${cert.cert.sha1}">${cert.subject.CN}</a></td>
+      <td>${cert.issuer.CN}</td>
+      <td>${cert.valid.from} - ${cert.valid.to}</td>
+    </tr>
+  </c:forEach>
 </table>
