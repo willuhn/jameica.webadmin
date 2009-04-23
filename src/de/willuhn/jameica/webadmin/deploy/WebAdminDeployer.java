@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/deploy/WebAdminDeployer.java,v $
- * $Revision: 1.5 $
- * $Date: 2007/12/04 12:13:48 $
+ * $Revision: 1.6 $
+ * $Date: 2009/04/23 09:05:51 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -17,7 +17,6 @@ import java.io.File;
 
 import org.mortbay.jetty.security.UserRealm;
 
-import de.willuhn.jameica.plugin.AbstractPlugin;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.jameica.webadmin.Plugin;
 import de.willuhn.jameica.webadmin.Settings;
@@ -41,8 +40,7 @@ public class WebAdminDeployer extends AbstractWebAppDeployer
    */
   protected String getPath()
   {
-    AbstractPlugin plugin = Application.getPluginLoader().getPlugin(Plugin.class);
-    return plugin.getResources().getPath() + File.separator + "webapps" + File.separator + "webadmin";
+    return Application.getPluginLoader().getPlugin(Plugin.class).getManifest().getPluginDir() + File.separator + "webapps" + File.separator + "webadmin";
   }
 
   /**
@@ -67,6 +65,9 @@ public class WebAdminDeployer extends AbstractWebAppDeployer
 
 /*********************************************************************
  * $Log: WebAdminDeployer.java,v $
+ * Revision 1.6  2009/04/23 09:05:51  willuhn
+ * @C deprecated api
+ *
  * Revision 1.5  2007/12/04 12:13:48  willuhn
  * @N Login pro Webanwendung konfigurierbar
  *

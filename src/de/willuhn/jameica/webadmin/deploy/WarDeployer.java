@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/deploy/WarDeployer.java,v $
- * $Revision: 1.6 $
- * $Date: 2008/04/10 13:02:29 $
+ * $Revision: 1.7 $
+ * $Date: 2009/04/23 09:05:51 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -43,7 +43,7 @@ public class WarDeployer implements Deployer
     for (int i=0;i<list.size();++i)
     {
       AbstractPlugin plugin = (AbstractPlugin) list.get(i);
-      File dir = new File(plugin.getResources().getPath());
+      File dir = new File(plugin.getManifest().getPluginDir());
 
       FileFinder finder = new FileFinder(dir);
       finder.extension("war");
@@ -85,6 +85,9 @@ public class WarDeployer implements Deployer
 
 /*********************************************************************
  * $Log: WarDeployer.java,v $
+ * Revision 1.7  2009/04/23 09:05:51  willuhn
+ * @C deprecated api
+ *
  * Revision 1.6  2008/04/10 13:02:29  willuhn
  * @N Zweischritt-Deployment. Der Server wird zwar sofort initialisiert, wenn der Jameica-Service startet, gestartet wird er aber erst, wenn die ersten Handler resgistriert werden
  * @N damit koennen auch nachtraeglich zur Laufzeit weitere Handler hinzu registriert werden
