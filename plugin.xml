@@ -6,8 +6,8 @@
 
 
   <description>Plugin, um Jameica mittels Embedded HTTP-Server administrieren zu koennen</description>
-  <url>https://www.willuhn.de/projects/jameica/releases/nightly/jameica.webadmin-1.1-nightly.zip</url>
-  <homepage>http://www.willuhn.de/projects/jameica</homepage>
+  <url>https://www.willuhn.de/products/jameica/releases/nightly/jameica.webadmin-1.1-nightly.zip</url>
+  <homepage>http://www.willuhn.de/products/jameica/extensions.php#jameica.webadmin</homepage>
   <license>GPL - http://www.gnu.org/copyleft/gpl.html</license>
 
   <requires jameica="1.7+"/>
