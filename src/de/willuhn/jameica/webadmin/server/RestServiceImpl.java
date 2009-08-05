@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/server/RestServiceImpl.java,v $
- * $Revision: 1.15 $
- * $Date: 2009/01/06 01:44:14 $
+ * $Revision: 1.16 $
+ * $Date: 2009/08/05 09:03:40 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -30,15 +30,15 @@ import de.willuhn.jameica.messaging.Message;
 import de.willuhn.jameica.messaging.MessageConsumer;
 import de.willuhn.jameica.messaging.QueryMessage;
 import de.willuhn.jameica.system.Application;
+import de.willuhn.jameica.webadmin.annotation.Path;
+import de.willuhn.jameica.webadmin.annotation.Request;
+import de.willuhn.jameica.webadmin.annotation.Response;
 import de.willuhn.jameica.webadmin.rest.Certificate;
 import de.willuhn.jameica.webadmin.rest.Echo;
 import de.willuhn.jameica.webadmin.rest.Log;
 import de.willuhn.jameica.webadmin.rest.Plugin;
 import de.willuhn.jameica.webadmin.rest.Server;
 import de.willuhn.jameica.webadmin.rest.Service;
-import de.willuhn.jameica.webadmin.rest.annotation.Path;
-import de.willuhn.jameica.webadmin.rest.annotation.Request;
-import de.willuhn.jameica.webadmin.rest.annotation.Response;
 import de.willuhn.jameica.webadmin.rmi.RestService;
 import de.willuhn.logging.Logger;
 
@@ -362,6 +362,9 @@ public class RestServiceImpl implements RestService
 
 /*********************************************************************
  * $Log: RestServiceImpl.java,v $
+ * Revision 1.16  2009/08/05 09:03:40  willuhn
+ * @C Annotations in eigenes Package verschoben (sind nicht mehr REST-spezifisch)
+ *
  * Revision 1.15  2009/01/06 01:44:14  willuhn
  * @N Code zum Hinzufuegen von Servern erweitert
  *

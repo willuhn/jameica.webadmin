@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Server.java,v $
- * $Revision: 1.2 $
- * $Date: 2009/01/07 00:30:20 $
+ * $Revision: 1.3 $
+ * $Date: 2009/08/05 09:03:40 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -20,9 +20,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import de.willuhn.jameica.messaging.StatusBarMessage;
 import de.willuhn.jameica.webadmin.Settings;
-import de.willuhn.jameica.webadmin.rest.annotation.Path;
-import de.willuhn.jameica.webadmin.rest.annotation.Request;
-import de.willuhn.jameica.webadmin.rest.annotation.Response;
+import de.willuhn.jameica.webadmin.annotation.Path;
+import de.willuhn.jameica.webadmin.annotation.Request;
+import de.willuhn.jameica.webadmin.annotation.Response;
 import de.willuhn.logging.Logger;
 import de.willuhn.util.I18N;
 
@@ -79,6 +79,9 @@ public class Server
 
 /*********************************************************************
  * $Log: Server.java,v $
+ * Revision 1.3  2009/08/05 09:03:40  willuhn
+ * @C Annotations in eigenes Package verschoben (sind nicht mehr REST-spezifisch)
+ *
  * Revision 1.2  2009/01/07 00:30:20  willuhn
  * @N Hinzufuegen weiterer Jameica-Server
  * @N Auto-Host-Check

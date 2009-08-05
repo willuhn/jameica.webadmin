@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Echo.java,v $
- * $Revision: 1.5 $
- * $Date: 2008/10/21 22:33:47 $
+ * $Revision: 1.6 $
+ * $Date: 2009/08/05 09:03:40 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -20,8 +20,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import de.willuhn.jameica.webadmin.rest.annotation.Path;
-import de.willuhn.jameica.webadmin.rest.annotation.Response;
+import de.willuhn.jameica.webadmin.annotation.Path;
+import de.willuhn.jameica.webadmin.annotation.Response;
 import de.willuhn.logging.Logger;
 
 /**
@@ -56,6 +56,9 @@ public class Echo
 
 /*********************************************************************
  * $Log: Echo.java,v $
+ * Revision 1.6  2009/08/05 09:03:40  willuhn
+ * @C Annotations in eigenes Package verschoben (sind nicht mehr REST-spezifisch)
+ *
  * Revision 1.5  2008/10/21 22:33:47  willuhn
  * @N Markieren der zu registrierenden REST-Kommandos via Annotation
  *

@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Certificate.java,v $
- * $Revision: 1.2 $
- * $Date: 2008/11/11 23:59:22 $
+ * $Revision: 1.3 $
+ * $Date: 2009/08/05 09:03:40 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -28,8 +28,8 @@ import org.json.JSONArray;
 
 import de.willuhn.jameica.security.Principal;
 import de.willuhn.jameica.system.Application;
-import de.willuhn.jameica.webadmin.rest.annotation.Path;
-import de.willuhn.jameica.webadmin.rest.annotation.Response;
+import de.willuhn.jameica.webadmin.annotation.Path;
+import de.willuhn.jameica.webadmin.annotation.Response;
 import de.willuhn.logging.Logger;
 import de.willuhn.util.ApplicationException;
 
@@ -123,6 +123,9 @@ public class Certificate
 
 /**********************************************************************
  * $Log: Certificate.java,v $
+ * Revision 1.3  2009/08/05 09:03:40  willuhn
+ * @C Annotations in eigenes Package verschoben (sind nicht mehr REST-spezifisch)
+ *
  * Revision 1.2  2008/11/11 23:59:22  willuhn
  * @N Dualer Aufruf (via JSON und Map/List)
  *

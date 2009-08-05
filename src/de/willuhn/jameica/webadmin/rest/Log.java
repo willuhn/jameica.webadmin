@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Log.java,v $
- * $Revision: 1.8 $
- * $Date: 2008/11/11 01:06:22 $
+ * $Revision: 1.9 $
+ * $Date: 2009/08/05 09:03:40 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -25,9 +25,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONArray;
 
-import de.willuhn.jameica.webadmin.rest.annotation.Path;
-import de.willuhn.jameica.webadmin.rest.annotation.Request;
-import de.willuhn.jameica.webadmin.rest.annotation.Response;
+import de.willuhn.jameica.webadmin.annotation.Path;
+import de.willuhn.jameica.webadmin.annotation.Request;
+import de.willuhn.jameica.webadmin.annotation.Response;
 import de.willuhn.logging.Level;
 import de.willuhn.logging.Logger;
 import de.willuhn.logging.Message;
@@ -148,6 +148,9 @@ public class Log
 
 /*********************************************************************
  * $Log: Log.java,v $
+ * Revision 1.9  2009/08/05 09:03:40  willuhn
+ * @C Annotations in eigenes Package verschoben (sind nicht mehr REST-spezifisch)
+ *
  * Revision 1.8  2008/11/11 01:06:22  willuhn
  * @N Mehr REST-Kommandos
  *
