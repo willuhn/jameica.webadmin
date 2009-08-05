@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/annotation/Attic/Lifecycle.java,v $
- * $Revision: 1.1 $
- * $Date: 2009/08/05 09:03:40 $
+ * $Revision: 1.2 $
+ * $Date: 2009/08/05 11:03:17 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -21,6 +21,9 @@ import java.lang.annotation.Target;
 
 /**
  * Annotation, mit der der Lifecycle einer Bean festgelegt werden kann.
+ * Es ist der Anwendung, die diesen Lifecycle auswertet, selbst ueberlassen,
+ * welchen Lifecycle-Typ sie verwendet, wenn an der konkreten Bean
+ * keine entsprechende Annotation definiert ist.
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
@@ -59,6 +62,9 @@ public @interface Lifecycle {
 
 /*********************************************************************
  * $Log: Lifecycle.java,v $
+ * Revision 1.2  2009/08/05 11:03:17  willuhn
+ * @N Neue Annotation "Lifecycle"
+ *
  * Revision 1.1  2009/08/05 09:03:40  willuhn
  * @C Annotations in eigenes Package verschoben (sind nicht mehr REST-spezifisch)
  *
