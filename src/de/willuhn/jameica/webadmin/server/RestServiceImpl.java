@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/server/RestServiceImpl.java,v $
- * $Revision: 1.16 $
- * $Date: 2009/08/05 09:03:40 $
+ * $Revision: 1.17 $
+ * $Date: 2009/09/10 16:48:39 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -19,6 +19,7 @@ import java.lang.reflect.Method;
 import java.rmi.RemoteException;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -26,6 +27,7 @@ import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import de.willuhn.datasource.BeanUtil;
 import de.willuhn.jameica.messaging.Message;
 import de.willuhn.jameica.messaging.MessageConsumer;
 import de.willuhn.jameica.messaging.QueryMessage;
@@ -205,11 +207,11 @@ public class RestServiceImpl implements RestService
   /**
    * Injiziert die Annotations.
    * @param bean die Bean.
-   * @throws IOException
+   * @throws Exception
    */
-  private void applyAnnotations(Object bean, HttpServletRequest request, HttpServletResponse response) throws IOException
+  private void applyAnnotations(Object bean, HttpServletRequest request, HttpServletResponse response) throws Exception
   {
-    Field[] fields = bean.getClass().getDeclaredFields();
+    List<Field> fields = BeanUtil.getAnnotatedFields(bean, Request.class,Response.class);
     for (Field f:fields)
     {
       Object value = null;
@@ -362,6 +364,9 @@ public class RestServiceImpl implements RestService
 
 /*********************************************************************
  * $Log: RestServiceImpl.java,v $
+ * Revision 1.17  2009/09/10 16:48:39  willuhn
+ * @C Annotations via BeanUtils ermitteln
+ *
  * Revision 1.16  2009/08/05 09:03:40  willuhn
  * @C Annotations in eigenes Package verschoben (sind nicht mehr REST-spezifisch)
  *
