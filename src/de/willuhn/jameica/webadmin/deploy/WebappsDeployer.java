@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/deploy/WebappsDeployer.java,v $
- * $Revision: 1.1 $
- * $Date: 2009/09/24 12:04:06 $
+ * $Revision: 1.2 $
+ * $Date: 2009/09/24 12:28:29 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -53,32 +53,32 @@ public class WebappsDeployer implements Deployer
     List<Handler> handlers = new ArrayList<Handler>();
   
     Logger.info("scanning " + dir.getAbsolutePath());
-      File[] dirs = dir.listFiles();
-      for (File f:dirs)
+    File[] dirs = dir.listFiles();
+    for (File f:dirs)
+    {
+      if (!f.isDirectory() || !f.canRead())
       {
-        if (!f.isDirectory() || !f.canRead())
-        {
-          Logger.info("  skipping " + f.getAbsolutePath() + " - no directory or not readable");
-          continue;
-        }
-  
-        final String path    = f.getAbsolutePath();
-        final String context = "/" + f.getName();
-  
-        try
-        {
-          Logger.info("deploying " + context + " (" + path + ")");
-          final WebAppContext ctx = new WebAppContext(path,context);
-          ctx.setBaseResource(Resource.newResource(f.getAbsolutePath()));
-          
-          handlers.add(ctx);
-        }
-        catch (Exception e)
-        {
-          Logger.error("unable to deploy " + context, e);
-        }
+        Logger.info("  skipping " + f.getAbsolutePath() + " - no directory or not readable");
+        continue;
       }
-      return handlers.toArray(new Handler[handlers.size()]);
+
+      final String path    = f.getAbsolutePath();
+      final String context = "/" + f.getName();
+
+      try
+      {
+        Logger.info("deploying " + context + " (" + path + ")");
+        final WebAppContext ctx = new WebAppContext(path,context);
+        ctx.setBaseResource(Resource.newResource(f.getAbsolutePath()));
+        
+        handlers.add(ctx);
+      }
+      catch (Exception e)
+      {
+        Logger.error("unable to deploy " + context, e);
+      }
+    }
+    return handlers.toArray(new Handler[handlers.size()]);
   }
 
 }
@@ -86,6 +86,9 @@ public class WebappsDeployer implements Deployer
 
 /*********************************************************************
  * $Log: WebappsDeployer.java,v $
+ * Revision 1.2  2009/09/24 12:28:29  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.1  2009/09/24 12:04:06  willuhn
  * @N Deployer, um auch externe Web-Anwendungen deployen zu koennen
  *
