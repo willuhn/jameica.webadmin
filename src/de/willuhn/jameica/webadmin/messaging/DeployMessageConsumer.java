@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/messaging/DeployMessageConsumer.java,v $
- * $Revision: 1.1 $
- * $Date: 2008/04/10 13:02:29 $
+ * $Revision: 1.2 $
+ * $Date: 2009/09/24 11:01:47 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -73,6 +73,7 @@ public class DeployMessageConsumer implements MessageConsumer
           if (handlers == null || handlers.length == 0)
           {
             Logger.info("skipping deployer " + d.getClass() + " - contains no handlers");
+            continue;
           }
           for (int k=0;k<handlers.length;++k)
           {
@@ -108,6 +109,9 @@ public class DeployMessageConsumer implements MessageConsumer
 
 /*********************************************************************
  * $Log: DeployMessageConsumer.java,v $
+ * Revision 1.2  2009/09/24 11:01:47  willuhn
+ * *** empty log message ***
+ *
  * Revision 1.1  2008/04/10 13:02:29  willuhn
  * @N Zweischritt-Deployment. Der Server wird zwar sofort initialisiert, wenn der Jameica-Service startet, gestartet wird er aber erst, wenn die ersten Handler resgistriert werden
  * @N damit koennen auch nachtraeglich zur Laufzeit weitere Handler hinzu registriert werden
