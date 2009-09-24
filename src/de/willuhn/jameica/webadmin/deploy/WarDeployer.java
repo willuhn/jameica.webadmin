@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/deploy/WarDeployer.java,v $
- * $Revision: 1.7 $
- * $Date: 2009/04/23 09:05:51 $
+ * $Revision: 1.8 $
+ * $Date: 2009/09/24 12:04:06 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -23,6 +23,7 @@ import org.mortbay.jetty.webapp.WebAppContext;
 import de.willuhn.io.FileFinder;
 import de.willuhn.jameica.plugin.AbstractPlugin;
 import de.willuhn.jameica.system.Application;
+import de.willuhn.jameica.webadmin.Plugin;
 import de.willuhn.logging.Logger;
 
 /**
@@ -36,9 +37,30 @@ public class WarDeployer implements Deployer
    */
   public Handler[] deploy()
   {
-    List list = Application.getPluginLoader().getInstalledPlugins();
+    List<Config> wars = new ArrayList<Config>();
 
-    ArrayList handlers = new ArrayList();
+    ////////////////////////////////////////////////////////////////////////////
+    // 1. Wir suchen nach War-Datein in ~/.jameica/jameica.webadmin/webapps
+    {
+      String work = Application.getPluginLoader().getPlugin(Plugin.class).getResources().getWorkPath();
+      File dir = new File(work,"webapps");
+
+      FileFinder finder = new FileFinder(dir);
+      finder.extension("war");
+      File[] files = finder.findRecursive();
+      for (File f:files)
+      {
+        wars.add(new Config(f,null));
+      }
+    }
+    ////////////////////////////////////////////////////////////////////////////
+    
+
+    
+    ////////////////////////////////////////////////////////////////////////////
+    // 2. Wir suchen in den Plugin-Verzeichnissen
+
+    List list = Application.getPluginLoader().getInstalledPlugins();
 
     for (int i=0;i<list.size();++i)
     {
@@ -47,37 +69,65 @@ public class WarDeployer implements Deployer
 
       FileFinder finder = new FileFinder(dir);
       finder.extension("war");
-      File[] wars = finder.findRecursive();
-      
-      if (wars == null || wars.length == 0)
+      File[] files = finder.findRecursive();
+      for (File f:files)
       {
-        Logger.debug("no war files found in " + dir.getAbsolutePath());
-        continue;
+        wars.add(new Config(f,plugin));
       }
+    }
+    ////////////////////////////////////////////////////////////////////////////
 
-      for (int k=0;k<wars.length;++k)
+    if (wars.size() == 0)
+    {
+      Logger.info("no war files found");
+      return null;
+    }
+
+    List<Handler> handlers = new ArrayList<Handler>();
+
+    for (Config c:wars)
+    {
+      final String path    = c.file.getAbsolutePath();
+      final String context = "/" + c.file.getName().replaceFirst("\\.war$",""); // ".war" am Ende noch abschneiden 
+
+      Logger.info("deploying " + context + " (" + path + ")");
+
+      try
       {
-        final String path    =       wars[k].getAbsolutePath();
-        final String context = "/" + wars[k].getName().replaceFirst("\\.war$",""); // ".war" am Ende noch abschneiden 
+        final WebAppContext ctx = new WebAppContext(path,context);
 
-        Logger.info("deploying " + context + " (" + path + ")");
+        // Classloader explizit angeben. Sonst verwendet Jetty den System-Classloader, der nichts kennt
+        if (c.plugin != null)
+          ctx.setClassLoader(c.plugin.getResources().getClassLoader());
 
-        try
-        {
-          final WebAppContext ctx = new WebAppContext(path,context);
-
-          // Classloader explizit angeben. Sonst verwendet Jetty den System-Classloader, der nichts kennt
-          ctx.setClassLoader(plugin.getResources().getClassLoader());
-
-          handlers.add(ctx);
-        }
-        catch (Exception e)
-        {
-          Logger.error("unable to deploy " + context, e);
-        }
+        handlers.add(ctx);
+      }
+      catch (Exception e)
+      {
+        Logger.error("unable to deploy " + context, e);
       }
     }
     return (Handler[]) handlers.toArray(new Handler[handlers.size()]);
+  }
+  
+  /**
+   * Hilfsklasse, um WAR-Datei und Plugin zusammenzuhalten.
+   */
+  private class Config
+  {
+    private File file = null;
+    private AbstractPlugin plugin = null;
+    
+    /**
+     * ct.
+     * @param file
+     * @param plugin
+     */
+    private Config(File file, AbstractPlugin plugin)
+    {
+      this.file = file;
+      this.plugin = plugin;
+    }
   }
 
 }
@@ -85,6 +135,9 @@ public class WarDeployer implements Deployer
 
 /*********************************************************************
  * $Log: WarDeployer.java,v $
+ * Revision 1.8  2009/09/24 12:04:06  willuhn
+ * @N Deployer, um auch externe Web-Anwendungen deployen zu koennen
+ *
  * Revision 1.7  2009/04/23 09:05:51  willuhn
  * @C deprecated api
  *
