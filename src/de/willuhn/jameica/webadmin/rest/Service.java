@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Service.java,v $
- * $Revision: 1.8 $
- * $Date: 2009/08/05 09:03:40 $
+ * $Revision: 1.9 $
+ * $Date: 2009/11/19 22:53:35 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -52,7 +52,7 @@ public class Service
     {
       de.willuhn.datasource.Service s = find(plugin,service);
       s.start();
-      response.getWriter().print(new JSONObject().put("started","true").toString());
+      response.getWriter().print(new JSONObject().put("started",Boolean.toString(s.isStarted())).toString());
     }
     catch (IOException e)
     {
@@ -197,6 +197,9 @@ public class Service
 
 /*********************************************************************
  * $Log: Service.java,v $
+ * Revision 1.9  2009/11/19 22:53:35  willuhn
+ * @B tatsaechlichen Start-Status zurueckliefern
+ *
  * Revision 1.8  2009/08/05 09:03:40  willuhn
  * @C Annotations in eigenes Package verschoben (sind nicht mehr REST-spezifisch)
  *
