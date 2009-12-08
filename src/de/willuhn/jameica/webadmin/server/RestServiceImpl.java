@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/server/RestServiceImpl.java,v $
- * $Revision: 1.17 $
- * $Date: 2009/09/10 16:48:39 $
+ * $Revision: 1.18 $
+ * $Date: 2009/12/08 16:46:14 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -155,7 +155,10 @@ public class RestServiceImpl implements RestService
   public void unregister(Object bean) throws RemoteException
   {
     if (!isStarted())
-      throw new RemoteException("REST service not started");
+    {
+      Logger.info("REST service not started");
+      return;
+    }
 
     Hashtable<String,Method> found = eval(bean);
     if (found.size() > 0)
@@ -163,7 +166,14 @@ public class RestServiceImpl implements RestService
       Logger.info("un-register REST commands for " + bean.getClass());
       Iterator<String> s = found.keySet().iterator();
       while (s.hasNext())
+      {
+        if (!this.isStarted())
+        {
+          Logger.info("REST service not started");
+          return;
+        }
         this.commands.remove(s.next());
+      }
     }
     else
     {
@@ -364,6 +374,9 @@ public class RestServiceImpl implements RestService
 
 /*********************************************************************
  * $Log: RestServiceImpl.java,v $
+ * Revision 1.18  2009/12/08 16:46:14  willuhn
+ * @B NPE
+ *
  * Revision 1.17  2009/09/10 16:48:39  willuhn
  * @C Annotations via BeanUtils ermitteln
  *
