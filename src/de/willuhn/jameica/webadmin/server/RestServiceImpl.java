@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/server/RestServiceImpl.java,v $
- * $Revision: 1.18 $
- * $Date: 2009/12/08 16:46:14 $
+ * $Revision: 1.19 $
+ * $Date: 2010/02/10 13:43:48 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -15,6 +15,7 @@ package de.willuhn.jameica.webadmin.server;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.rmi.RemoteException;
 import java.util.Hashtable;
@@ -115,6 +116,12 @@ public class RestServiceImpl implements RestService
           return;
         }
       }
+    }
+    catch (InvocationTargetException ive)
+    {
+      Throwable cause = ive.getCause();
+      if (cause != null && (cause instanceof IOException))
+        throw (IOException) cause;
     }
     catch (IOException e)
     {
@@ -374,6 +381,9 @@ public class RestServiceImpl implements RestService
 
 /*********************************************************************
  * $Log: RestServiceImpl.java,v $
+ * Revision 1.19  2010/02/10 13:43:48  willuhn
+ * @N InvocationTargetException entpacken
+ *
  * Revision 1.18  2009/12/08 16:46:14  willuhn
  * @B NPE
  *
