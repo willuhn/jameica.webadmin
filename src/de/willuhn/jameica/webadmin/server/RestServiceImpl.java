@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/server/RestServiceImpl.java,v $
- * $Revision: 1.19 $
- * $Date: 2010/02/10 13:43:48 $
+ * $Revision: 1.20 $
+ * $Date: 2010/03/18 09:29:35 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -112,7 +112,9 @@ public class RestServiceImpl implements RestService
           applyAnnotations(bean, request, response);
 
           Logger.debug("applying command " + path + " to " + method);
-          method.invoke(bean,params);
+          Object value = method.invoke(bean,params);
+          if (method.getReturnType() != null && value != null)
+            response.getWriter().print(value.toString());
           return;
         }
       }
@@ -381,6 +383,9 @@ public class RestServiceImpl implements RestService
 
 /*********************************************************************
  * $Log: RestServiceImpl.java,v $
+ * Revision 1.20  2010/03/18 09:29:35  willuhn
+ * @N Wenn REST-Beans Rueckgabe-Werte liefern, werrden sie automatisch als toString() in den Response-Writer geschrieben
+ *
  * Revision 1.19  2010/02/10 13:43:48  willuhn
  * @N InvocationTargetException entpacken
  *

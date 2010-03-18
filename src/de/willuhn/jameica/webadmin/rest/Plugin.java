@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Plugin.java,v $
- * $Revision: 1.11 $
- * $Date: 2009/08/05 09:03:40 $
+ * $Revision: 1.12 $
+ * $Date: 2010/03/18 09:29:35 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -19,15 +19,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.json.JSONArray;
 
 import de.willuhn.jameica.plugin.Dependency;
 import de.willuhn.jameica.plugin.Manifest;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.jameica.webadmin.annotation.Path;
-import de.willuhn.jameica.webadmin.annotation.Response;
 
 
 /**
@@ -35,17 +32,15 @@ import de.willuhn.jameica.webadmin.annotation.Response;
  */
 public class Plugin
 {
-  @Response
-  private HttpServletResponse response = null;
-  
   /**
    * Schreibt die installierten Plugins in den Response-Writer.
+   * @return die installierten Plugins.
    * @throws IOException
    */
   @Path("/plugins/list$")
-  public void list() throws IOException
+  public JSONArray list() throws IOException
   {
-    response.getWriter().print(new JSONArray(getList()).toString());
+    return new JSONArray(getList());
   }
   
   /**
@@ -106,6 +101,9 @@ public class Plugin
 
 /**********************************************************************
  * $Log: Plugin.java,v $
+ * Revision 1.12  2010/03/18 09:29:35  willuhn
+ * @N Wenn REST-Beans Rueckgabe-Werte liefern, werrden sie automatisch als toString() in den Response-Writer geschrieben
+ *
  * Revision 1.11  2009/08/05 09:03:40  willuhn
  * @C Annotations in eigenes Package verschoben (sind nicht mehr REST-spezifisch)
  *

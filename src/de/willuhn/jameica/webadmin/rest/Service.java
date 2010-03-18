@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Service.java,v $
- * $Revision: 1.9 $
- * $Date: 2009/11/19 22:53:35 $
+ * $Revision: 1.10 $
+ * $Date: 2010/03/18 09:29:35 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -19,8 +19,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -28,7 +26,6 @@ import de.willuhn.jameica.plugin.AbstractPlugin;
 import de.willuhn.jameica.plugin.ServiceDescriptor;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.jameica.webadmin.annotation.Path;
-import de.willuhn.jameica.webadmin.annotation.Response;
 import de.willuhn.logging.Logger;
 
 /**
@@ -36,23 +33,21 @@ import de.willuhn.logging.Logger;
  */
 public class Service
 {
-  @Response
-  private HttpServletResponse response = null;
-  
   /**
    * Startet den Service.
    * @param plugin Name des Plugins.
    * @param service Name des Services.
+   * @return der Service-Status.
    * @throws IOException
    */
   @Path("/plugins/(.*?)/services/(.*?)/start$")
-  public void start(String plugin, String service) throws IOException
+  public JSONObject start(String plugin, String service) throws IOException
   {
     try
     {
       de.willuhn.datasource.Service s = find(plugin,service);
       s.start();
-      response.getWriter().print(new JSONObject().put("started",Boolean.toString(s.isStarted())).toString());
+      return new JSONObject().put("started",Boolean.toString(s.isStarted()));
     }
     catch (IOException e)
     {
@@ -69,16 +64,17 @@ public class Service
    * Stoppt den Service.
    * @param plugin Name des Plugins.
    * @param service Name des Services.
+   * @return der Service-Status.
    * @throws IOException
    */
   @Path("/plugins/(.*?)/services/(.*?)/stop$")
-  public void stop(String plugin, String service) throws IOException
+  public JSONObject stop(String plugin, String service) throws IOException
   {
     try
     {
       de.willuhn.datasource.Service s = find(plugin,service);
       s.stop(false);
-      response.getWriter().print(new JSONObject().put("started","false").toString());
+      return new JSONObject().put("started",Boolean.toString(s.isStarted()));
     }
     catch (IOException e)
     {
@@ -95,15 +91,16 @@ public class Service
    * Liefert den Service-Status.
    * @param plugin Name des Plugins.
    * @param service Name des Services.
+   * @return der Service-Status.
    * @throws IOException
    */
   @Path("/plugins/(.*?)/services/(.*?)/status$")
-  public void status(String plugin, String service) throws IOException
+  public JSONObject status(String plugin, String service) throws IOException
   {
     try
     {
       de.willuhn.datasource.Service s = find(plugin,service);
-      response.getWriter().print(new JSONObject().put("started",s.isStarted() ? "true" : "false").toString());
+      return new JSONObject().put("started",Boolean.toString(s.isStarted()));
     }
     catch (IOException e)
     {
@@ -119,10 +116,11 @@ public class Service
   /**
    * Listet die Services eines Plugins auf.
    * @param plugin Name des Plugins.
+   * @return Liste der Services.
    * @throws IOException
    */
   @Path("/plugins/(.*?)/services/list$")
-  public void list(String plugin) throws IOException
+  public JSONArray list(String plugin) throws IOException
   {
     if (plugin == null || plugin.length() == 0)
       throw new IOException("no plugin name given");
@@ -166,7 +164,7 @@ public class Service
         Logger.error("unable to load service " + services[i].getName(),e);
       }
     }
-    response.getWriter().print(new JSONArray(json).toString());
+    return new JSONArray(json);
   }
 
   /**
@@ -197,6 +195,9 @@ public class Service
 
 /*********************************************************************
  * $Log: Service.java,v $
+ * Revision 1.10  2010/03/18 09:29:35  willuhn
+ * @N Wenn REST-Beans Rueckgabe-Werte liefern, werrden sie automatisch als toString() in den Response-Writer geschrieben
+ *
  * Revision 1.9  2009/11/19 22:53:35  willuhn
  * @B tatsaechlichen Start-Status zurueckliefern
  *

@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Application.java,v $
- * $Revision: 1.6 $
- * $Date: 2009/08/05 09:03:40 $
+ * $Revision: 1.7 $
+ * $Date: 2010/03/18 09:29:35 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -20,15 +20,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import de.willuhn.jameica.system.Config;
 import de.willuhn.jameica.webadmin.annotation.Path;
-import de.willuhn.jameica.webadmin.annotation.Response;
 import de.willuhn.logging.Logger;
 import de.willuhn.util.ApplicationException;
 
@@ -39,17 +36,15 @@ public class Application
 {
   private final static DateFormat DATEFORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
 
-  @Response
-  private HttpServletResponse response = null;
-
   /**
    * Schreibt die Uptime und Startzeit des Servers in den Response-Writer.
+   * @return die Uptime.
    * @throws IOException
    */
   @Path("/system/uptime$")
-  public void uptime() throws IOException
+  public JSONObject uptime() throws IOException
   {
-    response.getWriter().print(new JSONObject(getUptime()).toString());
+    return new JSONObject(getUptime());
   }
 
   /**
@@ -89,14 +84,15 @@ public class Application
   
   /**
    * Schreibt die System-Konfiguration in den Response-Writer.
+   * @return die System-Konfiguration.
    * @throws IOException
    */
   @Path("/system/config$")
-  public void config() throws IOException
+  public JSONObject config() throws IOException
   {
     try
     {
-      response.getWriter().print(new JSONObject(getConfig()).toString());
+      return new JSONObject(getConfig());
     }
     catch (ApplicationException ae)
     {
@@ -157,14 +153,15 @@ public class Application
 
   /**
    * Schreibt die Liste der beim Systemstart aufgelaufenen Nachrichten in den Response-Writer.
+   * @return die Systemnachrichten.
    * @throws IOException
    */
   @Path("/system/welcome$")
-  public void welcome() throws IOException
+  public JSONArray welcome() throws IOException
   {
     try
     {
-      response.getWriter().print(new JSONArray(getWelcome()).toString());
+      return new JSONArray(getWelcome());
     }
     catch (JSONException e)
     {
@@ -187,6 +184,9 @@ public class Application
 
 /*********************************************************************
  * $Log: Application.java,v $
+ * Revision 1.7  2010/03/18 09:29:35  willuhn
+ * @N Wenn REST-Beans Rueckgabe-Werte liefern, werrden sie automatisch als toString() in den Response-Writer geschrieben
+ *
  * Revision 1.6  2009/08/05 09:03:40  willuhn
  * @C Annotations in eigenes Package verschoben (sind nicht mehr REST-spezifisch)
  *

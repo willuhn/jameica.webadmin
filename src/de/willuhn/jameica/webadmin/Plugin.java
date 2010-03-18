@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/Plugin.java,v $
- * $Revision: 1.2 $
- * $Date: 2007/11/16 18:33:56 $
+ * $Revision: 1.3 $
+ * $Date: 2010/03/18 09:29:35 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -21,19 +21,14 @@ import de.willuhn.jameica.plugin.AbstractPlugin;
  */
 public class Plugin extends AbstractPlugin
 {
-
-  /**
-   * ct.
-   */
-  public Plugin()
-  {
-    super();
-  }
 }
 
 
 /**********************************************************************
  * $Log: Plugin.java,v $
+ * Revision 1.3  2010/03/18 09:29:35  willuhn
+ * @N Wenn REST-Beans Rueckgabe-Werte liefern, werrden sie automatisch als toString() in den Response-Writer geschrieben
+ *
  * Revision 1.2  2007/11/16 18:33:56  willuhn
  * @D javadoc fixed
  * @R removed unused methods/deprecated methods

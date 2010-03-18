@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Echo.java,v $
- * $Revision: 1.6 $
- * $Date: 2009/08/05 09:03:40 $
+ * $Revision: 1.7 $
+ * $Date: 2010/03/18 09:29:35 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -15,13 +15,10 @@ package de.willuhn.jameica.webadmin.rest;
 
 import java.io.IOException;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import de.willuhn.jameica.webadmin.annotation.Path;
-import de.willuhn.jameica.webadmin.annotation.Response;
 import de.willuhn.logging.Logger;
 
 /**
@@ -30,20 +27,18 @@ import de.willuhn.logging.Logger;
  */
 public class Echo
 {
-  @Response
-  private HttpServletResponse response = null;
-
   /**
    * Fuehrt das Echo aus.
    * @param echo zurueckzuliefernder Text.
+   * @return das Echo-Response.
    * @throws IOException
    */
   @Path("/echo/(.*)")
-  public void echo(String echo) throws IOException
+  public JSONObject echo(String echo) throws IOException
   {
     try
     {
-      response.getWriter().print(new JSONObject().put("echo",echo).toString());
+      return new JSONObject().put("echo",echo);
     }
     catch (JSONException e)
     {
@@ -56,6 +51,9 @@ public class Echo
 
 /*********************************************************************
  * $Log: Echo.java,v $
+ * Revision 1.7  2010/03/18 09:29:35  willuhn
+ * @N Wenn REST-Beans Rueckgabe-Werte liefern, werrden sie automatisch als toString() in den Response-Writer geschrieben
+ *
  * Revision 1.6  2009/08/05 09:03:40  willuhn
  * @C Annotations in eigenes Package verschoben (sind nicht mehr REST-spezifisch)
  *

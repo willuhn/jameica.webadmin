@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Log.java,v $
- * $Revision: 1.9 $
- * $Date: 2009/08/05 09:03:40 $
+ * $Revision: 1.10 $
+ * $Date: 2010/03/18 09:29:35 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -21,13 +21,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONArray;
 
 import de.willuhn.jameica.webadmin.annotation.Path;
 import de.willuhn.jameica.webadmin.annotation.Request;
-import de.willuhn.jameica.webadmin.annotation.Response;
 import de.willuhn.logging.Level;
 import de.willuhn.logging.Logger;
 import de.willuhn.logging.Message;
@@ -40,29 +38,28 @@ public class Log
 {
   private final static DateFormat DATEFORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
 
-  @Response
-  private HttpServletResponse response = null;
-  
   @Request
   private HttpServletRequest request   = null;
   
   /**
    * Liefert die letzten Zeilen des Logs.
+   * @return die letzten Zeilen des Logs.
    * @throws IOException
    */
   @Path("/log/last$")
-  public void last() throws IOException
+  public JSONArray last() throws IOException
   {
-    last(null);
+    return last(null);
   }
 
   /**
    * Liefert die letzten Zeilen des Logs.
    * @param lines Anzahl der Zeilen.
+   * @return die letzten Zeilen des Logs.
    * @throws IOException
    */
   @Path("/log/last/([0-9]{1,2})$")
-  public void last(String lines) throws IOException
+  public JSONArray last(String lines) throws IOException
   {
     int last = -1;
     try
@@ -89,7 +86,7 @@ public class Log
       data.put("text",  msg[i].getText());
       json.add(data);
     }
-    response.getWriter().print(new JSONArray(json).toString());
+    return new JSONArray(json);
   }
   
   /**
@@ -148,6 +145,9 @@ public class Log
 
 /*********************************************************************
  * $Log: Log.java,v $
+ * Revision 1.10  2010/03/18 09:29:35  willuhn
+ * @N Wenn REST-Beans Rueckgabe-Werte liefern, werrden sie automatisch als toString() in den Response-Writer geschrieben
+ *
  * Revision 1.9  2009/08/05 09:03:40  willuhn
  * @C Annotations in eigenes Package verschoben (sind nicht mehr REST-spezifisch)
  *
