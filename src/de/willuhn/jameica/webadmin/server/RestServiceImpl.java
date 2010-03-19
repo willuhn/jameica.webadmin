@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/server/RestServiceImpl.java,v $
- * $Revision: 1.21 $
- * $Date: 2010/03/19 15:56:17 $
+ * $Revision: 1.22 $
+ * $Date: 2010/03/19 16:04:13 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -129,6 +129,8 @@ public class RestServiceImpl implements RestService
       Throwable cause = ive.getCause();
       if (cause != null && (cause instanceof IOException))
         throw (IOException) cause;
+      else
+        throw new IOException(cause);
     }
     catch (IOException e)
     {
@@ -437,6 +439,9 @@ public class RestServiceImpl implements RestService
 
 /*********************************************************************
  * $Log: RestServiceImpl.java,v $
+ * Revision 1.22  2010/03/19 16:04:13  willuhn
+ * @N Exception durchreichen
+ *
  * Revision 1.21  2010/03/19 15:56:17  willuhn
  * @N LifeCycle-Annotation-Support jetzt auch fuer REST-Beans
  *
