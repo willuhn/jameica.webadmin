@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/server/RestServiceImpl.java,v $
- * $Revision: 1.20 $
- * $Date: 2010/03/18 09:29:35 $
+ * $Revision: 1.21 $
+ * $Date: 2010/03/19 15:56:17 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -27,12 +27,14 @@ import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import de.willuhn.datasource.BeanUtil;
 import de.willuhn.jameica.messaging.Message;
 import de.willuhn.jameica.messaging.MessageConsumer;
 import de.willuhn.jameica.messaging.QueryMessage;
 import de.willuhn.jameica.system.Application;
+import de.willuhn.jameica.webadmin.annotation.Lifecycle;
 import de.willuhn.jameica.webadmin.annotation.Path;
 import de.willuhn.jameica.webadmin.annotation.Request;
 import de.willuhn.jameica.webadmin.annotation.Response;
@@ -50,10 +52,13 @@ import de.willuhn.logging.Logger;
  */
 public class RestServiceImpl implements RestService
 {
-  private Map<String,Method> commands = null;
+  private Map<String,Method> commands     = null;
+  private Map<String,Object> contextScope = null;
+
   private MessageConsumer register    = new RestConsumer(true);
   private MessageConsumer unregister  = new RestConsumer(false);
-  
+
+
   /**
    * @see de.willuhn.jameica.webadmin.rmi.RestService#handleRequest(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
    */
@@ -108,7 +113,7 @@ public class RestServiceImpl implements RestService
           for (int k=0;k<params.length;++k)
             params[k] = match.group(k+1); // wir fangen bei "1" an, weil an Pos. 0 der Pattern selbst steht
 
-          Object bean = method.getDeclaringClass().newInstance();
+          Object bean = getBean(method.getDeclaringClass(),request);
           applyAnnotations(bean, request, response);
 
           Logger.debug("applying command " + path + " to " + method);
@@ -136,6 +141,53 @@ public class RestServiceImpl implements RestService
     }
     
     throw new IOException("no command found for REST url " + command);
+  }
+  
+  /**
+   * Liefert eine Instanz der Bean.
+   * Die Funktion wertet die Lifecycle-Annotation der Bean aus
+   * und verwendet eine eventuell vorhandene Instanz, falls sie
+   * mit dem Lifecycle Context oder Session markiert ist.
+   * @param c die Klasse der Bean.
+   * @param request brauchen wir, um in der Session nachschauen zu koennen.
+   * @return die Instanz der Bean.
+   * @throws Exception
+   */
+  private Object getBean(Class c, HttpServletRequest request) throws Exception
+  {
+    String id = c.getName();
+    
+    Object bean = null;
+    
+    // 1. Checken, ob wir sie im Context-Scope haben
+    bean = contextScope.get(id);
+    if (bean != null)
+      return bean;
+    
+    // 2. Checken, ob wir sie im Session-Scope haben
+    HttpSession session = request.getSession();
+    bean = session.getAttribute(id);
+    if (bean != null)
+      return bean;
+    
+    // 3. Bean erzeugen
+    bean = c.newInstance();
+    
+    // Ggg in Context oder Session speichern
+    Lifecycle lc = (Lifecycle) c.getAnnotation(Lifecycle.class);
+    Lifecycle.Type type = lc != null ? lc.value() : Lifecycle.Type.REQUEST;
+    
+    switch(type)
+    {
+      case CONTEXT:
+        contextScope.put(id,bean);
+        break;
+      case SESSION:
+        session.setAttribute(id,bean);
+        break;
+    }
+    
+    return bean;
   }
 
   /**
@@ -289,7 +341,8 @@ public class RestServiceImpl implements RestService
     }
     
     Logger.info("init REST registry");
-    this.commands = new Hashtable<String,Method>();
+    this.commands     = new Hashtable<String,Method>();
+    this.contextScope = new Hashtable<String,Object>();
     
     // eigene REST-Kommandos deployen
     register(new Echo());
@@ -326,7 +379,8 @@ public class RestServiceImpl implements RestService
     finally
     {
       Logger.info("REST service stopped");
-      this.commands = null;
+      this.contextScope = null;
+      this.commands     = null;
     }
   }
 
@@ -383,6 +437,9 @@ public class RestServiceImpl implements RestService
 
 /*********************************************************************
  * $Log: RestServiceImpl.java,v $
+ * Revision 1.21  2010/03/19 15:56:17  willuhn
+ * @N LifeCycle-Annotation-Support jetzt auch fuer REST-Beans
+ *
  * Revision 1.20  2010/03/18 09:29:35  willuhn
  * @N Wenn REST-Beans Rueckgabe-Werte liefern, werrden sie automatisch als toString() in den Response-Writer geschrieben
  *
