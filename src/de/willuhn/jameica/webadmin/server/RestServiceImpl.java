@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/server/RestServiceImpl.java,v $
- * $Revision: 1.22 $
- * $Date: 2010/03/19 16:04:13 $
+ * $Revision: 1.23 $
+ * $Date: 2010/03/31 16:01:09 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -124,22 +124,26 @@ public class RestServiceImpl implements RestService
         }
       }
     }
+    catch (IOException e)
+    {
+      throw e;
+    }
     catch (InvocationTargetException ive)
     {
       Throwable cause = ive.getCause();
       if (cause != null && (cause instanceof IOException))
         throw (IOException) cause;
       else
-        throw new IOException(cause);
-    }
-    catch (IOException e)
-    {
-      throw e;
+      {
+        // Den Konstruktor mit dem Throwable als Parameter gibts erst ab 1.6
+        Logger.error("error while executing command " + command,cause);
+        throw new IOException("error while executing command " + command + ": " + ive.getMessage());
+      }
     }
     catch (Exception e2)
     {
       Logger.error("error while executing command " + command,e2);
-      throw new IOException("error while executing command " + command);
+      throw new IOException("error while executing command " + command + ": " + e2.getMessage());
     }
     
     throw new IOException("no command found for REST url " + command);
@@ -439,6 +443,9 @@ public class RestServiceImpl implements RestService
 
 /*********************************************************************
  * $Log: RestServiceImpl.java,v $
+ * Revision 1.23  2010/03/31 16:01:09  willuhn
+ * @B Compile-Fehler unter JDK 1.5
+ *
  * Revision 1.22  2010/03/19 16:04:13  willuhn
  * @N Exception durchreichen
  *
