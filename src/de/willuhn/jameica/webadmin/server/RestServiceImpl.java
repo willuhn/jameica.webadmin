@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/server/RestServiceImpl.java,v $
- * $Revision: 1.24 $
- * $Date: 2010/05/11 14:59:48 $
+ * $Revision: 1.25 $
+ * $Date: 2010/05/11 16:41:20 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -28,6 +28,9 @@ import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import de.willuhn.datasource.BeanUtil;
 import de.willuhn.jameica.messaging.Message;
@@ -80,6 +83,7 @@ public class RestServiceImpl implements RestService
     // http://jira.codehaus.org/browse/JETTY-113
     // http://jetty.mortbay.org/jetty5/faq/faq_s_900-Content_t_International.html
     String queryencoding = de.willuhn.jameica.webadmin.Settings.SETTINGS.getString("http.queryencoding",null);
+    int jsonIndent       = de.willuhn.jameica.webadmin.Settings.SETTINGS.getInt("json.indent",2);
     if (queryencoding != null)
     {
       Logger.debug("query encoding: " + queryencoding);
@@ -113,7 +117,16 @@ public class RestServiceImpl implements RestService
           Logger.debug("applying command " + path + " to " + method);
           Object value = method.invoke(bean,params);
           if (method.getReturnType() != null && value != null)
-            response.getWriter().print(value.toString());
+          {
+            String s = null;
+            if ((value instanceof JSONObject) && jsonIndent > 0)
+              s = ((JSONObject)value).toString(jsonIndent);
+            else if ((value instanceof JSONArray) && jsonIndent > 0)
+              s = ((JSONArray)value).toString(jsonIndent);
+            else
+              s = value.toString();
+            response.getWriter().print(s);
+          }
           return;
         }
       }
@@ -428,6 +441,9 @@ public class RestServiceImpl implements RestService
 
 /*********************************************************************
  * $Log: RestServiceImpl.java,v $
+ * Revision 1.25  2010/05/11 16:41:20  willuhn
+ * @N Automatisches Indent bei JSON-Objekten
+ *
  * Revision 1.24  2010/05/11 14:59:48  willuhn
  * @N Automatisches Deployment von REST-Beans
  *
