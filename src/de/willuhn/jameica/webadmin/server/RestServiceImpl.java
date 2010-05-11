@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/server/RestServiceImpl.java,v $
- * $Revision: 1.23 $
- * $Date: 2010/03/31 16:01:09 $
+ * $Revision: 1.24 $
+ * $Date: 2010/05/11 14:59:48 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -38,12 +38,6 @@ import de.willuhn.jameica.webadmin.annotation.Lifecycle;
 import de.willuhn.jameica.webadmin.annotation.Path;
 import de.willuhn.jameica.webadmin.annotation.Request;
 import de.willuhn.jameica.webadmin.annotation.Response;
-import de.willuhn.jameica.webadmin.rest.Certificate;
-import de.willuhn.jameica.webadmin.rest.Echo;
-import de.willuhn.jameica.webadmin.rest.Log;
-import de.willuhn.jameica.webadmin.rest.Plugin;
-import de.willuhn.jameica.webadmin.rest.Server;
-import de.willuhn.jameica.webadmin.rest.Service;
 import de.willuhn.jameica.webadmin.rmi.RestService;
 import de.willuhn.logging.Logger;
 
@@ -350,15 +344,6 @@ public class RestServiceImpl implements RestService
     this.commands     = new Hashtable<String,Method>();
     this.contextScope = new Hashtable<String,Object>();
     
-    // eigene REST-Kommandos deployen
-    register(new Echo());
-    register(new Log());
-    register(new Plugin());
-    register(new Service());
-    register(new Certificate());
-    register(new de.willuhn.jameica.webadmin.rest.Application());
-    register(new Server());
-
     Application.getMessagingFactory().getMessagingQueue("jameica.webadmin.rest.register").registerMessageConsumer(this.register);
     Application.getMessagingFactory().getMessagingQueue("jameica.webadmin.rest.unregister").registerMessageConsumer(this.unregister);
 
@@ -443,6 +428,9 @@ public class RestServiceImpl implements RestService
 
 /*********************************************************************
  * $Log: RestServiceImpl.java,v $
+ * Revision 1.24  2010/05/11 14:59:48  willuhn
+ * @N Automatisches Deployment von REST-Beans
+ *
  * Revision 1.23  2010/03/31 16:01:09  willuhn
  * @B Compile-Fehler unter JDK 1.5
  *

@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Server.java,v $
- * $Revision: 1.3 $
- * $Date: 2009/08/05 09:03:40 $
+ * $Revision: 1.4 $
+ * $Date: 2010/05/11 14:59:48 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -29,7 +29,7 @@ import de.willuhn.util.I18N;
 /**
  * Command zum Hinzufuegen und Entfernen von Servern.
  */
-public class Server
+public class Server implements AutoRestBean
 {
   private static I18N i18n = de.willuhn.jameica.system.Application.getPluginLoader().getPlugin(de.willuhn.jameica.webadmin.Plugin.class).getResources().getI18N();
 
@@ -79,6 +79,9 @@ public class Server
 
 /*********************************************************************
  * $Log: Server.java,v $
+ * Revision 1.4  2010/05/11 14:59:48  willuhn
+ * @N Automatisches Deployment von REST-Beans
+ *
  * Revision 1.3  2009/08/05 09:03:40  willuhn
  * @C Annotations in eigenes Package verschoben (sind nicht mehr REST-spezifisch)
  *

@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Log.java,v $
- * $Revision: 1.10 $
- * $Date: 2010/03/18 09:29:35 $
+ * $Revision: 1.11 $
+ * $Date: 2010/05/11 14:59:48 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -34,7 +34,7 @@ import de.willuhn.logging.Message;
  * Logger-Command.
  * Schreibt die uebergebene Nachricht ins lokale Log.
  */
-public class Log
+public class Log implements AutoRestBean
 {
   private final static DateFormat DATEFORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
 
@@ -145,6 +145,9 @@ public class Log
 
 /*********************************************************************
  * $Log: Log.java,v $
+ * Revision 1.11  2010/05/11 14:59:48  willuhn
+ * @N Automatisches Deployment von REST-Beans
+ *
  * Revision 1.10  2010/03/18 09:29:35  willuhn
  * @N Wenn REST-Beans Rueckgabe-Werte liefern, werrden sie automatisch als toString() in den Response-Writer geschrieben
  *

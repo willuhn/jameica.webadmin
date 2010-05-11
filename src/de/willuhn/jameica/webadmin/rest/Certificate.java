@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Certificate.java,v $
- * $Revision: 1.4 $
- * $Date: 2010/03/18 09:29:35 $
+ * $Revision: 1.5 $
+ * $Date: 2010/05/11 14:59:48 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -34,7 +34,7 @@ import de.willuhn.util.ApplicationException;
 /**
  * REST-Kommando fuer den Zugriff auf die Zertifikate.
  */
-public class Certificate
+public class Certificate implements AutoRestBean
 {
   private final static DateFormat DATEFORMAT = new SimpleDateFormat("dd.MM.yyyy");
 
@@ -118,6 +118,9 @@ public class Certificate
 
 /**********************************************************************
  * $Log: Certificate.java,v $
+ * Revision 1.5  2010/05/11 14:59:48  willuhn
+ * @N Automatisches Deployment von REST-Beans
+ *
  * Revision 1.4  2010/03/18 09:29:35  willuhn
  * @N Wenn REST-Beans Rueckgabe-Werte liefern, werrden sie automatisch als toString() in den Response-Writer geschrieben
  *

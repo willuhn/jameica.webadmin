@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Service.java,v $
- * $Revision: 1.10 $
- * $Date: 2010/03/18 09:29:35 $
+ * $Revision: 1.11 $
+ * $Date: 2010/05/11 14:59:48 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -31,7 +31,7 @@ import de.willuhn.logging.Logger;
 /**
  * REST-Kommandos zum Starten und Stoppen von Services.
  */
-public class Service
+public class Service implements AutoRestBean
 {
   /**
    * Startet den Service.
@@ -195,6 +195,9 @@ public class Service
 
 /*********************************************************************
  * $Log: Service.java,v $
+ * Revision 1.11  2010/05/11 14:59:48  willuhn
+ * @N Automatisches Deployment von REST-Beans
+ *
  * Revision 1.10  2010/03/18 09:29:35  willuhn
  * @N Wenn REST-Beans Rueckgabe-Werte liefern, werrden sie automatisch als toString() in den Response-Writer geschrieben
  *

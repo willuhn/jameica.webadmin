@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Plugin.java,v $
- * $Revision: 1.12 $
- * $Date: 2010/03/18 09:29:35 $
+ * $Revision: 1.13 $
+ * $Date: 2010/05/11 14:59:48 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -30,7 +30,7 @@ import de.willuhn.jameica.webadmin.annotation.Path;
 /**
  * REST-Kommando fuer den Zugriff auf Plugins.
  */
-public class Plugin
+public class Plugin implements AutoRestBean
 {
   /**
    * Schreibt die installierten Plugins in den Response-Writer.
@@ -101,6 +101,9 @@ public class Plugin
 
 /**********************************************************************
  * $Log: Plugin.java,v $
+ * Revision 1.13  2010/05/11 14:59:48  willuhn
+ * @N Automatisches Deployment von REST-Beans
+ *
  * Revision 1.12  2010/03/18 09:29:35  willuhn
  * @N Wenn REST-Beans Rueckgabe-Werte liefern, werrden sie automatisch als toString() in den Response-Writer geschrieben
  *

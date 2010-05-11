@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Echo.java,v $
- * $Revision: 1.7 $
- * $Date: 2010/03/18 09:29:35 $
+ * $Revision: 1.8 $
+ * $Date: 2010/05/11 14:59:48 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -25,7 +25,7 @@ import de.willuhn.logging.Logger;
  * Test-Command, welches den uebergebenen QueryString zurueckschickt.
  * Schreibt die uebergebene Nachricht ins lokale Log.
  */
-public class Echo
+public class Echo implements AutoRestBean
 {
   /**
    * Fuehrt das Echo aus.
@@ -51,6 +51,9 @@ public class Echo
 
 /*********************************************************************
  * $Log: Echo.java,v $
+ * Revision 1.8  2010/05/11 14:59:48  willuhn
+ * @N Automatisches Deployment von REST-Beans
+ *
  * Revision 1.7  2010/03/18 09:29:35  willuhn
  * @N Wenn REST-Beans Rueckgabe-Werte liefern, werrden sie automatisch als toString() in den Response-Writer geschrieben
  *
