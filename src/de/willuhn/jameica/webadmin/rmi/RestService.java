@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rmi/RestService.java,v $
- * $Revision: 1.4 $
- * $Date: 2008/10/21 22:33:47 $
+ * $Revision: 1.5 $
+ * $Date: 2010/05/11 23:21:44 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -15,11 +15,13 @@ package de.willuhn.jameica.webadmin.rmi;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import de.willuhn.datasource.Service;
+import de.willuhn.jameica.webadmin.beans.RestBeanDoc;
 
 /**
  * Service, der eine Mini-REST-API bereitstellt.
@@ -50,11 +52,21 @@ public interface RestService extends Service
    * @throws RemoteException
    */
   public void unregister(Object bean) throws RemoteException;
+  
+  /**
+   * Liefert die Dokumentation der REST-Beans.
+   * @return Dokumentation der REST-Beans.
+   * @throws RemoteException
+   */
+  public List<RestBeanDoc> getDoc() throws RemoteException;
 }
 
 
 /*********************************************************************
  * $Log: RestService.java,v $
+ * Revision 1.5  2010/05/11 23:21:44  willuhn
+ * @N Automatische Dokumentations-Seite fuer die REST-Beans basierend auf der Annotation "Doc"
+ *
  * Revision 1.4  2008/10/21 22:33:47  willuhn
  * @N Markieren der zu registrierenden REST-Kommandos via Annotation
  *

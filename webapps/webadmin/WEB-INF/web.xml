@@ -10,10 +10,19 @@
     <servlet-class>de.willuhn.jameica.webadmin.servlets.RestServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
   </servlet>
+  <servlet>
+    <servlet-name>restdoc</servlet-name>
+    <jsp-file>/restdoc.jsp</jsp-file>
+  </servlet>
   
   <servlet-mapping>
     <servlet-name>rest</servlet-name>
     <url-pattern>/rest/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>restdoc</servlet-name>
+    <url-pattern>/rest</url-pattern>
   </servlet-mapping>
 
 </web-app>

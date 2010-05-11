@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/server/RestServiceImpl.java,v $
- * $Revision: 1.25 $
- * $Date: 2010/05/11 16:41:20 $
+ * $Revision: 1.26 $
+ * $Date: 2010/05/11 23:21:44 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -18,6 +18,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -37,10 +39,13 @@ import de.willuhn.jameica.messaging.Message;
 import de.willuhn.jameica.messaging.MessageConsumer;
 import de.willuhn.jameica.messaging.QueryMessage;
 import de.willuhn.jameica.system.Application;
+import de.willuhn.jameica.webadmin.annotation.Doc;
 import de.willuhn.jameica.webadmin.annotation.Lifecycle;
 import de.willuhn.jameica.webadmin.annotation.Path;
 import de.willuhn.jameica.webadmin.annotation.Request;
 import de.willuhn.jameica.webadmin.annotation.Response;
+import de.willuhn.jameica.webadmin.beans.RestBeanDoc;
+import de.willuhn.jameica.webadmin.beans.RestMethodDoc;
 import de.willuhn.jameica.webadmin.rmi.RestService;
 import de.willuhn.logging.Logger;
 
@@ -51,6 +56,7 @@ public class RestServiceImpl implements RestService
 {
   private Map<String,Method> commands     = null;
   private Map<String,Object> contextScope = null;
+  private List<RestBeanDoc> doc           = null;
 
   private MessageConsumer register    = new RestConsumer(true);
   private MessageConsumer unregister  = new RestConsumer(false);
@@ -216,6 +222,36 @@ public class RestServiceImpl implements RestService
     {
       Logger.info("register REST commands for " + bean.getClass());
       this.commands.putAll(found);
+      
+      //////////////////////////////////////////////////////////////////////////
+      // Dokumentation der REST-Bean
+      RestBeanDoc bd = new RestBeanDoc();
+      bd.setBeanClass(bean.getClass());
+      Doc d = bean.getClass().getAnnotation(Doc.class);
+      if (d != null)
+        bd.setText(d.value());
+      Enumeration<String> e = found.keys();
+      List<RestMethodDoc> methods = new ArrayList<RestMethodDoc>();
+      while (e.hasMoreElements())
+      {
+        String path = e.nextElement();
+        Method m = found.get(path);
+        RestMethodDoc md = new RestMethodDoc();
+        md.setPath(path);
+        md.setMethod(m.getName());
+        d = m.getAnnotation(Doc.class);
+        if (d != null)
+        {
+          md.setText(d.value());
+          md.setExample(d.example());
+        }
+        methods.add(md);
+      }
+      bd.setMethods(methods);
+      this.doc.add(bd);
+      //
+      //////////////////////////////////////////////////////////////////////////
+      
     }
     else
     {
@@ -247,6 +283,14 @@ public class RestServiceImpl implements RestService
           return;
         }
         this.commands.remove(s.next());
+      }
+      for (RestBeanDoc bd:this.doc)
+      {
+        if (bd.getBeanClass().equals(bean.getClass()))
+        {
+          this.doc.remove(bd);
+          break;
+        }
       }
     }
     else
@@ -356,6 +400,7 @@ public class RestServiceImpl implements RestService
     Logger.info("init REST registry");
     this.commands     = new Hashtable<String,Method>();
     this.contextScope = new Hashtable<String,Object>();
+    this.doc          = new ArrayList<RestBeanDoc>();
     
     Application.getMessagingFactory().getMessagingQueue("jameica.webadmin.rest.register").registerMessageConsumer(this.register);
     Application.getMessagingFactory().getMessagingQueue("jameica.webadmin.rest.unregister").registerMessageConsumer(this.unregister);
@@ -385,11 +430,22 @@ public class RestServiceImpl implements RestService
       Logger.info("REST service stopped");
       this.contextScope = null;
       this.commands     = null;
+      this.doc          = null;
     }
   }
 
 
   
+  /**
+   * @see de.willuhn.jameica.webadmin.rmi.RestService#getDoc()
+   */
+  public List<RestBeanDoc> getDoc() throws RemoteException
+  {
+    return this.doc;
+  }
+
+
+
   /**
    * Hilfsklasse zum Registrieren von REST-Kommandos via Messaging
    */
@@ -441,6 +497,9 @@ public class RestServiceImpl implements RestService
 
 /*********************************************************************
  * $Log: RestServiceImpl.java,v $
+ * Revision 1.26  2010/05/11 23:21:44  willuhn
+ * @N Automatische Dokumentations-Seite fuer die REST-Beans basierend auf der Annotation "Doc"
+ *
  * Revision 1.25  2010/05/11 16:41:20  willuhn
  * @N Automatisches Indent bei JSON-Objekten
  *
