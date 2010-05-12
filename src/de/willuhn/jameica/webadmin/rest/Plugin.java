@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Plugin.java,v $
- * $Revision: 1.13 $
- * $Date: 2010/05/11 14:59:48 $
+ * $Revision: 1.14 $
+ * $Date: 2010/05/12 10:59:20 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -24,12 +24,14 @@ import org.json.JSONArray;
 import de.willuhn.jameica.plugin.Dependency;
 import de.willuhn.jameica.plugin.Manifest;
 import de.willuhn.jameica.system.Application;
+import de.willuhn.jameica.webadmin.annotation.Doc;
 import de.willuhn.jameica.webadmin.annotation.Path;
 
 
 /**
  * REST-Kommando fuer den Zugriff auf Plugins.
  */
+@Doc("System: Liefert Informationen über die installierten Plugins")
 public class Plugin implements AutoRestBean
 {
   /**
@@ -37,6 +39,8 @@ public class Plugin implements AutoRestBean
    * @return die installierten Plugins.
    * @throws IOException
    */
+  @Doc(value="Liefert eine Liste der installierten Plugins",
+       example="plugins/list")
   @Path("/plugins/list$")
   public JSONArray list() throws IOException
   {
@@ -101,6 +105,9 @@ public class Plugin implements AutoRestBean
 
 /**********************************************************************
  * $Log: Plugin.java,v $
+ * Revision 1.14  2010/05/12 10:59:20  willuhn
+ * @N Automatische Dokumentations-Seite fuer die REST-Beans basierend auf der Annotation "Doc"
+ *
  * Revision 1.13  2010/05/11 14:59:48  willuhn
  * @N Automatisches Deployment von REST-Beans
  *

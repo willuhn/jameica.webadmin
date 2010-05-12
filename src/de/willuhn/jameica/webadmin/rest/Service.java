@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Service.java,v $
- * $Revision: 1.11 $
- * $Date: 2010/05/11 14:59:48 $
+ * $Revision: 1.12 $
+ * $Date: 2010/05/12 10:59:20 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -25,12 +25,14 @@ import org.json.JSONObject;
 import de.willuhn.jameica.plugin.AbstractPlugin;
 import de.willuhn.jameica.plugin.ServiceDescriptor;
 import de.willuhn.jameica.system.Application;
+import de.willuhn.jameica.webadmin.annotation.Doc;
 import de.willuhn.jameica.webadmin.annotation.Path;
 import de.willuhn.logging.Logger;
 
 /**
  * REST-Kommandos zum Starten und Stoppen von Services.
  */
+@Doc("System: Bietet Zugriff auf die Services der Plugins.")
 public class Service implements AutoRestBean
 {
   /**
@@ -40,6 +42,8 @@ public class Service implements AutoRestBean
    * @return der Service-Status.
    * @throws IOException
    */
+  @Doc(value="Startet den angegebenen Service (meinservicename) des angegebenen Plugins (meinplugin)",
+       example="plugins/meinplugin/services/meinservicename/start")
   @Path("/plugins/(.*?)/services/(.*?)/start$")
   public JSONObject start(String plugin, String service) throws IOException
   {
@@ -67,6 +71,8 @@ public class Service implements AutoRestBean
    * @return der Service-Status.
    * @throws IOException
    */
+  @Doc(value="Stoppt den angegebenen Service (meinservicename) des angegebenen Plugins (meinplugin)",
+       example="plugins/meinplugin/services/meinservicename/stop")
   @Path("/plugins/(.*?)/services/(.*?)/stop$")
   public JSONObject stop(String plugin, String service) throws IOException
   {
@@ -94,6 +100,8 @@ public class Service implements AutoRestBean
    * @return der Service-Status.
    * @throws IOException
    */
+  @Doc(value="Liefert den Status den angegebenen Service (meinservicename) des angegebenen Plugins (meinplugin)",
+       example="plugins/meinplugin/services/meinservicename/status")
   @Path("/plugins/(.*?)/services/(.*?)/status$")
   public JSONObject status(String plugin, String service) throws IOException
   {
@@ -119,6 +127,8 @@ public class Service implements AutoRestBean
    * @return Liste der Services.
    * @throws IOException
    */
+  @Doc(value="Liefert eine Liste der Services des angegebenen Plugins (meinplugin)",
+       example="plugins/meinplugin/services/list")
   @Path("/plugins/(.*?)/services/list$")
   public JSONArray list(String plugin) throws IOException
   {
@@ -195,6 +205,9 @@ public class Service implements AutoRestBean
 
 /*********************************************************************
  * $Log: Service.java,v $
+ * Revision 1.12  2010/05/12 10:59:20  willuhn
+ * @N Automatische Dokumentations-Seite fuer die REST-Beans basierend auf der Annotation "Doc"
+ *
  * Revision 1.11  2010/05/11 14:59:48  willuhn
  * @N Automatisches Deployment von REST-Beans
  *

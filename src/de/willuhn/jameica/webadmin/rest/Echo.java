@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Echo.java,v $
- * $Revision: 1.8 $
- * $Date: 2010/05/11 14:59:48 $
+ * $Revision: 1.9 $
+ * $Date: 2010/05/12 10:59:20 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -18,6 +18,7 @@ import java.io.IOException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import de.willuhn.jameica.webadmin.annotation.Doc;
 import de.willuhn.jameica.webadmin.annotation.Path;
 import de.willuhn.logging.Logger;
 
@@ -25,6 +26,7 @@ import de.willuhn.logging.Logger;
  * Test-Command, welches den uebergebenen QueryString zurueckschickt.
  * Schreibt die uebergebene Nachricht ins lokale Log.
  */
+@Doc("System: Service zum Testen der REST-Funktionalität")
 public class Echo implements AutoRestBean
 {
   /**
@@ -33,6 +35,8 @@ public class Echo implements AutoRestBean
    * @return das Echo-Response.
    * @throws IOException
    */
+  @Doc(value="Liefert den übergebenen Text als Echo zurück",
+       example="echo/HalloWelt")
   @Path("/echo/(.*)")
   public JSONObject echo(String echo) throws IOException
   {
@@ -51,6 +55,9 @@ public class Echo implements AutoRestBean
 
 /*********************************************************************
  * $Log: Echo.java,v $
+ * Revision 1.9  2010/05/12 10:59:20  willuhn
+ * @N Automatische Dokumentations-Seite fuer die REST-Beans basierend auf der Annotation "Doc"
+ *
  * Revision 1.8  2010/05/11 14:59:48  willuhn
  * @N Automatisches Deployment von REST-Beans
  *

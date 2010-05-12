@@ -16,6 +16,8 @@
       <jsp:include page="inc.messages.jspf"/>
       <br/>
       <jsp:include page="inc.server.jspf"/>
+      <br/>
+      <jsp:include page="inc.rest.jspf"/>
     </td>
   </tr>
 </table>

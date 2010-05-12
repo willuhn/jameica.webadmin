@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Certificate.java,v $
- * $Revision: 1.5 $
- * $Date: 2010/05/11 14:59:48 $
+ * $Revision: 1.6 $
+ * $Date: 2010/05/12 10:59:20 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -26,6 +26,7 @@ import org.json.JSONArray;
 
 import de.willuhn.jameica.security.Principal;
 import de.willuhn.jameica.system.Application;
+import de.willuhn.jameica.webadmin.annotation.Doc;
 import de.willuhn.jameica.webadmin.annotation.Path;
 import de.willuhn.logging.Logger;
 import de.willuhn.util.ApplicationException;
@@ -34,6 +35,7 @@ import de.willuhn.util.ApplicationException;
 /**
  * REST-Kommando fuer den Zugriff auf die Zertifikate.
  */
+@Doc("System: Liefert Informationen über die in Jameica installierten SSL-Zertifikate")
 public class Certificate implements AutoRestBean
 {
   private final static DateFormat DATEFORMAT = new SimpleDateFormat("dd.MM.yyyy");
@@ -43,6 +45,8 @@ public class Certificate implements AutoRestBean
    * @return die Liste der Zertifikate
    * @throws IOException
    */
+  @Doc(value="Liefert eine Liste der installierten SSL-Zertifikate",
+       example="certs/list")
   @Path("/certs/list$")
   public JSONArray list() throws IOException
   {
@@ -118,6 +122,9 @@ public class Certificate implements AutoRestBean
 
 /**********************************************************************
  * $Log: Certificate.java,v $
+ * Revision 1.6  2010/05/12 10:59:20  willuhn
+ * @N Automatische Dokumentations-Seite fuer die REST-Beans basierend auf der Annotation "Doc"
+ *
  * Revision 1.5  2010/05/11 14:59:48  willuhn
  * @N Automatisches Deployment von REST-Beans
  *

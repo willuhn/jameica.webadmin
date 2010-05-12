@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Log.java,v $
- * $Revision: 1.11 $
- * $Date: 2010/05/11 14:59:48 $
+ * $Revision: 1.12 $
+ * $Date: 2010/05/12 10:59:20 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.json.JSONArray;
 
+import de.willuhn.jameica.webadmin.annotation.Doc;
 import de.willuhn.jameica.webadmin.annotation.Path;
 import de.willuhn.jameica.webadmin.annotation.Request;
 import de.willuhn.logging.Level;
@@ -34,6 +35,7 @@ import de.willuhn.logging.Message;
  * Logger-Command.
  * Schreibt die uebergebene Nachricht ins lokale Log.
  */
+@Doc("System: Bietet Zugriff auf das Logging-System von Jameica")
 public class Log implements AutoRestBean
 {
   private final static DateFormat DATEFORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
@@ -46,6 +48,8 @@ public class Log implements AutoRestBean
    * @return die letzten Zeilen des Logs.
    * @throws IOException
    */
+  @Doc(value="Liefert eine Liste der letzten 200 Zeilen des System-Logs",
+       example="log/last")
   @Path("/log/last$")
   public JSONArray last() throws IOException
   {
@@ -58,7 +62,10 @@ public class Log implements AutoRestBean
    * @return die letzten Zeilen des Logs.
    * @throws IOException
    */
-  @Path("/log/last/([0-9]{1,2})$")
+  @Doc(value="Liefert eine Liste der letzten X Zeilen des System-Logs." +
+  		       "X steht hierbei für die Anzahl der zurückzuliefernden Zeilen",
+       example="log/last/200")
+  @Path("/log/last/([0-9]{1,4})$")
   public JSONArray last(String lines) throws IOException
   {
     int last = -1;
@@ -96,6 +103,10 @@ public class Log implements AutoRestBean
    * @param text zu loggender Text.
    * @throws IOException
    */
+  @Doc(value="Schreibt eine Log-Nachricht mit dem Log-Level INFO in das System-Log." +
+  		       "Hierbei können neben der Log-Nachricht auch der Name der loggenden " +
+  		       "Klasse und der Name der Funktion übergeben werden",
+       example="log/info/Meineklasse/Meinefunktion/Test-Hinweis")
   @Path("/log/info/(.*?)/(.*?)/(.*?)")
   public void info(String clazz, String method, String text) throws IOException
   {
@@ -109,6 +120,10 @@ public class Log implements AutoRestBean
    * @param text zu loggender Text.
    * @throws IOException
    */
+  @Doc(value="Schreibt eine Log-Nachricht mit dem Log-Level WARN in das System-Log." +
+             "Hierbei können neben der Log-Nachricht auch der Name der loggenden " +
+             "Klasse und der Name der Funktion übergeben werden",
+       example="log/warn/Meineklasse/Meinefunktion/Test-Warnung")
   @Path("/log/warn/(.*?)/(.*?)/(.*?)")
   public void warn(String clazz, String method, String text) throws IOException
   {
@@ -122,6 +137,10 @@ public class Log implements AutoRestBean
    * @param text zu loggender Text.
    * @throws IOException
    */
+  @Doc(value="Schreibt eine Log-Nachricht mit dem Log-Level ERROR in das System-Log." +
+             "Hierbei können neben der Log-Nachricht auch der Name der loggenden " +
+             "Klasse und der Name der Funktion übergeben werden",
+       example="log/error/Meineklasse/Meinefunktion/Test-Fehler")
   @Path("/log/error/(.*?)/(.*?)/(.*?)")
   public void error(String clazz, String method, String text) throws IOException
   {
@@ -145,6 +164,9 @@ public class Log implements AutoRestBean
 
 /*********************************************************************
  * $Log: Log.java,v $
+ * Revision 1.12  2010/05/12 10:59:20  willuhn
+ * @N Automatische Dokumentations-Seite fuer die REST-Beans basierend auf der Annotation "Doc"
+ *
  * Revision 1.11  2010/05/11 14:59:48  willuhn
  * @N Automatisches Deployment von REST-Beans
  *

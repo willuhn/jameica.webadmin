@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Application.java,v $
- * $Revision: 1.8 $
- * $Date: 2010/05/11 14:59:48 $
+ * $Revision: 1.9 $
+ * $Date: 2010/05/12 10:59:20 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -25,6 +25,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import de.willuhn.jameica.system.Config;
+import de.willuhn.jameica.webadmin.annotation.Doc;
 import de.willuhn.jameica.webadmin.annotation.Path;
 import de.willuhn.logging.Logger;
 import de.willuhn.util.ApplicationException;
@@ -32,6 +33,7 @@ import de.willuhn.util.ApplicationException;
 /**
  * REST-Bean zum Abfragen von System-Infos.
  */
+@Doc("System: Liefert Statusinformationen und die Systemkonfiguration von Jameica")
 public class Application implements AutoRestBean
 {
   private final static DateFormat DATEFORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
@@ -41,6 +43,8 @@ public class Application implements AutoRestBean
    * @return die Uptime.
    * @throws IOException
    */
+  @Doc(value="Liefert die Uptime und Startzeit des Jameica-Servers",
+       example="system/uptime")
   @Path("/system/uptime$")
   public JSONObject uptime() throws IOException
   {
@@ -87,6 +91,8 @@ public class Application implements AutoRestBean
    * @return die System-Konfiguration.
    * @throws IOException
    */
+  @Doc(value="Liefert die System-Konfiguration des Jameica-Servers",
+       example="system/config")
   @Path("/system/config$")
   public JSONObject config() throws IOException
   {
@@ -156,6 +162,8 @@ public class Application implements AutoRestBean
    * @return die Systemnachrichten.
    * @throws IOException
    */
+  @Doc(value="Liefert eine Liste der beim Systemstart aufgelaufenen Nachrichten des Jameica-Servers",
+      example="system/welcome")
   @Path("/system/welcome$")
   public JSONArray welcome() throws IOException
   {
@@ -184,6 +192,9 @@ public class Application implements AutoRestBean
 
 /*********************************************************************
  * $Log: Application.java,v $
+ * Revision 1.9  2010/05/12 10:59:20  willuhn
+ * @N Automatische Dokumentations-Seite fuer die REST-Beans basierend auf der Annotation "Doc"
+ *
  * Revision 1.8  2010/05/11 14:59:48  willuhn
  * @N Automatisches Deployment von REST-Beans
  *

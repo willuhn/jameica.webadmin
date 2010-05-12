@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Server.java,v $
- * $Revision: 1.4 $
- * $Date: 2010/05/11 14:59:48 $
+ * $Revision: 1.5 $
+ * $Date: 2010/05/12 10:59:20 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import de.willuhn.jameica.messaging.StatusBarMessage;
 import de.willuhn.jameica.webadmin.Settings;
+import de.willuhn.jameica.webadmin.annotation.Doc;
 import de.willuhn.jameica.webadmin.annotation.Path;
 import de.willuhn.jameica.webadmin.annotation.Request;
 import de.willuhn.jameica.webadmin.annotation.Response;
@@ -29,6 +30,7 @@ import de.willuhn.util.I18N;
 /**
  * Command zum Hinzufuegen und Entfernen von Servern.
  */
+@Doc("System: Ermöglicht das Hinzufügen weiterer Jameica-Server zur Management-Console")
 public class Server implements AutoRestBean
 {
   private static I18N i18n = de.willuhn.jameica.system.Application.getPluginLoader().getPlugin(de.willuhn.jameica.webadmin.Plugin.class).getResources().getI18N();
@@ -43,6 +45,15 @@ public class Server implements AutoRestBean
    * Fuegt einen Server hinzu.
    * @throws IOException
    */
+  @Doc(value="Fügt einen weiteren Jameica-Server zur Management-Console hinzu." +
+  		       "Die Funktion erwartet folgende 4 Parameter via GET oder POST.<br/>" +
+  		       "<ul>" +
+  		       "  <li><b>host</b>: Hostname des Jameica-Servers</li>" +
+             "  <li><b>ssl</b>: &quot;true&quot; wenn für den Zugriff HTTPS verwendet werden soll</li>" +
+             "  <li><b>port</b>: TCP-Port der Management-Console des entfernten Jameica-Servers (meist 8080)</li>" +
+             "  <li><b>password</b>: Das Master-Passwort des entfernten Jameica-Servers</li>" +
+  		       "</ul>",
+  		 example="server/add")
   @Path("/server/add")
   public void add() throws IOException
   {
@@ -51,7 +62,7 @@ public class Server implements AutoRestBean
       String host = request.getParameter("host");
       if (host != null && host.length() > 0)
       {
-        boolean ssl = (request.getParameter("ssl") != null);
+        boolean ssl = (request.getParameter("ssl") != null && "true".equals(request.getParameter("ssl")));
         int port = 8080;
         try
         {
@@ -79,6 +90,9 @@ public class Server implements AutoRestBean
 
 /*********************************************************************
  * $Log: Server.java,v $
+ * Revision 1.5  2010/05/12 10:59:20  willuhn
+ * @N Automatische Dokumentations-Seite fuer die REST-Beans basierend auf der Annotation "Doc"
+ *
  * Revision 1.4  2010/05/11 14:59:48  willuhn
  * @N Automatisches Deployment von REST-Beans
  *

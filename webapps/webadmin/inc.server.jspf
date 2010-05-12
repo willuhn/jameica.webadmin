@@ -76,7 +76,7 @@
     </tr>
     <tr>
       <td>SSL verwenden?</td>
-      <td><input name="ssl" type="checkbox" checked></td>
+      <td><input name="ssl" type="checkbox" value="true" checked></td>
     </tr>
     <tr>
       <td>&nbsp;</td>
