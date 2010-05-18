@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/server/RestServiceImpl.java,v $
- * $Revision: 1.26 $
- * $Date: 2010/05/11 23:21:44 $
+ * $Revision: 1.27 $
+ * $Date: 2010/05/18 10:43:20 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -48,6 +48,7 @@ import de.willuhn.jameica.webadmin.beans.RestBeanDoc;
 import de.willuhn.jameica.webadmin.beans.RestMethodDoc;
 import de.willuhn.jameica.webadmin.rmi.RestService;
 import de.willuhn.logging.Logger;
+import de.willuhn.util.ApplicationException;
 
 /**
  * Implementierung des REST-Services.
@@ -137,28 +138,26 @@ public class RestServiceImpl implements RestService
         }
       }
     }
-    catch (IOException e)
+    catch (Exception e)
     {
-      throw e;
-    }
-    catch (InvocationTargetException ive)
-    {
-      Throwable cause = ive.getCause();
-      if (cause != null && (cause instanceof IOException))
-        throw (IOException) cause;
-      else
+      String errorText = null;
+      if (e instanceof InvocationTargetException)
       {
-        // Den Konstruktor mit dem Throwable als Parameter gibts erst ab 1.6
-        Logger.error("error while executing command " + command,cause);
-        throw new IOException("error while executing command " + command + ": " + ive.getMessage());
+        Throwable cause = e.getCause();
+        if (cause != null && (cause instanceof IOException || cause instanceof ApplicationException))
+          errorText = cause.getMessage();
       }
+      
+      if (errorText == null)
+      {
+        // Wir wissen nicht, wie wir den Fehler behandeln sollen.
+        // Also ist es ein unerwarteter Fehler - und den loggen wir
+        Logger.error("error while executing command " + command,e);
+        errorText = e.getMessage();
+      }
+      response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,errorText);
+      return;
     }
-    catch (Exception e2)
-    {
-      Logger.error("error while executing command " + command,e2);
-      throw new IOException("error while executing command " + command + ": " + e2.getMessage());
-    }
-    
     throw new IOException("no command found for REST url " + command);
   }
   
@@ -497,6 +496,9 @@ public class RestServiceImpl implements RestService
 
 /*********************************************************************
  * $Log: RestServiceImpl.java,v $
+ * Revision 1.27  2010/05/18 10:43:20  willuhn
+ * @N Lesbarere Fehlermeldungen
+ *
  * Revision 1.26  2010/05/11 23:21:44  willuhn
  * @N Automatische Dokumentations-Seite fuer die REST-Beans basierend auf der Annotation "Doc"
  *
