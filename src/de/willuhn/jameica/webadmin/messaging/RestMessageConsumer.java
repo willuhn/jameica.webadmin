@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/messaging/RestMessageConsumer.java,v $
- * $Revision: 1.1 $
- * $Date: 2010/05/11 14:59:48 $
+ * $Revision: 1.2 $
+ * $Date: 2010/09/13 12:45:44 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -50,6 +50,10 @@ public class RestMessageConsumer implements MessageConsumer
    */
   public void handleMessage(Message message) throws Exception
   {
+    SystemMessage m = (SystemMessage) message;
+    if (m.getStatusCode() != SystemMessage.SYSTEM_STARTED)
+      return;
+    
     try
     {
       Logger.info("searching auto rest beans");
