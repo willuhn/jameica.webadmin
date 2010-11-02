@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/Settings.java,v $
- * $Revision: 1.3 $
- * $Date: 2009/01/06 01:44:14 $
+ * $Revision: 1.4 $
+ * $Date: 2010/11/02 00:56:31 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -18,8 +18,6 @@ import java.net.BindException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
 
 import de.willuhn.jameica.security.Wallet;
 import de.willuhn.jameica.system.Application;
@@ -31,13 +29,13 @@ import de.willuhn.util.ApplicationException;
  */
 public class Settings
 {
-  private static Wallet wallet = null;
-  
   /**
    * Die Einstellungen des Plugins.
    */
   public final static de.willuhn.jameica.system.Settings SETTINGS = Application.getPluginLoader().getPlugin(Plugin.class).getResources().getSettings();
   
+  private static Wallet wallet = null;
+
   /**
    * Liefert den TCP-Port fuer den Server.
    * @return der TCP-Port.
@@ -160,84 +158,29 @@ public class Settings
   {
     SETTINGS.setAttribute("listener.http.auth",auth);
   }
-  
-  /**
-   * Liefert die URL zu einem weiteren Jameica-Server.
-   * @param name Aliasname des Servers.
-   * @return URL oder NULL.
-   */
-  public static String getServer(String name)
-  {
-    if (name == null || name.length() == 0)
-      return null;
-    return SETTINGS.getString("jameica.server." + name,null);
-  }
-  
-  /**
-   * Fuegt einen weiteren Jameica-Server hinzu.
-   * @param name Aliasname des Servers.
-   * @param url URL des Servers.
-   */
-  public static void addServer(String name, String url)
-  {
-    if (name == null || url == null || name.length() == 0 || url.length() == 0)
-      return;
-    SETTINGS.setAttribute("jameica.server." + name,url);
-  }
-  
-  /**
-   * Entfernt den Server aus der Liste.
-   * @param name Aliasname des Servers.
-   */
-  public static void removeServer(String name)
-  {
-    if (name == null || name.length() == 0)
-      return;
-    SETTINGS.setAttribute("jameica.server." + name,(String) null);
-  }
-  
-  /**
-   * Liefert eine Liste aller Servernamen.
-   * @return Liste der Servernamen.
-   */
-  public static List<String> getServers()
-  {
-    String[] names = SETTINGS.getAttributes();
-    List<String> list = new ArrayList<String>();
-    if (names != null)
-    {
-      for (String name:names)
-      {
-        if (!name.startsWith("jameica.server."))
-          continue;
-        list.add(name.replaceFirst("jameica\\.server\\.",""));
-      }
-    }
-    return list;
-  }
-  
+
   /**
    * Liefert das zu verwendende Passwort fuer die Jameica-Instanz.
    * @param jameicaUrl URL der Jameica-Instanz.
    * @return Passwort.
    * @throws Exception
    */
-  public static String getJameicaInstancePassword(String jameicaUrl) throws Exception
+  public static String getServerPassword(String jameicaUrl) throws Exception
   {
     return (String) getWallet().get(jameicaUrl + ".password");
   }
-
+  
   /**
    * Speichert das zu verwendende Passwort fuer die Jameica-Instanz.
    * @param jameicaUrl URL der Jameica-Instanz.
    * @param password das Passwort.
    * @throws Exception
    */
-  public static void setJameicaInstancePassword(String jameicaUrl, String password) throws Exception
+  public static void setServerPassword(String jameicaUrl, String password) throws Exception
   {
     getWallet().set(jameicaUrl + ".password",password);
   }
-  
+
   /**
    * Liefert ein Wallet zum verschluesselten Speichern der Passwoerter.
    * @return Wallet.
@@ -254,6 +197,9 @@ public class Settings
 
 /*********************************************************************
  * $Log: Settings.java,v $
+ * Revision 1.4  2010/11/02 00:56:31  willuhn
+ * @N Umstellung des Webfrontends auf Velocity/Webtools
+ *
  * Revision 1.3  2009/01/06 01:44:14  willuhn
  * @N Code zum Hinzufuegen von Servern erweitert
  *

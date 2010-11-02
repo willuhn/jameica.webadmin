@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Application.java,v $
- * $Revision: 1.9 $
- * $Date: 2010/05/12 10:59:20 $
+ * $Revision: 1.10 $
+ * $Date: 2010/11/02 00:56:31 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -14,21 +14,24 @@
 package de.willuhn.jameica.webadmin.rest;
 
 import java.io.IOException;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
+import de.willuhn.jameica.messaging.StatusBarMessage;
+import de.willuhn.jameica.plugin.Manifest;
 import de.willuhn.jameica.system.Config;
 import de.willuhn.jameica.webadmin.annotation.Doc;
 import de.willuhn.jameica.webadmin.annotation.Path;
+import de.willuhn.jameica.webadmin.messaging.StatusBarMessageConsumer;
 import de.willuhn.logging.Logger;
 import de.willuhn.util.ApplicationException;
+import de.willuhn.util.I18N;
 
 /**
  * REST-Bean zum Abfragen von System-Infos.
@@ -36,26 +39,17 @@ import de.willuhn.util.ApplicationException;
 @Doc("System: Liefert Statusinformationen und die Systemkonfiguration von Jameica")
 public class Application implements AutoRestBean
 {
-  private final static DateFormat DATEFORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-
   /**
-   * Schreibt die Uptime und Startzeit des Servers in den Response-Writer.
+   * Liefert die Uptime und Startzeit des Servers.
    * @return die Uptime.
    * @throws IOException
    */
   @Doc(value="Liefert die Uptime und Startzeit des Jameica-Servers",
        example="system/uptime")
   @Path("/system/uptime$")
-  public JSONObject uptime() throws IOException
+  public JSONObject getUptime() throws IOException
   {
-    return new JSONObject(getUptime());
-  }
-
-  /**
-   * Liefert die Uptime und Startzeit des Servers.
-   */
-  public Map getUptime()
-  {
+    I18N i18n = de.willuhn.jameica.system.Application.getPluginLoader().getPlugin(de.willuhn.jameica.webadmin.Plugin.class).getResources().getI18N();
     Date started = de.willuhn.jameica.system.Application.getStartDate();
 
     ////////////////////////////////////////////////////////////////////////////
@@ -76,29 +70,85 @@ public class Application implements AutoRestBean
     else
     {
       long days = hours / 24;
-      uptime = days + " Tag(e), " + (hours % 24) + ":" + mins + " h";
+      uptime = i18n.tr("{0} Tag(e), {1}:{2} h",Long.toString(days),Long.toString(hours % 24),mins);
     }
     ////////////////////////////////////////////////////////////////////////////
     
     Map o = new HashMap();
-    o.put("started",DATEFORMAT.format(started));
+    o.put("started",new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(started));
     o.put("uptime",uptime);
-    return o;
+
+    return new JSONObject(o);
   }
-  
+
   /**
-   * Schreibt die System-Konfiguration in den Response-Writer.
+   * Liefert die System-Konfiguration.
    * @return die System-Konfiguration.
    * @throws IOException
    */
   @Doc(value="Liefert die System-Konfiguration des Jameica-Servers",
        example="system/config")
   @Path("/system/config$")
-  public JSONObject config() throws IOException
+  public JSONObject getConfig() throws IOException
   {
     try
     {
-      return new JSONObject(getConfig());
+      Map all = new HashMap();
+      
+      Config config = de.willuhn.jameica.system.Application.getConfig();
+      
+      all.put("locale",config.getLocale().toString());
+      
+      {
+        Map map = new HashMap();
+        map.put("port",      config.getRmiPort());
+        map.put("ssl",       config.getRmiSSL());
+        map.put("clientauth",config.getRmiUseClientAuth());
+        all.put("rmi",map);
+      }
+
+      {
+        Map map = new HashMap();
+        map.put("dir",    config.getBackupDir());
+        map.put("enabled",config.getUseBackup());
+        map.put("count",  config.getBackupCount());
+        all.put("backup",map);
+      }
+
+      {
+        Map map = new HashMap();
+        map.put("config",config.getConfigDir());
+        map.put("work",config.getWorkDir());
+        Map plugins = new HashMap();
+        plugins.put("system",config.getSystemPluginDir().getAbsolutePath());
+        plugins.put("user",  config.getUserPluginDir().getAbsolutePath());
+        plugins.put("config",config.getPluginDirs());
+        map.put("plugins",plugins);
+        all.put("dir",map);
+      }
+      
+      {
+        Map map = new HashMap();
+        map.put("file",config.getLogFile());
+        map.put("level",config.getLogLevel());
+        all.put("log",map);
+      }
+      
+      {
+        Map map = new HashMap();
+        map.put("host",config.getProxyHost());
+        map.put("port",config.getProxyPort() == -1 ? "" : String.valueOf(config.getProxyPort()));
+        all.put("proxy",map);
+      }
+
+      {
+        Map map = new HashMap();
+        map.put("multicastlookup",config.getMulticastLookup());
+        map.put("shareservices",config.getShareServices());
+        all.put("service",map);
+      }
+
+      return new JSONObject(all);
     }
     catch (ApplicationException ae)
     {
@@ -107,91 +157,86 @@ public class Application implements AutoRestBean
   }
 
   /**
-   * Liefert die System-Konfiguration.
+   * Liefert Versions-Informationen zu Jameica.
+   * @return Versions-Informationen zu Jameica.
+   * @throws IOException
    */
-  public Map getConfig() throws ApplicationException
+  @Doc(value="Liefert die Versions-Informationen des Jameica-Servers",
+       example="system/version")
+  @Path("/system/version$")
+  public JSONObject getVersion() throws IOException
   {
-    Map all = new HashMap();
-    
-    Config config = de.willuhn.jameica.system.Application.getConfig();
-    
-    all.put("locale",config.getLocale().toString());
-    
-    Map rmi = new HashMap();
-    rmi.put("port",      config.getRmiPort());
-    rmi.put("ssl",       config.getRmiSSL());
-    rmi.put("clientauth",config.getRmiUseClientAuth());
-    all.put("rmi",rmi);
+    Manifest mf = de.willuhn.jameica.system.Application.getManifest();
 
-    Map backup = new HashMap();
-    backup.put("dir",    config.getBackupDir());
-    backup.put("enabled",config.getUseBackup());
-    backup.put("count",  config.getBackupCount());
-    all.put("backup",backup);
-    
-    Map dir = new HashMap();
-    dir.put("config",config.getConfigDir());
-    dir.put("work",config.getWorkDir());
-    Map plugins = new HashMap();
-    plugins.put("system",config.getSystemPluginDir().getAbsolutePath());
-    plugins.put("user",  config.getUserPluginDir().getAbsolutePath());
-    plugins.put("config",config.getPluginDirs());
-    dir.put("plugins",plugins);
-    all.put("dir",dir);
-    
-    Map log = new HashMap();
-    log.put("file",config.getLogFile());
-    log.put("level",config.getLogLevel());
-    all.put("log",log);
-    
-    Map proxy = new HashMap();
-    proxy.put("host",config.getProxyHost());
-    proxy.put("port",config.getProxyPort() == -1 ? "" : String.valueOf(config.getProxyPort()));
-    all.put("proxy",proxy);
-    
-    Map service = new HashMap();
-    service.put("multicastlookup",config.getMulticastLookup());
-    service.put("shareservices",config.getShareServices());
-    all.put("service",service);
-    
-    return all;
+    Map map = new HashMap();
+    map.put("builddate",mf.getBuildDate());
+    map.put("buildnumber",mf.getBuildnumber());
+    map.put("version",mf.getVersion());
+    return new JSONObject(map);
   }
 
   /**
-   * Schreibt die Liste der beim Systemstart aufgelaufenen Nachrichten in den Response-Writer.
+   * Liefert Host-Informationen zu Jameica.
+   * @return Host-Informationen zu Jameica.
+   * @throws IOException
+   */
+  @Doc(value="Liefert die Host-Informationen des Jameica-Servers",
+       example="system/host")
+  @Path("/system/host$")
+  public JSONObject getHost() throws IOException
+  {
+    try
+    {
+      Map map = new HashMap();
+      map.put("name",de.willuhn.jameica.system.Application.getCallback().getHostname());
+      return new JSONObject(map);
+    }
+    catch (Exception e)
+    {
+      Logger.error("unable to get host config",e);
+      throw new IOException("unable to get host config");
+    }
+  }
+
+  /**
+   * Liefert die Liste der beim Systemstart aufgelaufenen Nachrichten.
    * @return die Systemnachrichten.
    * @throws IOException
    */
   @Doc(value="Liefert eine Liste der beim Systemstart aufgelaufenen Nachrichten des Jameica-Servers",
       example="system/welcome")
   @Path("/system/welcome$")
-  public JSONArray welcome() throws IOException
+  public JSONArray getWelcome() throws IOException
   {
-    try
-    {
-      return new JSONArray(getWelcome());
-    }
-    catch (JSONException e)
-    {
-      Logger.error("unable to encode via json",e);
-      throw new IOException("error while encoding into json");
-    }
+    return new JSONArray(Arrays.asList(de.willuhn.jameica.system.Application.getWelcomeMessages()));
   }
 
   /**
-   * Liefert eine Liste der beim Systemstart aufgelaufenen Nachrichten.
+   * Liefert die letzte Statusbar-Message.
+   * @return die letzte Statusbar-Message.
    * @throws IOException
    */
-  public String[] getWelcome()
+  @Doc(value="Liefert die letzte Status-Meldung des Systems",
+       example="system/status")
+  @Path("/system/status$")
+  public JSONObject getStatus() throws IOException
   {
-    return de.willuhn.jameica.system.Application.getWelcomeMessages();
-  }
+    StatusBarMessage m = StatusBarMessageConsumer.getLastMessage();
+    Map map = new HashMap();
+    map.put("title",m.getTitle());
+    map.put("text",m.getText());
+    map.put("type",m.getType());
 
+    return new JSONObject(map);
+  }
 }
 
 
 /*********************************************************************
  * $Log: Application.java,v $
+ * Revision 1.10  2010/11/02 00:56:31  willuhn
+ * @N Umstellung des Webfrontends auf Velocity/Webtools
+ *
  * Revision 1.9  2010/05/12 10:59:20  willuhn
  * @N Automatische Dokumentations-Seite fuer die REST-Beans basierend auf der Annotation "Doc"
  *
@@ -200,23 +245,4 @@ public class Application implements AutoRestBean
  *
  * Revision 1.7  2010/03/18 09:29:35  willuhn
  * @N Wenn REST-Beans Rueckgabe-Werte liefern, werrden sie automatisch als toString() in den Response-Writer geschrieben
- *
- * Revision 1.6  2009/08/05 09:03:40  willuhn
- * @C Annotations in eigenes Package verschoben (sind nicht mehr REST-spezifisch)
- *
- * Revision 1.5  2009/01/06 01:44:14  willuhn
- * @N Code zum Hinzufuegen von Servern erweitert
- *
- * Revision 1.4  2008/11/11 23:59:22  willuhn
- * @N Dualer Aufruf (via JSON und Map/List)
- *
- * Revision 1.3  2008/11/11 01:06:49  willuhn
- * @R testcode entfernt
- *
- * Revision 1.2  2008/11/11 01:06:22  willuhn
- * @N Mehr REST-Kommandos
- *
- * Revision 1.1  2008/11/07 00:14:37  willuhn
- * @N REST-Bean fuer Anzeige von System-Infos (Start-Zeit, Config)
- *
  **********************************************************************/

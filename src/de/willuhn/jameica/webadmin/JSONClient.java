@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/JSONClient.java,v $
- * $Revision: 1.4 $
- * $Date: 2009/01/07 00:30:20 $
+ * $Revision: 1.5 $
+ * $Date: 2010/11/02 00:56:31 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -20,16 +20,9 @@ import java.net.Authenticator;
 import java.net.HttpURLConnection;
 import java.net.PasswordAuthentication;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import de.willuhn.jameica.messaging.CheckTrustMessage;
@@ -46,13 +39,13 @@ import de.willuhn.logging.Logger;
 public class JSONClient
 {
   /**
-   * @param url
-   * @param username
-   * @param password
+   * Fragt eine REST-URL ab und liefert das JSON-Response zurueck.
+   * @param url die Basis-URL.
+   * @param restCommand das REST-Kommando.
    * @return json-Daten.
    * @throws Exception
    */
-  private static String execute(String url, String restCommand) throws Exception
+  public static Object execute(String url, String restCommand) throws Exception
   {
     AutoCertTrust certTrust = null;
     AutoHostTrust hostTrust = null;
@@ -71,7 +64,7 @@ public class JSONClient
       HttpURLConnection connection = (HttpURLConnection) new URL(url + restCommand).openConnection(); 
       connection.setDoOutput(true);
       
-      final String password = Settings.getJameicaInstancePassword(url);
+      final String password = Settings.getServerPassword(url);
       if (password != null && password.length() > 0)
       {
         Authenticator.setDefault(new Authenticator() {
@@ -94,10 +87,7 @@ public class JSONClient
       }
       reader.close();
       JSONTokener tokener = new JSONTokener(builder.toString());
-      Object response = tokener.nextValue();
-      if (response == null)
-        throw new IOException("invalid JSON response");
-      return response.toString();
+      return tokener.nextValue();
     }
     catch (JSONException ex)
     {
@@ -111,41 +101,6 @@ public class JSONClient
       if (hostTrust != null)
         Application.getMessagingFactory().getMessagingQueue("jameica.trust.hostname").unRegisterMessageConsumer(certTrust);
     }
-  }
-  
-  /**
-   * Ruft einen JSON-Service auf und liefert das Ergebnis als Liste von Objekten zurueck.
-   * @param url Basis-URL des JSON-Services.
-   * @param restCommand das REST-Kommando.
-   * @return Liste der Datensaetze.
-   * @throws Exception
-   */
-  public static List asList(String url, String restCommand) throws Exception
-  {
-    JSONArray array = new JSONArray(execute(url, restCommand));
-    ArrayList result = new ArrayList();
-    for (int i=0;i<array.length();++i)
-    {
-      result.add(toMap(array.getJSONObject(i)));
-    }
-    return result;
-  }
-  
-  /**
-   * Konvertiert ein JSON-Objekt in eine Map.
-   * @param object JSON-Objekt.
-   * @return Java-Map.
-   * @throws JSONException
-   */
-  public static Map toMap(JSONObject object) throws JSONException
-  {
-    Map map = new HashMap();
-    Iterator  keys = object.keys();
-    while (keys.hasNext()) {
-      String key = (String) keys.next();
-      map.put(key,object.get(key));
-    }
-    return map;
   }
   
   /**
@@ -242,23 +197,10 @@ public class JSONClient
 
 /**********************************************************************
  * $Log: JSONClient.java,v $
+ * Revision 1.5  2010/11/02 00:56:31  willuhn
+ * @N Umstellung des Webfrontends auf Velocity/Webtools
+ *
  * Revision 1.4  2009/01/07 00:30:20  willuhn
  * @N Hinzufuegen weiterer Jameica-Server
  * @N Auto-Host-Check
- *
- * Revision 1.3  2008/12/12 17:19:10  willuhn
- * *** empty log message ***
- *
- * Revision 1.2  2008/07/08 14:26:59  willuhn
- * @D javadoc
- *
- * Revision 1.1  2008/07/02 17:43:00  willuhn
- * @N Remote-Administrierbarkeit
- *
- * Revision 1.2  2008/06/20 15:07:12  willuhn
- * *** empty log message ***
- *
- * Revision 1.1  2008/06/16 23:27:28  willuhn
- * @N JSON-Client-Code zum Abfragen der Daten von anderen Jameica-Servern
- *
  **********************************************************************/

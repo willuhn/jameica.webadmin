@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Log.java,v $
- * $Revision: 1.12 $
- * $Date: 2010/05/12 10:59:20 $
+ * $Revision: 1.13 $
+ * $Date: 2010/11/02 00:56:31 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -14,14 +14,15 @@
 package de.willuhn.jameica.webadmin.rest;
 
 import java.io.IOException;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.json.JSONArray;
 
 import de.willuhn.jameica.webadmin.annotation.Doc;
@@ -38,10 +39,8 @@ import de.willuhn.logging.Message;
 @Doc("System: Bietet Zugriff auf das Logging-System von Jameica")
 public class Log implements AutoRestBean
 {
-  private final static DateFormat DATEFORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-
   @Request
-  private HttpServletRequest request   = null;
+  private HttpServletRequest request = null;
   
   /**
    * Liefert die letzten Zeilen des Logs.
@@ -51,9 +50,9 @@ public class Log implements AutoRestBean
   @Doc(value="Liefert eine Liste der letzten 200 Zeilen des System-Logs",
        example="log/last")
   @Path("/log/last$")
-  public JSONArray last() throws IOException
+  public JSONArray getLast() throws IOException
   {
-    return last(null);
+    return getLast("200");
   }
 
   /**
@@ -62,11 +61,12 @@ public class Log implements AutoRestBean
    * @return die letzten Zeilen des Logs.
    * @throws IOException
    */
-  @Doc(value="Liefert eine Liste der letzten X Zeilen des System-Logs." +
-  		       "X steht hierbei für die Anzahl der zurückzuliefernden Zeilen",
+  @Doc(value="Liefert eine Liste der letzten X Zeilen des System-Logs. " +
+             "X steht hierbei für die Anzahl der zurückzuliefernden Zeilen. " +
+             "Die Zeilen sind umgekehrt chronologisch sortiert, also neue zuerst.",
        example="log/last/200")
   @Path("/log/last/([0-9]{1,4})$")
-  public JSONArray last(String lines) throws IOException
+  public JSONArray getLast(String lines) throws IOException
   {
     int last = -1;
     try
@@ -74,7 +74,7 @@ public class Log implements AutoRestBean
       last = Integer.parseInt(lines);
     } catch (Exception e) {}
     
-    ArrayList json = new ArrayList();
+    List<Map> list = new ArrayList<Map>();
 
     int count = last;
     
@@ -84,18 +84,23 @@ public class Log implements AutoRestBean
       if (last > 0 && count-- <= 0)
         break;
 
+      String loggingClass = msg[i].getLoggingClass();
+      int isClass = loggingClass.lastIndexOf('.');
+      if (isClass != -1)
+        loggingClass = loggingClass.substring(isClass+1);
+
       Map data = new HashMap();
-      data.put("date",  DATEFORMAT.format(msg[i].getDate()));
+      data.put("date",  new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(msg[i].getDate()));
       data.put("host",  msg[i].getHost());
       data.put("level", msg[i].getLevel().getName());
-      data.put("class", msg[i].getLoggingClass());
+      data.put("class", loggingClass);
       data.put("method",msg[i].getLoggingMethod());
-      data.put("text",  msg[i].getText());
-      json.add(data);
+      data.put("text",  StringEscapeUtils.escapeXml(msg[i].getText()));
+      list.add(data);
     }
-    return new JSONArray(json);
+    return new JSONArray(list);
   }
-  
+
   /**
    * Loggt die Nachricht als INFO.
    * @param clazz Ausloesende Klasse.
@@ -164,6 +169,9 @@ public class Log implements AutoRestBean
 
 /*********************************************************************
  * $Log: Log.java,v $
+ * Revision 1.13  2010/11/02 00:56:31  willuhn
+ * @N Umstellung des Webfrontends auf Velocity/Webtools
+ *
  * Revision 1.12  2010/05/12 10:59:20  willuhn
  * @N Automatische Dokumentations-Seite fuer die REST-Beans basierend auf der Annotation "Doc"
  *

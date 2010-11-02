@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Echo.java,v $
- * $Revision: 1.9 $
- * $Date: 2010/05/12 10:59:20 $
+ * $Revision: 1.10 $
+ * $Date: 2010/11/02 00:56:31 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -14,13 +14,13 @@
 package de.willuhn.jameica.webadmin.rest;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import de.willuhn.jameica.webadmin.annotation.Doc;
 import de.willuhn.jameica.webadmin.annotation.Path;
-import de.willuhn.logging.Logger;
 
 /**
  * Test-Command, welches den uebergebenen QueryString zurueckschickt.
@@ -40,21 +40,18 @@ public class Echo implements AutoRestBean
   @Path("/echo/(.*)")
   public JSONObject echo(String echo) throws IOException
   {
-    try
-    {
-      return new JSONObject().put("echo",echo);
-    }
-    catch (JSONException e)
-    {
-      Logger.error("unable to encode via json",e);
-      throw new IOException("error while encoding into json");
-    }
+    Map map = new HashMap();
+    map.put("echo",echo);
+    return new JSONObject(map);
   }
 }
 
 
 /*********************************************************************
  * $Log: Echo.java,v $
+ * Revision 1.10  2010/11/02 00:56:31  willuhn
+ * @N Umstellung des Webfrontends auf Velocity/Webtools
+ *
  * Revision 1.9  2010/05/12 10:59:20  willuhn
  * @N Automatische Dokumentations-Seite fuer die REST-Beans basierend auf der Annotation "Doc"
  *

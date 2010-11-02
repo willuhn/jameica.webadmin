@@ -1,0 +1,20 @@
+<h2>Installierte Zertifikate</h2>
+<table class="data">
+  <tr>
+    <th>Ausgestellt für</th>
+    <th>Ausgestellt von</th>
+    <th>Gültigkeit</th>
+  </tr>
+  #set($list = $certificate.list)
+  #if($list.length() > 0)
+    #set($size = $list.length() - 1)
+    #foreach($i in [0..$size])
+      #set($line = $list.get($i))
+      <tr onmouseover="change_to(this);" onmouseout="change_back(this);">
+        <td><a title="Klicken für Details" href="cert.html?cert=$line.cert.sha1">$line.subject.CN</a></td>
+        <td>$line.issuer.CN</td>
+        <td>$line.valid.from - $line.valid.to</td>
+      </tr>
+    #end
+  #end
+</table>

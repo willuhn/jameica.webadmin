@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Certificate.java,v $
- * $Revision: 1.6 $
- * $Date: 2010/05/12 10:59:20 $
+ * $Revision: 1.7 $
+ * $Date: 2010/11/02 00:56:31 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -22,7 +22,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import de.willuhn.jameica.security.Principal;
 import de.willuhn.jameica.system.Application;
@@ -38,21 +40,107 @@ import de.willuhn.util.ApplicationException;
 @Doc("System: Liefert Informationen über die in Jameica installierten SSL-Zertifikate")
 public class Certificate implements AutoRestBean
 {
-  private final static DateFormat DATEFORMAT = new SimpleDateFormat("dd.MM.yyyy");
-
   /**
-   * Schreibt die installierten Zertifikate in den Response-Writer.
+   * Liefert die Details des angegebenen Zertifikates.
+   * Die Funktion erwartet als Parameter den SHA1-Hash des Zertifikates.
+   * @return die Details des angegebenen Zertifikates.
+   * @throws IOException
+   */
+  @Doc(value="Liefert die Details des angegebenen Zertifikates",
+       example="certs/get/12:34:56:78:90")
+  @Path("/certs/get/(.*)$")
+  public JSONObject getDetails(String sha1) throws IOException
+  {
+    if (sha1 == null || sha1.length() == 0)
+      throw new IOException("no sha1 hash given");
+    
+    try
+    {
+      X509Certificate[] certs = Application.getSSLFactory().getTrustedCertificates();
+      for (X509Certificate c:certs)
+      {
+        de.willuhn.jameica.security.Certificate cert = new de.willuhn.jameica.security.Certificate(c);
+        if (!cert.getSHA1Fingerprint().equals(sha1))
+          continue;
+
+        Map all = new HashMap();
+
+        {
+          Map map = new HashMap();
+          DateFormat DATEFORMAT = new SimpleDateFormat("dd.MM.yyyy");
+          map.put("from",DATEFORMAT.format(c.getNotBefore()));
+          map.put("to",  DATEFORMAT.format(c.getNotAfter()));
+          all.put("valid",map);
+        }
+        
+        {
+          Map map = new HashMap();
+          Principal ps = cert.getSubject();
+          map.put(Principal.COMMON_NAME,        StringUtils.trimToEmpty(ps.getAttribute(Principal.COMMON_NAME)));
+          map.put(Principal.COUNTRY,            StringUtils.trimToEmpty(ps.getAttribute(Principal.COUNTRY)));
+          map.put(Principal.DISTINGUISHED_NAME, StringUtils.trimToEmpty(ps.getAttribute(Principal.DISTINGUISHED_NAME)));
+          map.put(Principal.LOCALITY,           StringUtils.trimToEmpty(ps.getAttribute(Principal.LOCALITY)));
+          map.put(Principal.ORGANIZATION,       StringUtils.trimToEmpty(ps.getAttribute(Principal.ORGANIZATION)));
+          map.put(Principal.ORGANIZATIONAL_UNIT,StringUtils.trimToEmpty(ps.getAttribute(Principal.ORGANIZATIONAL_UNIT)));
+          map.put(Principal.STATE,              StringUtils.trimToEmpty(ps.getAttribute(Principal.STATE)));
+          all.put("subject",map);
+        }
+
+        {
+          Map map = new HashMap();
+          Principal pi = cert.getIssuer();
+          map.put(Principal.COMMON_NAME,        StringUtils.trimToEmpty(pi.getAttribute(Principal.COMMON_NAME)));
+          map.put(Principal.COUNTRY,            StringUtils.trimToEmpty(pi.getAttribute(Principal.COUNTRY)));
+          map.put(Principal.DISTINGUISHED_NAME, StringUtils.trimToEmpty(pi.getAttribute(Principal.DISTINGUISHED_NAME)));
+          map.put(Principal.LOCALITY,           StringUtils.trimToEmpty(pi.getAttribute(Principal.LOCALITY)));
+          map.put(Principal.ORGANIZATION,       StringUtils.trimToEmpty(pi.getAttribute(Principal.ORGANIZATION)));
+          map.put(Principal.ORGANIZATIONAL_UNIT,StringUtils.trimToEmpty(pi.getAttribute(Principal.ORGANIZATIONAL_UNIT)));
+          map.put(Principal.STATE,              StringUtils.trimToEmpty(pi.getAttribute(Principal.STATE)));
+          all.put("issuer",map);
+        }
+
+        {
+          Map map = new HashMap();
+          map.put("serial", c.getSerialNumber().toString());
+          map.put("md5", cert.getMD5Fingerprint());
+          map.put("sha1",cert.getSHA1Fingerprint());
+          all.put("cert",map);
+        }
+        return new JSONObject(all);
+      }
+      throw new IOException("certificate " + sha1 + " not found");
+    }
+    catch (ApplicationException ae)
+    {
+      throw new IOException(ae.getMessage());
+    }
+    catch (Exception e)
+    {
+      Logger.error("unable to load certificate " + sha1,e);
+      throw new IOException("unable to load certificate " + sha1);
+    }
+  }
+  
+  /**
+   * Liefert die installierten Zertifikate.
    * @return die Liste der Zertifikate
    * @throws IOException
    */
   @Doc(value="Liefert eine Liste der installierten SSL-Zertifikate",
        example="certs/list")
   @Path("/certs/list$")
-  public JSONArray list() throws IOException
+  public JSONArray getList() throws IOException
   {
     try
     {
-      return new JSONArray(getList());
+      List<JSONObject> list = new ArrayList();
+      X509Certificate[] certs = Application.getSSLFactory().getTrustedCertificates();
+      for (int i=0;i<certs.length;++i)
+      {
+        de.willuhn.jameica.security.Certificate cert = new de.willuhn.jameica.security.Certificate(certs[i]);
+        list.add(getDetails(cert.getSHA1Fingerprint()));
+      }
+      return new JSONArray(list);
     }
     catch (ApplicationException ae)
     {
@@ -64,64 +152,14 @@ public class Certificate implements AutoRestBean
       throw new IOException("unable to load certificates: " + e.getMessage());
     }
   }
-
-  /**
-   * Listet die installierten Zertifikate auf.
-   * @throws Exception
-   */
-  public List getList() throws Exception
-  {
-    ArrayList list = new ArrayList();
-    X509Certificate[] certs = Application.getSSLFactory().getTrustedCertificates();
-    for (int i=0;i<certs.length;++i)
-    {
-      de.willuhn.jameica.security.Certificate cert = new de.willuhn.jameica.security.Certificate(certs[i]);
-
-      Map data = new HashMap();
-
-      Map valid = new HashMap();
-      valid.put("from",DATEFORMAT.format(certs[i].getNotBefore()));
-      valid.put("to",  DATEFORMAT.format(certs[i].getNotAfter()));
-      data.put("valid",valid);
-      
-      Map subject = new HashMap();
-      Principal ps = cert.getSubject();
-      subject.put(Principal.COMMON_NAME,        ps.getAttribute(Principal.COMMON_NAME));
-      subject.put(Principal.COUNTRY,            ps.getAttribute(Principal.COUNTRY));
-      subject.put(Principal.DISTINGUISHED_NAME, ps.getAttribute(Principal.DISTINGUISHED_NAME));
-      subject.put(Principal.LOCALITY,           ps.getAttribute(Principal.LOCALITY));
-      subject.put(Principal.ORGANIZATION,       ps.getAttribute(Principal.ORGANIZATION));
-      subject.put(Principal.ORGANIZATIONAL_UNIT,ps.getAttribute(Principal.ORGANIZATIONAL_UNIT));
-      subject.put(Principal.STATE,              ps.getAttribute(Principal.STATE));
-      data.put("subject",subject);
-
-      Map issuer = new HashMap();
-      Principal pi = cert.getIssuer();
-      issuer.put(Principal.COMMON_NAME,        pi.getAttribute(Principal.COMMON_NAME));
-      issuer.put(Principal.COUNTRY,            pi.getAttribute(Principal.COUNTRY));
-      issuer.put(Principal.DISTINGUISHED_NAME, pi.getAttribute(Principal.DISTINGUISHED_NAME));
-      issuer.put(Principal.LOCALITY,           pi.getAttribute(Principal.LOCALITY));
-      issuer.put(Principal.ORGANIZATION,       pi.getAttribute(Principal.ORGANIZATION));
-      issuer.put(Principal.ORGANIZATIONAL_UNIT,pi.getAttribute(Principal.ORGANIZATIONAL_UNIT));
-      issuer.put(Principal.STATE,              pi.getAttribute(Principal.STATE));
-      data.put("issuer",issuer);
-
-      Map certprops = new HashMap();
-      certprops.put("serial", certs[i].getSerialNumber().toString());
-      certprops.put("md5", cert.getMD5Fingerprint());
-      certprops.put("sha1",cert.getSHA1Fingerprint());
-      data.put("cert",certprops);
-
-      list.add(data);
-    }
-    return list;
-  }
-
 }
 
 
 /**********************************************************************
  * $Log: Certificate.java,v $
+ * Revision 1.7  2010/11/02 00:56:31  willuhn
+ * @N Umstellung des Webfrontends auf Velocity/Webtools
+ *
  * Revision 1.6  2010/05/12 10:59:20  willuhn
  * @N Automatische Dokumentations-Seite fuer die REST-Beans basierend auf der Annotation "Doc"
  *
@@ -130,14 +168,4 @@ public class Certificate implements AutoRestBean
  *
  * Revision 1.4  2010/03/18 09:29:35  willuhn
  * @N Wenn REST-Beans Rueckgabe-Werte liefern, werrden sie automatisch als toString() in den Response-Writer geschrieben
- *
- * Revision 1.3  2009/08/05 09:03:40  willuhn
- * @C Annotations in eigenes Package verschoben (sind nicht mehr REST-spezifisch)
- *
- * Revision 1.2  2008/11/11 23:59:22  willuhn
- * @N Dualer Aufruf (via JSON und Map/List)
- *
- * Revision 1.1  2008/11/06 23:36:43  willuhn
- * @N REST-Bean fuer Anzeige der installierten Zertifikate
- *
  **********************************************************************/
