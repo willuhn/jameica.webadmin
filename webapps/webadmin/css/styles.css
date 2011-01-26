@@ -50,6 +50,16 @@ h2 {
   margin-top               : 10px;
 }
 
+h3 {
+  color                    : #000000;
+  border-left              : 1px solid #d76B00;
+  background               : #f9f9f9;
+  padding-left             : 10px;
+  font-weight              : normal;
+  font-size                : 8.5pt;
+  margin-top               : 5px;
+}
+
 pre {
   font-family              : "DejaVu Sans Mono", "BitStream Vera Sans Mono", "Terminal [DEC]", "Courier New", "Courier";
   font-size                : 8.0pt;
@@ -81,6 +91,10 @@ a:focus {
   text-decoration          : none;
 }
 
+a.external,a:link.external, a:visited.external,a:active.external,a:focus.external {
+  padding-right            : 13px;
+  background               : url('/webadmin/img/external.png') center right no-repeat;
+}
 
 table.data {
   width                    : 100%;
