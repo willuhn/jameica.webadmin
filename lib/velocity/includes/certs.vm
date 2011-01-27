@@ -1,3 +1,12 @@
+<script type="text/javascript">
+  function doUpload()
+  {
+    if (!document.form_upload.elements.filename.value)
+      return;
+    document.form_upload.submit();
+  }
+</script>
+
 <h2>Installierte Zertifikate</h2>
 <table class="data">
   <tr>
@@ -17,4 +26,13 @@
       </tr>
     #end
   #end
+  <tr>
+    <td colspan="3" class="footer">
+      <form method="post" action="cert.html" name="form_upload" enctype="multipart/form-data" style="margin:0px">
+        neues Zertifikat importieren
+        <input type="hidden" name="action" value="upload">
+        <input type="file" name="filename" onchange="javascript:doUpload()" />
+      </form>
+    </td>
+  </tr>
 </table>
