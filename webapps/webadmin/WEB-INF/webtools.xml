@@ -18,7 +18,7 @@
   <!-- Die konkreten Pages -->
   <pages>
     <page pattern="^/rest.html"   template="rest.vm" />
-    <page pattern="^/cert.html"   template="cert.vm" />
+    <page pattern="^/cert.html"   template="cert.vm"   controller="de.willuhn.jameica.webadmin.rest.Certificate" action="upload" />
     <page pattern="^/plugin.html" template="plugin.vm" controller="de.willuhn.jameica.webadmin.rest.Plugin" />
     
     <!-- Default-Seite -->

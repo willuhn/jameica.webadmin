@@ -5,6 +5,14 @@
       return;
     document.form_upload.submit();
   }
+
+  function doDelete(v)
+  {
+    if (!window.confirm("Sicher?"))
+      return;
+
+    location.href="cert.html?action=delete&sha1=" + v;
+  }
 </script>
 
 <h2>Installierte Zertifikate</h2>
@@ -13,6 +21,7 @@
     <th>Ausgestellt für</th>
     <th>Ausgestellt von</th>
     <th>Gültigkeit</th>
+    <th style="width:10%">Aktion</th>
   </tr>
   #set($list = $certificate.list)
   #if($list.length() > 0)
@@ -23,14 +32,14 @@
         <td><a title="Klicken für Details" href="cert.html?cert=$line.cert.sha1">$line.subject.CN</a></td>
         <td>$line.issuer.CN</td>
         <td>$line.valid.from - $line.valid.to</td>
+        <td><a title="Zertifikat löschen" href="javascript:doDelete('$line.cert.sha1')"><img src="img/user-trash-full.png" width="16" height="16" border="0" style="margin-right: 5px">Löschen...</a></td>
       </tr>
     #end
   #end
   <tr>
-    <td colspan="3" class="footer">
+    <td colspan="4" class="footer">
       <form method="post" action="cert.html" name="form_upload" enctype="multipart/form-data" style="margin:0px">
         neues Zertifikat importieren
-        <input type="hidden" name="action" value="upload">
         <input type="file" name="filename" onchange="javascript:doUpload()" />
       </form>
     </td>

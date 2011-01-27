@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webtools/FrontController.java,v $
- * $Revision: 1.1 $
- * $Date: 2010/10/27 14:32:18 $
+ * $Revision: 1.2 $
+ * $Date: 2011/01/27 16:26:54 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -245,6 +245,11 @@ public class FrontController extends HttpServlet
             ctx.put("c",controller);
           }
 
+          // Der Controller hat das Reponse bereits erledigt. Dann brauchen wir
+          // das Template nicht mehr.
+          if (response.isCommitted())
+            return;
+          
           // Template ausfuehren
           Template template = engine.getTemplate(pc.getTemplate()); // TODO: Sollte hier ein Encoding angegeben sein?
           template.merge(ctx,response.getWriter());
@@ -268,7 +273,10 @@ public class FrontController extends HttpServlet
 
 /**********************************************************************
  * $Log: FrontController.java,v $
- * Revision 1.1  2010/10/27 14:32:18  willuhn
+ * Revision 1.2  2011/01/27 16:26:54  willuhn
+ * @N Importieren und Loeschen von SSL-Zertifikaten
+ *
+ * Revision 1.1  2010-10-27 14:32:18  willuhn
  * @R jameica.webtools ist jetzt Bestandteil von jameica.webadmin. Das separate webtools-Plugin ist nicht mehr noetig
  *
  * Revision 1.15  2010/03/04 13:20:43  willuhn
