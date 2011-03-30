@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webtools/BeanHandler.java,v $
- * $Revision: 1.1 $
- * $Date: 2010/10/27 14:32:18 $
+ * $Revision: 1.2 $
+ * $Date: 2011/03/30 12:14:05 $
  * $Author: willuhn $
  *
  * Copyright (c) by willuhn - software & services
@@ -11,15 +11,14 @@
 
 package de.willuhn.jameica.webtools;
 
-import java.lang.reflect.Field;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import de.willuhn.annotation.Inject;
 import de.willuhn.datasource.BeanUtil;
 import de.willuhn.jameica.webadmin.annotation.Lifecycle;
 import de.willuhn.jameica.webadmin.annotation.Request;
@@ -117,19 +116,8 @@ public class BeanHandler
    */
   private static void injectContext(Object bean, RequestConfig config) throws Exception
   {
-    List<Field> fields = BeanUtil.getAnnotatedFields(bean,Request.class, Response.class);
-    for (Field f:fields)
-    {
-      Object value = null;
-      if (f.getAnnotation(Request.class) != null)       value = config.getRequest();
-      else if (f.getAnnotation(Response.class) != null) value = config.getResponse();
-
-      if (value == null)
-        continue;
-
-      f.setAccessible(true);
-      f.set(bean,value);
-    }
+    Inject.inject(bean,Request.class,config.getRequest());
+    Inject.inject(bean,Response.class,config.getResponse());
   }
   
   /**
@@ -166,7 +154,10 @@ public class BeanHandler
 
 /**********************************************************************
  * $Log: BeanHandler.java,v $
- * Revision 1.1  2010/10/27 14:32:18  willuhn
+ * Revision 1.2  2011/03/30 12:14:05  willuhn
+ * @N Neuer Injector fuer DI
+ *
+ * Revision 1.1  2010-10-27 14:32:18  willuhn
  * @R jameica.webtools ist jetzt Bestandteil von jameica.webadmin. Das separate webtools-Plugin ist nicht mehr noetig
  *
  * Revision 1.2  2010/03/04 13:20:43  willuhn

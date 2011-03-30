@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/server/RestServiceImpl.java,v $
- * $Revision: 1.27 $
- * $Date: 2010/05/18 10:43:20 $
+ * $Revision: 1.28 $
+ * $Date: 2011/03/30 12:14:05 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -14,7 +14,6 @@
 package de.willuhn.jameica.webadmin.server;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.rmi.RemoteException;
@@ -34,7 +33,7 @@ import javax.servlet.http.HttpSession;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import de.willuhn.datasource.BeanUtil;
+import de.willuhn.annotation.Inject;
 import de.willuhn.jameica.messaging.Message;
 import de.willuhn.jameica.messaging.MessageConsumer;
 import de.willuhn.jameica.messaging.QueryMessage;
@@ -338,26 +337,15 @@ public class RestServiceImpl implements RestService
    */
   private void applyAnnotations(Object bean, HttpServletRequest request, HttpServletResponse response) throws Exception
   {
-    List<Field> fields = BeanUtil.getAnnotatedFields(bean, Request.class,Response.class);
-    for (Field f:fields)
+    try
     {
-      Object value = null;
-      if (f.getAnnotation(Request.class) != null)       value = request;
-      else if (f.getAnnotation(Response.class) != null) value = response;
-      
-      if (value == null)
-        continue;
-      
-      try
-      {
-        f.setAccessible(true);
-        f.set(bean,value);
-      }
-      catch (Exception e)
-      {
-        Logger.error("unable to inject context",e);
-        throw new IOException("unable to inject context");
-      }
+      Inject.inject(bean,Request.class,request);
+      Inject.inject(bean,Response.class,response);
+    }
+    catch (Exception e)
+    {
+      Logger.error("unable to inject context",e);
+      throw new IOException("unable to inject context");
     }
   }
 
@@ -496,6 +484,9 @@ public class RestServiceImpl implements RestService
 
 /*********************************************************************
  * $Log: RestServiceImpl.java,v $
+ * Revision 1.28  2011/03/30 12:14:05  willuhn
+ * @N Neuer Injector fuer DI
+ *
  * Revision 1.27  2010/05/18 10:43:20  willuhn
  * @N Lesbarere Fehlermeldungen
  *
