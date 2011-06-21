@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Application.java,v $
- * $Revision: 1.10 $
- * $Date: 2010/11/02 00:56:31 $
+ * $Revision: 1.11 $
+ * $Date: 2011/06/21 10:03:29 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -223,9 +223,9 @@ public class Application implements AutoRestBean
   {
     StatusBarMessage m = StatusBarMessageConsumer.getLastMessage();
     Map map = new HashMap();
-    map.put("title",m.getTitle());
-    map.put("text",m.getText());
-    map.put("type",m.getType());
+    map.put("title",m != null ? m.getTitle() : "");
+    map.put("text",m != null ? m.getText() : "");
+    map.put("type",m != null ? m.getType() : "");
 
     return new JSONObject(map);
   }
@@ -234,7 +234,11 @@ public class Application implements AutoRestBean
 
 /*********************************************************************
  * $Log: Application.java,v $
- * Revision 1.10  2010/11/02 00:56:31  willuhn
+ * Revision 1.11  2011/06/21 10:03:29  willuhn
+ * @B Beim Klick auf "Zertifikats-Details" wurde u.U. eine NPE angezeigt
+ * @N Download von Zertifikaten
+ *
+ * Revision 1.10  2010-11-02 00:56:31  willuhn
  * @N Umstellung des Webfrontends auf Velocity/Webtools
  *
  * Revision 1.9  2010/05/12 10:59:20  willuhn

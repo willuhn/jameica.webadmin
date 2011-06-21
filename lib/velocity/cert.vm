@@ -1,6 +1,20 @@
 #parse("includes/header.vm")
 #set($cert = $certificate.getDetails($request.getParameter("cert")))
 
+<script type="text/javascript">
+  function doDelete(v)
+  {
+    if (!window.confirm("Sicher?"))
+      return;
+
+    location.href="cert.html?action=delete&sha1=" + v;
+  }
+  function doDownload(v)
+  {
+    location.href="cert.html?action=download&sha1=" + v;
+  }
+</script>
+
 <div id="breadcrumbs">
   <a href="/webadmin/">Home</a>
   &raquo;
@@ -57,6 +71,12 @@
         <tr><td>SHA1</td><td>$cert.cert.sha1</td></tr>
         <tr><td>MD5</td><td>$cert.cert.md5</td></tr>
       </table>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" class="footer">
+      <a title="Zertifikat löschen" href="javascript:doDelete('$cert.cert.sha1')"><img src="img/user-trash-full.png" width="16" height="16" border="0" style="margin-right: 5px">Löschen...</a>
+      <a title="Zertifikat herunterladen" href="javascript:doDownload('$cert.cert.sha1')"><img src="img/document-save.png" width="16" height="16" border="0" style="margin-right: 5px">Speichern...</a>
     </td>
   </tr>
 </table>

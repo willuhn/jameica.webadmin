@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Certificate.java,v $
- * $Revision: 1.8 $
- * $Date: 2011/01/27 16:26:54 $
+ * $Revision: 1.9 $
+ * $Date: 2011/06/21 10:03:29 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -15,6 +15,7 @@ package de.willuhn.jameica.webadmin.rest;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.security.cert.X509Certificate;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -63,6 +64,7 @@ public class Certificate implements AutoRestBean
   /**
    * Liefert die Details des angegebenen Zertifikates.
    * Die Funktion erwartet als Parameter den SHA1-Hash des Zertifikates.
+   * @param sha1 der SHA1-Fingerprint des Zertifikates.
    * @return die Details des angegebenen Zertifikates.
    * @throws IOException
    */
@@ -71,62 +73,82 @@ public class Certificate implements AutoRestBean
   @Path("/certs/get/(.*)$")
   public JSONObject getDetails(String sha1) throws IOException
   {
+    X509Certificate c = getCertificate(sha1);
+    de.willuhn.jameica.security.Certificate cert = new de.willuhn.jameica.security.Certificate(c);
+    
+    try
+    {
+      Map all = new HashMap();
+  
+      {
+        Map map = new HashMap();
+        DateFormat DATEFORMAT = new SimpleDateFormat("dd.MM.yyyy");
+        map.put("from",DATEFORMAT.format(c.getNotBefore()));
+        map.put("to",  DATEFORMAT.format(c.getNotAfter()));
+        all.put("valid",map);
+      }
+      
+      {
+        Map map = new HashMap();
+        Principal ps = cert.getSubject();
+        map.put(Principal.COMMON_NAME,        StringUtils.trimToEmpty(ps.getAttribute(Principal.COMMON_NAME)));
+        map.put(Principal.COUNTRY,            StringUtils.trimToEmpty(ps.getAttribute(Principal.COUNTRY)));
+        map.put(Principal.DISTINGUISHED_NAME, StringUtils.trimToEmpty(ps.getAttribute(Principal.DISTINGUISHED_NAME)));
+        map.put(Principal.LOCALITY,           StringUtils.trimToEmpty(ps.getAttribute(Principal.LOCALITY)));
+        map.put(Principal.ORGANIZATION,       StringUtils.trimToEmpty(ps.getAttribute(Principal.ORGANIZATION)));
+        map.put(Principal.ORGANIZATIONAL_UNIT,StringUtils.trimToEmpty(ps.getAttribute(Principal.ORGANIZATIONAL_UNIT)));
+        map.put(Principal.STATE,              StringUtils.trimToEmpty(ps.getAttribute(Principal.STATE)));
+        all.put("subject",map);
+      }
+  
+      {
+        Map map = new HashMap();
+        Principal pi = cert.getIssuer();
+        map.put(Principal.COMMON_NAME,        StringUtils.trimToEmpty(pi.getAttribute(Principal.COMMON_NAME)));
+        map.put(Principal.COUNTRY,            StringUtils.trimToEmpty(pi.getAttribute(Principal.COUNTRY)));
+        map.put(Principal.DISTINGUISHED_NAME, StringUtils.trimToEmpty(pi.getAttribute(Principal.DISTINGUISHED_NAME)));
+        map.put(Principal.LOCALITY,           StringUtils.trimToEmpty(pi.getAttribute(Principal.LOCALITY)));
+        map.put(Principal.ORGANIZATION,       StringUtils.trimToEmpty(pi.getAttribute(Principal.ORGANIZATION)));
+        map.put(Principal.ORGANIZATIONAL_UNIT,StringUtils.trimToEmpty(pi.getAttribute(Principal.ORGANIZATIONAL_UNIT)));
+        map.put(Principal.STATE,              StringUtils.trimToEmpty(pi.getAttribute(Principal.STATE)));
+        all.put("issuer",map);
+      }
+  
+      {
+        Map map = new HashMap();
+        map.put("serial", c.getSerialNumber().toString());
+        map.put("md5", cert.getMD5Fingerprint());
+        map.put("sha1",cert.getSHA1Fingerprint());
+        all.put("cert",map);
+      }
+      return new JSONObject(all);
+    }
+    catch (Exception e)
+    {
+      Logger.error("unable to load certificate " + sha1,e);
+      throw new IOException("unable to load certificate " + sha1);
+    }
+  }
+  
+  /**
+   * Liefert das Zertifikate mit dem genannten Fingerprint.
+   * @param sha1 der Fingerprint.
+   * @return das Zertifikate.
+   * @throws IOException
+   */
+  private X509Certificate getCertificate(String sha1) throws IOException
+  {
     if (sha1 == null || sha1.length() == 0)
       throw new IOException("no sha1 hash given");
-    
+
     try
     {
       X509Certificate[] certs = Application.getSSLFactory().getTrustedCertificates();
       for (X509Certificate c:certs)
       {
         de.willuhn.jameica.security.Certificate cert = new de.willuhn.jameica.security.Certificate(c);
-        if (!cert.getSHA1Fingerprint().equals(sha1))
-          continue;
-
-        Map all = new HashMap();
-
-        {
-          Map map = new HashMap();
-          DateFormat DATEFORMAT = new SimpleDateFormat("dd.MM.yyyy");
-          map.put("from",DATEFORMAT.format(c.getNotBefore()));
-          map.put("to",  DATEFORMAT.format(c.getNotAfter()));
-          all.put("valid",map);
-        }
-        
-        {
-          Map map = new HashMap();
-          Principal ps = cert.getSubject();
-          map.put(Principal.COMMON_NAME,        StringUtils.trimToEmpty(ps.getAttribute(Principal.COMMON_NAME)));
-          map.put(Principal.COUNTRY,            StringUtils.trimToEmpty(ps.getAttribute(Principal.COUNTRY)));
-          map.put(Principal.DISTINGUISHED_NAME, StringUtils.trimToEmpty(ps.getAttribute(Principal.DISTINGUISHED_NAME)));
-          map.put(Principal.LOCALITY,           StringUtils.trimToEmpty(ps.getAttribute(Principal.LOCALITY)));
-          map.put(Principal.ORGANIZATION,       StringUtils.trimToEmpty(ps.getAttribute(Principal.ORGANIZATION)));
-          map.put(Principal.ORGANIZATIONAL_UNIT,StringUtils.trimToEmpty(ps.getAttribute(Principal.ORGANIZATIONAL_UNIT)));
-          map.put(Principal.STATE,              StringUtils.trimToEmpty(ps.getAttribute(Principal.STATE)));
-          all.put("subject",map);
-        }
-
-        {
-          Map map = new HashMap();
-          Principal pi = cert.getIssuer();
-          map.put(Principal.COMMON_NAME,        StringUtils.trimToEmpty(pi.getAttribute(Principal.COMMON_NAME)));
-          map.put(Principal.COUNTRY,            StringUtils.trimToEmpty(pi.getAttribute(Principal.COUNTRY)));
-          map.put(Principal.DISTINGUISHED_NAME, StringUtils.trimToEmpty(pi.getAttribute(Principal.DISTINGUISHED_NAME)));
-          map.put(Principal.LOCALITY,           StringUtils.trimToEmpty(pi.getAttribute(Principal.LOCALITY)));
-          map.put(Principal.ORGANIZATION,       StringUtils.trimToEmpty(pi.getAttribute(Principal.ORGANIZATION)));
-          map.put(Principal.ORGANIZATIONAL_UNIT,StringUtils.trimToEmpty(pi.getAttribute(Principal.ORGANIZATIONAL_UNIT)));
-          map.put(Principal.STATE,              StringUtils.trimToEmpty(pi.getAttribute(Principal.STATE)));
-          all.put("issuer",map);
-        }
-
-        {
-          Map map = new HashMap();
-          map.put("serial", c.getSerialNumber().toString());
-          map.put("md5", cert.getMD5Fingerprint());
-          map.put("sha1",cert.getSHA1Fingerprint());
-          all.put("cert",map);
-        }
-        return new JSONObject(all);
+        if (cert.getSHA1Fingerprint().equals(sha1))
+          return c;
       }
       throw new IOException("certificate " + sha1 + " not found");
     }
@@ -234,33 +256,59 @@ public class Certificate implements AutoRestBean
   }
 
   /**
+   * Action zum Herunterladen eines Zertifikates.
+   * @throws IOException
+   */
+  public void download() throws IOException
+  {
+    String sha1 = request.getParameter("sha1");
+    X509Certificate c = getCertificate(sha1);
+    de.willuhn.jameica.security.Certificate cert = new de.willuhn.jameica.security.Certificate(c);
+
+    try
+    {
+      byte[] data = c.getEncoded();
+      response.setContentLength(data.length);
+      response.setContentType("application/octet-stream"); // application/x-x509-ca-cert // application/octet-stream
+      response.setHeader("Content-Disposition","attachment; filename=\"" + cert.getSubject().getAttribute(Principal.COMMON_NAME) + ".crt\"");
+      OutputStream os = response.getOutputStream();
+      os.write(data);
+      os.flush();
+      Application.getMessagingFactory().sendMessage(new StatusBarMessage(i18n.tr("Zertifikat heruntergeladen"),StatusBarMessage.TYPE_SUCCESS));
+    }
+    catch (IOException ioe)
+    {
+      throw ioe;
+    }
+    catch (Exception e)
+    {
+      Logger.error("unable to delete certificate " + sha1,e);
+      throw new IOException("unable to delete certificate " + sha1);
+    }
+  }
+
+  /**
    * Action zum Loeschen eines Zertifikates.
    * @throws IOException
    */
   public void delete() throws IOException
   {
     String sha1 = request.getParameter("sha1");
-    if (sha1 == null || sha1.length() == 0)
-      throw new IOException("no sha1 hash given");
+    X509Certificate c = getCertificate(sha1);
 
     try
     {
-      X509Certificate[] certs = Application.getSSLFactory().getTrustedCertificates();
-      for (X509Certificate c:certs)
-      {
-        de.willuhn.jameica.security.Certificate cert = new de.willuhn.jameica.security.Certificate(c);
-        if (!cert.getSHA1Fingerprint().equals(sha1))
-          continue;
-        Application.getSSLFactory().removeTrustedCertificate(c);
-        Application.getMessagingFactory().sendMessage(new StatusBarMessage(i18n.tr("Zertifikat gelöscht"),StatusBarMessage.TYPE_SUCCESS));
-        response.sendRedirect("/webadmin/"); // Zurueck zur Startseite
-        return;
-      }
-      throw new IOException("certificate " + sha1 + " not found");
+      Application.getSSLFactory().removeTrustedCertificate(c);
+      Application.getMessagingFactory().sendMessage(new StatusBarMessage(i18n.tr("Zertifikat gelöscht"),StatusBarMessage.TYPE_SUCCESS));
+      response.sendRedirect("/webadmin/"); // Zurueck zur Startseite
     }
     catch (ApplicationException ae)
     {
       throw new IOException(ae.getMessage());
+    }
+    catch (IOException ioe)
+    {
+      throw ioe;
     }
     catch (Exception e)
     {
@@ -273,7 +321,11 @@ public class Certificate implements AutoRestBean
 
 /**********************************************************************
  * $Log: Certificate.java,v $
- * Revision 1.8  2011/01/27 16:26:54  willuhn
+ * Revision 1.9  2011/06/21 10:03:29  willuhn
+ * @B Beim Klick auf "Zertifikats-Details" wurde u.U. eine NPE angezeigt
+ * @N Download von Zertifikaten
+ *
+ * Revision 1.8  2011-01-27 16:26:54  willuhn
  * @N Importieren und Loeschen von SSL-Zertifikaten
  *
  * Revision 1.7  2010-11-02 00:56:31  willuhn

@@ -13,6 +13,10 @@
 
     location.href="cert.html?action=delete&sha1=" + v;
   }
+  function doDownload(v)
+  {
+    location.href="cert.html?action=download&sha1=" + v;
+  }
 </script>
 
 <h2>Installierte Zertifikate</h2>
@@ -32,7 +36,10 @@
         <td><a title="Klicken für Details" href="cert.html?cert=$line.cert.sha1">$line.subject.CN</a></td>
         <td>$line.issuer.CN</td>
         <td>$line.valid.from - $line.valid.to</td>
-        <td><a title="Zertifikat löschen" href="javascript:doDelete('$line.cert.sha1')"><img src="img/user-trash-full.png" width="16" height="16" border="0" style="margin-right: 5px">Löschen...</a></td>
+        <td>
+          <a title="Zertifikat löschen" href="javascript:doDelete('$line.cert.sha1')"><img src="img/user-trash-full.png" width="16" height="16" border="0" style="margin-right: 5px">Löschen...</a>
+          <a title="Zertifikat herunterladen" href="javascript:doDownload('$line.cert.sha1')"><img src="img/document-save.png" width="16" height="16" border="0" style="margin-right: 5px">Speichern...</a>
+        </td>
       </tr>
     #end
   #end
