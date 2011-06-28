@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/server/RestServiceImpl.java,v $
- * $Revision: 1.28 $
- * $Date: 2011/03/30 12:14:05 $
+ * $Revision: 1.29 $
+ * $Date: 2011/06/28 09:56:25 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -34,12 +34,12 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import de.willuhn.annotation.Inject;
+import de.willuhn.annotation.Lifecycle;
 import de.willuhn.jameica.messaging.Message;
 import de.willuhn.jameica.messaging.MessageConsumer;
 import de.willuhn.jameica.messaging.QueryMessage;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.jameica.webadmin.annotation.Doc;
-import de.willuhn.jameica.webadmin.annotation.Lifecycle;
 import de.willuhn.jameica.webadmin.annotation.Path;
 import de.willuhn.jameica.webadmin.annotation.Request;
 import de.willuhn.jameica.webadmin.annotation.Response;
@@ -484,7 +484,10 @@ public class RestServiceImpl implements RestService
 
 /*********************************************************************
  * $Log: RestServiceImpl.java,v $
- * Revision 1.28  2011/03/30 12:14:05  willuhn
+ * Revision 1.29  2011/06/28 09:56:25  willuhn
+ * @N Lifecycle-Annotation aus jameica.webadmin in util verschoben
+ *
+ * Revision 1.28  2011-03-30 12:14:05  willuhn
  * @N Neuer Injector fuer DI
  *
  * Revision 1.27  2010/05/18 10:43:20  willuhn

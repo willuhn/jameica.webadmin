@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webtools/BeanHandler.java,v $
- * $Revision: 1.2 $
- * $Date: 2011/03/30 12:14:05 $
+ * $Revision: 1.3 $
+ * $Date: 2011/06/28 09:56:26 $
  * $Author: willuhn $
  *
  * Copyright (c) by willuhn - software & services
@@ -19,8 +19,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import de.willuhn.annotation.Inject;
+import de.willuhn.annotation.Lifecycle;
 import de.willuhn.datasource.BeanUtil;
-import de.willuhn.jameica.webadmin.annotation.Lifecycle;
 import de.willuhn.jameica.webadmin.annotation.Request;
 import de.willuhn.jameica.webadmin.annotation.Response;
 import de.willuhn.logging.Logger;
@@ -154,7 +154,10 @@ public class BeanHandler
 
 /**********************************************************************
  * $Log: BeanHandler.java,v $
- * Revision 1.2  2011/03/30 12:14:05  willuhn
+ * Revision 1.3  2011/06/28 09:56:26  willuhn
+ * @N Lifecycle-Annotation aus jameica.webadmin in util verschoben
+ *
+ * Revision 1.2  2011-03-30 12:14:05  willuhn
  * @N Neuer Injector fuer DI
  *
  * Revision 1.1  2010-10-27 14:32:18  willuhn
