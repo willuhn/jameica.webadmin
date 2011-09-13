@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Plugin.java,v $
- * $Revision: 1.15 $
- * $Date: 2010/11/02 00:56:30 $
+ * $Revision: 1.16 $
+ * $Date: 2011/09/13 09:08:31 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -114,6 +114,7 @@ public class Plugin implements AutoRestBean
 
   /**
    * Liefert die Details des angegebenen Plugins.
+   * @param plugin der Name des Plugins.
    * @return die Details des angegebenen Plugins.
    * @throws IOException
    */
@@ -182,7 +183,10 @@ public class Plugin implements AutoRestBean
 
 /**********************************************************************
  * $Log: Plugin.java,v $
- * Revision 1.15  2010/11/02 00:56:30  willuhn
+ * Revision 1.16  2011/09/13 09:08:31  willuhn
+ * @C Code-Cleanup
+ *
+ * Revision 1.15  2010-11-02 00:56:30  willuhn
  * @N Umstellung des Webfrontends auf Velocity/Webtools
  *
  * Revision 1.14  2010/05/12 10:59:20  willuhn
