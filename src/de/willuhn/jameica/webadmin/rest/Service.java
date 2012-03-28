@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Service.java,v $
- * $Revision: 1.13 $
- * $Date: 2010/11/02 00:56:31 $
+ * $Revision: 1.14 $
+ * $Date: 2012/03/28 22:28:21 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -23,7 +23,6 @@ import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import de.willuhn.jameica.plugin.AbstractPlugin;
 import de.willuhn.jameica.plugin.Manifest;
 import de.willuhn.jameica.plugin.ServiceDescriptor;
 import de.willuhn.jameica.system.Application;
@@ -180,7 +179,7 @@ public class Service implements AutoRestBean
     if (mf == null)
       throw new IOException("plugin " + plugin + " not found");
 
-    AbstractPlugin p = Application.getPluginLoader().getPlugin(mf.getPluginClass());
+    de.willuhn.jameica.plugin.Plugin p = Application.getPluginLoader().getPlugin(mf.getPluginClass());
     de.willuhn.datasource.Service s = Application.getServiceFactory().lookup(p.getClass(),service);
     if (s == null)
       throw new IOException("service " + service + " not found in plugin " + plugin);
@@ -192,7 +191,11 @@ public class Service implements AutoRestBean
 
 /*********************************************************************
  * $Log: Service.java,v $
- * Revision 1.13  2010/11/02 00:56:31  willuhn
+ * Revision 1.14  2012/03/28 22:28:21  willuhn
+ * @N Einfuehrung eines neuen Interfaces "Plugin", welches von "AbstractPlugin" implementiert wird. Es dient dazu, kuenftig auch Jameica-Plugins zu unterstuetzen, die selbst gar keinen eigenen Java-Code mitbringen sondern nur ein Manifest ("plugin.xml") und z.Bsp. Jars oder JS-Dateien. Plugin-Autoren muessen lediglich darauf achten, dass die Jameica-Funktionen, die bisher ein Object vom Typ "AbstractPlugin" zuruecklieferten, jetzt eines vom Typ "Plugin" liefern.
+ * @C "getClassloader()" verschoben von "plugin.getRessources().getClassloader()" zu "manifest.getClassloader()" - der Zugriffsweg ist kuerzer. Die alte Variante existiert weiterhin, ist jedoch als deprecated markiert.
+ *
+ * Revision 1.13  2010-11-02 00:56:31  willuhn
  * @N Umstellung des Webfrontends auf Velocity/Webtools
  *
  * Revision 1.12  2010/05/12 10:59:20  willuhn

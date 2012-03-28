@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webtools/FrontController.java,v $
- * $Revision: 1.2 $
- * $Date: 2011/01/27 16:26:54 $
+ * $Revision: 1.3 $
+ * $Date: 2012/03/28 22:28:21 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -37,7 +37,6 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 
 import de.willuhn.datasource.BeanUtil;
-import de.willuhn.jameica.plugin.AbstractPlugin;
 import de.willuhn.jameica.plugin.Manifest;
 import de.willuhn.jameica.services.VelocityService;
 import de.willuhn.jameica.system.Application;
@@ -71,10 +70,9 @@ public class FrontController extends HttpServlet
       Logger.info("trying to determine classloader for plugin " + plugin);
       try
       {
-        AbstractPlugin p = Application.getPluginLoader().getPlugin(plugin);
-        Manifest mf = p.getManifest();
+        Manifest mf = Application.getPluginLoader().getManifest(plugin);
         Logger.info("found plugin (" + mf.getName() + " " + mf.getVersion() + ") - using its classloader");
-        this.loader = p.getResources().getClassLoader();
+        this.loader = mf.getClassLoader();
       }
       catch (Exception e)
       {
@@ -273,7 +271,11 @@ public class FrontController extends HttpServlet
 
 /**********************************************************************
  * $Log: FrontController.java,v $
- * Revision 1.2  2011/01/27 16:26:54  willuhn
+ * Revision 1.3  2012/03/28 22:28:21  willuhn
+ * @N Einfuehrung eines neuen Interfaces "Plugin", welches von "AbstractPlugin" implementiert wird. Es dient dazu, kuenftig auch Jameica-Plugins zu unterstuetzen, die selbst gar keinen eigenen Java-Code mitbringen sondern nur ein Manifest ("plugin.xml") und z.Bsp. Jars oder JS-Dateien. Plugin-Autoren muessen lediglich darauf achten, dass die Jameica-Funktionen, die bisher ein Object vom Typ "AbstractPlugin" zuruecklieferten, jetzt eines vom Typ "Plugin" liefern.
+ * @C "getClassloader()" verschoben von "plugin.getRessources().getClassloader()" zu "manifest.getClassloader()" - der Zugriffsweg ist kuerzer. Die alte Variante existiert weiterhin, ist jedoch als deprecated markiert.
+ *
+ * Revision 1.2  2011-01-27 16:26:54  willuhn
  * @N Importieren und Loeschen von SSL-Zertifikaten
  *
  * Revision 1.1  2010-10-27 14:32:18  willuhn

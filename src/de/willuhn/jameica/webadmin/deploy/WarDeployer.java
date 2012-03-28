@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/deploy/WarDeployer.java,v $
- * $Revision: 1.8 $
- * $Date: 2009/09/24 12:04:06 $
+ * $Revision: 1.9 $
+ * $Date: 2012/03/28 22:28:21 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -98,7 +98,7 @@ public class WarDeployer implements Deployer
 
         // Classloader explizit angeben. Sonst verwendet Jetty den System-Classloader, der nichts kennt
         if (c.plugin != null)
-          ctx.setClassLoader(c.plugin.getResources().getClassLoader());
+          ctx.setClassLoader(c.plugin.getManifest().getClassLoader());
 
         handlers.add(ctx);
       }
@@ -135,6 +135,10 @@ public class WarDeployer implements Deployer
 
 /*********************************************************************
  * $Log: WarDeployer.java,v $
+ * Revision 1.9  2012/03/28 22:28:21  willuhn
+ * @N Einfuehrung eines neuen Interfaces "Plugin", welches von "AbstractPlugin" implementiert wird. Es dient dazu, kuenftig auch Jameica-Plugins zu unterstuetzen, die selbst gar keinen eigenen Java-Code mitbringen sondern nur ein Manifest ("plugin.xml") und z.Bsp. Jars oder JS-Dateien. Plugin-Autoren muessen lediglich darauf achten, dass die Jameica-Funktionen, die bisher ein Object vom Typ "AbstractPlugin" zuruecklieferten, jetzt eines vom Typ "Plugin" liefern.
+ * @C "getClassloader()" verschoben von "plugin.getRessources().getClassloader()" zu "manifest.getClassloader()" - der Zugriffsweg ist kuerzer. Die alte Variante existiert weiterhin, ist jedoch als deprecated markiert.
+ *
  * Revision 1.8  2009/09/24 12:04:06  willuhn
  * @N Deployer, um auch externe Web-Anwendungen deployen zu koennen
  *
