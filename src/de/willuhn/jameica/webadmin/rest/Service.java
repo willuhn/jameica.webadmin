@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/rest/Service.java,v $
- * $Revision: 1.14 $
- * $Date: 2012/03/28 22:28:21 $
+ * $Revision: 1.15 $
+ * $Date: 2012/03/29 20:54:40 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -179,8 +179,7 @@ public class Service implements AutoRestBean
     if (mf == null)
       throw new IOException("plugin " + plugin + " not found");
 
-    de.willuhn.jameica.plugin.Plugin p = Application.getPluginLoader().getPlugin(mf.getPluginClass());
-    de.willuhn.datasource.Service s = Application.getServiceFactory().lookup(p.getClass(),service);
+    de.willuhn.datasource.Service s = Application.getServiceFactory().lookup(Application.getPluginLoader().getPlugin(mf.getPluginClass()).getClass(),service);
     if (s == null)
       throw new IOException("service " + service + " not found in plugin " + plugin);
 
@@ -191,6 +190,9 @@ public class Service implements AutoRestBean
 
 /*********************************************************************
  * $Log: Service.java,v $
+ * Revision 1.15  2012/03/29 20:54:40  willuhn
+ * @C Kompatibilitaet zu Jameica 2.2 wieder hergestellt
+ *
  * Revision 1.14  2012/03/28 22:28:21  willuhn
  * @N Einfuehrung eines neuen Interfaces "Plugin", welches von "AbstractPlugin" implementiert wird. Es dient dazu, kuenftig auch Jameica-Plugins zu unterstuetzen, die selbst gar keinen eigenen Java-Code mitbringen sondern nur ein Manifest ("plugin.xml") und z.Bsp. Jars oder JS-Dateien. Plugin-Autoren muessen lediglich darauf achten, dass die Jameica-Funktionen, die bisher ein Object vom Typ "AbstractPlugin" zuruecklieferten, jetzt eines vom Typ "Plugin" liefern.
  * @C "getClassloader()" verschoben von "plugin.getRessources().getClassloader()" zu "manifest.getClassloader()" - der Zugriffsweg ist kuerzer. Die alte Variante existiert weiterhin, ist jedoch als deprecated markiert.
