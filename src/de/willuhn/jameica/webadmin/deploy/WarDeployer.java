@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/deploy/WarDeployer.java,v $
- * $Revision: 1.10 $
- * $Date: 2012/03/29 20:54:40 $
+ * $Revision: 1.11 $
+ * $Date: 2012/03/29 21:11:30 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -98,7 +98,7 @@ public class WarDeployer implements Deployer
 
         // Classloader explizit angeben. Sonst verwendet Jetty den System-Classloader, der nichts kennt
         if (c.plugin != null)
-          ctx.setClassLoader(c.plugin.getResources().getClassLoader()); // COMPAT zu Jameica 2.2
+          ctx.setClassLoader(c.plugin.getManifest().getClassLoader());
 
         handlers.add(ctx);
       }
@@ -135,6 +135,9 @@ public class WarDeployer implements Deployer
 
 /*********************************************************************
  * $Log: WarDeployer.java,v $
+ * Revision 1.11  2012/03/29 21:11:30  willuhn
+ * @C Kompatibilitaet zu Jameica 2.2 leider doch nicht moeglich
+ *
  * Revision 1.10  2012/03/29 20:54:40  willuhn
  * @C Kompatibilitaet zu Jameica 2.2 wieder hergestellt
  *

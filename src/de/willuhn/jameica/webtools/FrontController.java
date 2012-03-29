@@ -1,7 +1,7 @@
 /**********************************************************************
  * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webtools/FrontController.java,v $
- * $Revision: 1.4 $
- * $Date: 2012/03/29 20:54:40 $
+ * $Revision: 1.5 $
+ * $Date: 2012/03/29 21:11:30 $
  * $Author: willuhn $
  * $Locker:  $
  * $State: Exp $
@@ -72,7 +72,7 @@ public class FrontController extends HttpServlet
       {
         Manifest mf = Application.getPluginLoader().getManifest(plugin);
         Logger.info("found plugin (" + mf.getName() + " " + mf.getVersion() + ") - using its classloader");
-        this.loader = Application.getPluginLoader().getPlugin(plugin).getResources().getClassLoader(); // COMPAT zu Jameica 2.2
+        this.loader = mf.getClassLoader();
       }
       catch (Exception e)
       {
@@ -271,6 +271,9 @@ public class FrontController extends HttpServlet
 
 /**********************************************************************
  * $Log: FrontController.java,v $
+ * Revision 1.5  2012/03/29 21:11:30  willuhn
+ * @C Kompatibilitaet zu Jameica 2.2 leider doch nicht moeglich
+ *
  * Revision 1.4  2012/03/29 20:54:40  willuhn
  * @C Kompatibilitaet zu Jameica 2.2 wieder hergestellt
  *
