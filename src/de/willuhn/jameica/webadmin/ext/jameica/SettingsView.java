@@ -343,8 +343,6 @@ public class SettingsView implements Extension
       boolean s = ((Boolean) getUseSSL().getValue()).booleanValue();
       if (a && !s)
         GUI.getView().setErrorText(i18n.tr("Benutzerauthentifizierung sollte nur zusammen mit Verschlüsselung aktiviert werden"));
-      else
-        GUI.getView().setSuccessText("");
     }
   }
 }
