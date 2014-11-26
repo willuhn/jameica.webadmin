@@ -68,8 +68,8 @@
     <td>Fingerabdruck</td>
     <td>
       <table>
-        <tr><td>SHA1</td><td>$cert.cert.sha1</td></tr>
-        <tr><td>MD5</td><td>$cert.cert.md5</td></tr>
+        <tr><td>SHA-1</td><td>$cert.cert.sha1</td></tr>
+        <tr><td>SHA-256</td><td>$cert.cert.sha256</td></tr>
       </table>
     </td>
   </tr>

@@ -117,8 +117,8 @@ public class Certificate implements AutoRestBean
       {
         Map map = new HashMap();
         map.put("serial", c.getSerialNumber().toString());
-        map.put("md5", cert.getMD5Fingerprint());
-        map.put("sha1",cert.getSHA1Fingerprint());
+        map.put("sha1",   cert.getSHA1Fingerprint());
+        map.put("sha256", cert.getSHA256Fingerprint());
         all.put("cert",map);
       }
       return new JSONObject(all);

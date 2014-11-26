@@ -23,7 +23,7 @@
 <table class="data">
   <tr>
     <th>Ausgestellt für</th>
-    <th>Ausgestellt von</th>
+    <th style="width:50%">Ausgestellt von</th>
     <th>Gültigkeit</th>
     <th style="width:10%">Aktion</th>
   </tr>
@@ -36,7 +36,7 @@
         <td><a title="Klicken für Details" href="cert.html?cert=$line.cert.sha1">$line.subject.CN</a></td>
         <td>$line.issuer.CN</td>
         <td>$line.valid.from - $line.valid.to</td>
-        <td>
+        <td style="white-space:nowrap">
           <a title="Zertifikat löschen" href="javascript:doDelete('$line.cert.sha1')"><img src="img/user-trash-full.png" width="16" height="16" border="0" style="margin-right: 5px">Löschen...</a>
           <a title="Zertifikat herunterladen" href="javascript:doDownload('$line.cert.sha1')"><img src="img/document-save.png" width="16" height="16" border="0" style="margin-right: 5px">Speichern...</a>
         </td>
