@@ -1,12 +1,6 @@
 /**********************************************************************
- * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/ext/jameica/SettingsView.java,v $
- * $Revision: 1.2 $
- * $Date: 2008/04/04 00:16:58 $
- * $Author: willuhn $
- * $Locker:  $
- * $State: Exp $
  *
- * Copyright (c) by willuhn.webdesign
+ * Copyright (c) by Olaf Willuhn
  * All rights reserved
  *
  **********************************************************************/
@@ -231,7 +225,8 @@ public class SettingsView implements Extension
         {
           InetAddress ia = (InetAddress) e2.nextElement();
           if (ia instanceof Inet6Address)
-            continue; // IPv6 ignorieren wir - nutzt ja eh keiner ;)
+            continue; // IPv6 ignorieren wir - das kann der Jetty nicht
+          
           l.add(new AddressObject(ia));
         }
       }
@@ -250,7 +245,7 @@ public class SettingsView implements Extension
   /**
    * Hilfsobjekt fuer die Adress-Auswahl.
    */
-  private class AddressObject implements GenericObject, Comparable
+  private class AddressObject implements GenericObject, Comparable<AddressObject>
   {
     private InetAddress ia = null;
     
@@ -318,13 +313,13 @@ public class SettingsView implements Extension
     /**
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
-    public int compareTo(Object o)
+    public int compareTo(AddressObject o)
     {
-      if (o == null)
+      if (o == null || o.ia == null)
         return -1;
       if (this.ia == null)
         return -1;
-      return this.ia.getHostAddress().compareTo(((AddressObject)o).ia.getHostAddress());
+      return this.ia.getHostAddress().compareTo(o.ia.getHostAddress());
     }
   }
 
@@ -346,13 +341,3 @@ public class SettingsView implements Extension
     }
   }
 }
-
-
-/*********************************************************************
- * $Log: SettingsView.java,v $
- * Revision 1.2  2008/04/04 00:16:58  willuhn
- * @N Apache XML-RPC von 3.0 auf 3.1 aktualisiert
- * @N jameica.xmlrpc ist jetzt von jameica.webadmin abhaengig
- * @N jameica.xmlrpc nutzt jetzt keinen eigenen embedded Webserver mehr sondern den Jetty von jameica.webadmin mittels Servlet. Damit kann nun XML-RPC ueber den gleichen TCP-Port (8080) gemacht werden, wo auch die restlichen Webfrontends laufen -> spart einen TCP-Port und skaliert besser wegen Multi-Threading-Support in Jetty
- *
- *********************************************************************/
