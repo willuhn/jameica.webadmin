@@ -13,6 +13,7 @@
 
 package de.willuhn.jameica.webadmin.server;
 
+import java.net.InetAddress;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Server;
+import org.mortbay.jetty.bio.SocketConnector;
 
 import de.willuhn.jameica.messaging.TextMessage;
 import de.willuhn.jameica.system.Application;
@@ -85,15 +87,24 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
   {
     if (this.isStarted())
     {
-      Logger.warn("service allready started, skipping request");
+      Logger.warn("service already started, skipping request");
       return;
     }
 
     this.server = new Server(Settings.getPort());
     this.server.setStopAtShutdown(false);
-    if (Settings.getUseSSL())
-      this.server.setConnectors(new Connector[]{new JameicaSocketConnector()});
     
+    SocketConnector conn = Settings.getUseSSL() ? new JameicaSocketConnector() : new SocketConnector();
+    conn.setPort(Settings.getPort());
+    
+    InetAddress bindAddress = Settings.getAddress();
+    if (bindAddress != null)
+    {
+      Logger.info("  bound to: " + bindAddress.getHostAddress());
+      conn.setHost(bindAddress.getHostAddress());
+    }
+    this.server.setConnectors(new Connector[]{conn});
+
     // Wir wollen keinen Default-Handler.
     // this.server.addHandler(new DefaultHandler());
 

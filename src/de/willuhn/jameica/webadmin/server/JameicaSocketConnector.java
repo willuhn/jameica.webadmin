@@ -30,8 +30,6 @@ import de.willuhn.logging.Logger;
  */
 public class JameicaSocketConnector extends SslSocketConnector
 {
-  private int port;
-  private InetAddress bindAddress = null;
   private boolean auth;
   
   /**
@@ -39,21 +37,9 @@ public class JameicaSocketConnector extends SslSocketConnector
    */
   public JameicaSocketConnector()
   {
-    this.port = Settings.getPort();
-    setPort(port);
-
-    this.bindAddress = Settings.getAddress();
-    if (this.bindAddress != null)
-    {
-      Logger.info("  bound to: " + this.bindAddress.getHostAddress());
-      setHost(this.bindAddress.getHostAddress());
-    }
-    
     this.auth = Settings.getUseAuth();
-      Logger.info("  auth enabled: " + auth);
-
+    Logger.info("  auth enabled: " + auth);
     Logger.info("  ssl enabled : true");
-
   }
 
   /**
@@ -79,13 +65,11 @@ public class JameicaSocketConnector extends SslSocketConnector
   {
     try
     {
-      if (port != this.port)
-        Logger.warn("requested server port differs from configured port, suspect!");
-
       Logger.info("creating server socket at port: " + port);
-      if (this.bindAddress == null)
+      InetAddress a = Settings.getAddress();
+      if (a == null)
         return createFactory().createServerSocket(port,backlog);
-      return createFactory().createServerSocket(port,backlog,this.bindAddress);
+      return createFactory().createServerSocket(port,backlog,a);
     }
     catch (IOException ioe)
     {
