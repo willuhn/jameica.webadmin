@@ -1,14 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jameica"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry exported="true" kind="lib" path="lib/slf4j-api-1.4.3.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/json.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jsp/jsp-api-2.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jetty-6.1.12.jar" sourcepath="lib.src/jetty-6.1.12.src.zip"/>
-	<classpathentry exported="true" kind="lib" path="lib/jetty-util-6.1.12.jar" sourcepath="lib.src/jetty-6.1.12.src.zip"/>
-	<classpathentry exported="true" kind="lib" path="lib/servlet-api-2.5-6.1.12.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jakarta_commons/commons-fileupload-1.3.2.jar"/>
+	<classpathentry kind="lib" path="lib/apache-el-8.0.33.jar"/>
+	<classpathentry kind="lib" path="lib/apache-jsp-8.0.33.jar"/>
+	<classpathentry kind="lib" path="lib/apache-jsp-9.3.19.v20170502.jar"/>
+	<classpathentry kind="lib" path="lib/asm-5.0.1.jar"/>
+	<classpathentry kind="lib" path="lib/asm-commons-5.0.1.jar"/>
+	<classpathentry kind="lib" path="lib/asm-tree-5.0.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-fileupload-1.3.2.jar"/>
+	<classpathentry kind="lib" path="lib/commons-io-2.2.jar"/>
+	<classpathentry kind="lib" path="lib/ecj-4.4.2.jar"/>
+	<classpathentry kind="lib" path="lib/javax.annotation-api-1.2.jar"/>
+	<classpathentry kind="lib" path="lib/javax.el-3.0.1-b08.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/javax.servlet-api-3.1.0.jar"/>
+	<classpathentry kind="lib" path="lib/javax.servlet.jsp-2.3.2.jar"/>
+	<classpathentry kind="lib" path="lib/javax.servlet.jsp-api-2.3.1.jar"/>
+	<classpathentry kind="lib" path="lib/javax.servlet.jsp.jstl-1.2.0.v201105211821.jar"/>
+	<classpathentry kind="lib" path="lib/javax.servlet.jsp.jstl-1.2.2.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-annotations-9.3.19.v20170502.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-deploy-9.3.19.v20170502.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-http-9.3.19.v20170502.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-io-9.3.19.v20170502.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-jndi-9.3.19.v20170502.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-jsp-9.3.0.M1.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-plus-9.3.19.v20170502.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-schemas-3.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jetty-security-9.3.19.v20170502.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jetty-server-9.3.19.v20170502.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-servlet-9.3.19.v20170502.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-util-9.3.19.v20170502.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-webapp-9.3.19.v20170502.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-xml-9.3.19.v20170502.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/json-20170516.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.jdt.core-3.8.2.v20130121.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-api-1.8.0-alpha2.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-jdk14-1.8.0-alpha2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

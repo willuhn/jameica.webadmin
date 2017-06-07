@@ -1,0 +1,33 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+sourceCompatibility = 1.7
+compileJava.options.encoding = 'ISO-8859-1'
+
+eclipse {
+  classpath {
+    downloadSources = true
+  }
+}
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  compile 'org.eclipse.jetty:jetty-webapp:9.3+'
+  compile 'org.eclipse.jetty:jetty-deploy:9.3+'
+  compile 'org.eclipse.jetty:jetty-annotations:9.3+'
+  compile 'org.eclipse.jetty:jetty-jsp:9.3+'
+  compile 'org.eclipse.jetty:apache-jsp:9.3+'
+  
+  
+  compile 'org.slf4j:slf4j-jdk14:+'
+  compile 'commons-fileupload:commons-fileupload:+'
+  compile 'org.json:json:+'
+}
+
+task download(type: Copy) {
+  into "lib"
+  from configurations.runtime
+}

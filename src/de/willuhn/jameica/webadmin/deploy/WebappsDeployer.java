@@ -17,9 +17,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.mortbay.jetty.Handler;
-import org.mortbay.jetty.webapp.WebAppContext;
-import org.mortbay.resource.Resource;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.util.resource.Resource;
+import org.eclipse.jetty.webapp.WebAppContext;
 
 import de.willuhn.jameica.system.Application;
 import de.willuhn.jameica.webadmin.Plugin;

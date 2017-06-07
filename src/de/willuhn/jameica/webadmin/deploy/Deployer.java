@@ -13,7 +13,7 @@
 
 package de.willuhn.jameica.webadmin.deploy;
 
-import org.mortbay.jetty.Handler;
+import org.eclipse.jetty.server.Handler;
 
 /**
  * Basis-Interface fuer Applikations-Deployer.

@@ -140,7 +140,7 @@ public class Plugin implements AutoRestBean
     data.put("class",       StringUtils.trimToEmpty(mf.getPluginClass()));
     data.put("plugindir",   StringUtils.trimToEmpty(mf.getPluginDir()));
     data.put("url",         StringUtils.trimToEmpty(mf.getURL()));
-    data.put("version",     mf.getVersion());
+    data.put("version",     mf.getVersion().toString());
 
     ArrayList deps = new ArrayList();
     Dependency[] d = mf.getDependencies();

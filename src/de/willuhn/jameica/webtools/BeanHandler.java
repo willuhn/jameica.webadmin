@@ -102,6 +102,8 @@ public class BeanHandler
       case SESSION:
         session.setAttribute(className,bean);
         break;
+      case REQUEST:
+        break;
     }
     
     injectContext(bean,config);

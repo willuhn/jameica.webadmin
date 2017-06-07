@@ -1,21 +1,16 @@
 /**********************************************************************
- * $Source: /cvsroot/jameica/jameica.webadmin/src/de/willuhn/jameica/webadmin/messaging/DeployMessageConsumer.java,v $
- * $Revision: 1.2 $
- * $Date: 2009/09/24 11:01:47 $
- * $Author: willuhn $
- * $Locker:  $
- * $State: Exp $
  *
- * Copyright (c) by willuhn software & services
+ * Copyright (c) by Olaf Willuhn
  * All rights reserved
+ * GPLv2
  *
  **********************************************************************/
 
 package de.willuhn.jameica.webadmin.messaging;
 
-import org.mortbay.jetty.Handler;
-import org.mortbay.jetty.handler.ContextHandlerCollection;
-import org.mortbay.jetty.handler.HandlerCollection;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.handler.ContextHandlerCollection;
+import org.eclipse.jetty.server.handler.HandlerCollection;
 
 import de.willuhn.jameica.messaging.Message;
 import de.willuhn.jameica.messaging.MessageConsumer;
@@ -75,9 +70,9 @@ public class DeployMessageConsumer implements MessageConsumer
             Logger.info("skipping deployer " + d.getClass() + " - contains no handlers");
             continue;
           }
-          for (int k=0;k<handlers.length;++k)
+          for (Handler h:handlers)
           {
-            collection.addHandler(handlers[k]);
+            collection.addHandler(h);
           }
           
         }
@@ -93,28 +88,12 @@ public class DeployMessageConsumer implements MessageConsumer
       return;
     }
     
-    // Wir erzeugen eine Handler-Collection mit Default-Handler.
+    // Wir erzeugen eine Handler-Collection.
     HandlerCollection handlers = new HandlerCollection();
     handlers.addHandler(collection);
     
-    // Liefert eine Liste der verfuegbaren Contexte auf der Startseite (Information-Leak)
-    // handlers.addHandler(new DefaultHandler());
-
     HttpService server = (HttpService) Application.getServiceFactory().lookup(Plugin.class,"listener.http");
     server.addHandler(handlers);
   }
 
 }
-
-
-/*********************************************************************
- * $Log: DeployMessageConsumer.java,v $
- * Revision 1.2  2009/09/24 11:01:47  willuhn
- * *** empty log message ***
- *
- * Revision 1.1  2008/04/10 13:02:29  willuhn
- * @N Zweischritt-Deployment. Der Server wird zwar sofort initialisiert, wenn der Jameica-Service startet, gestartet wird er aber erst, wenn die ersten Handler resgistriert werden
- * @N damit koennen auch nachtraeglich zur Laufzeit weitere Handler hinzu registriert werden
- * @R separater Worker in HttpServiceImpl entfernt. Der Classloader wird nun direkt von den Deployern gesetzt. Das ist wichtig, da Jetty fuer die Webanwendungen sonst den System-Classloader nutzt, welcher die Plugins nicht kennt
- *
- **********************************************************************/

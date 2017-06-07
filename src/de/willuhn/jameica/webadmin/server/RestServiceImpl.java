@@ -202,6 +202,8 @@ public class RestServiceImpl implements RestService
       case SESSION:
         session.setAttribute(id,bean);
         break;
+      case REQUEST:
+        break;
     }
     
     return bean;

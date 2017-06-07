@@ -15,16 +15,21 @@ package de.willuhn.jameica.webadmin.rest;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import de.willuhn.jameica.messaging.BootMessage;
+import de.willuhn.jameica.messaging.BootMessageConsumer;
+import de.willuhn.jameica.messaging.MessagingQueue;
 import de.willuhn.jameica.messaging.StatusBarMessage;
 import de.willuhn.jameica.plugin.Manifest;
+import de.willuhn.jameica.services.BeanService;
 import de.willuhn.jameica.system.Config;
 import de.willuhn.jameica.webadmin.annotation.Doc;
 import de.willuhn.jameica.webadmin.annotation.Path;
@@ -171,7 +176,7 @@ public class Application implements AutoRestBean
     Map map = new HashMap();
     map.put("builddate",mf.getBuildDate());
     map.put("buildnumber",mf.getBuildnumber());
-    map.put("version",mf.getVersion());
+    map.put("version",mf.getVersion().toString());
     return new JSONObject(map);
   }
 
@@ -208,7 +213,19 @@ public class Application implements AutoRestBean
   @Path("/system/welcome$")
   public JSONArray getWelcome() throws IOException
   {
-    return new JSONArray(Arrays.asList(de.willuhn.jameica.system.Application.getWelcomeMessages()));
+    // flushen, um sicherzustellen, dass zugestellt wurde
+    MessagingQueue queue = de.willuhn.jameica.system.Application.getMessagingFactory().getMessagingQueue("jameica.boot");
+    queue.flush();
+
+    BeanService service = de.willuhn.jameica.system.Application.getBootLoader().getBootable(BeanService.class);
+    BootMessageConsumer consumer = service.get(BootMessageConsumer.class);
+    
+    List<String> list = new LinkedList<String>();
+    for (BootMessage msg:consumer.getMessages())
+    {
+      list.add(msg.getText());
+    }
+    return new JSONArray(list);
   }
 
   /**
