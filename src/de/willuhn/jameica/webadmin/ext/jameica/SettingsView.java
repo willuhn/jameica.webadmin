@@ -22,7 +22,6 @@ import org.eclipse.swt.widgets.Listener;
 
 import de.willuhn.datasource.GenericIterator;
 import de.willuhn.datasource.GenericObject;
-import de.willuhn.datasource.Service;
 import de.willuhn.datasource.pseudo.PseudoIterator;
 import de.willuhn.jameica.gui.GUI;
 import de.willuhn.jameica.gui.extension.Extendable;
@@ -148,19 +147,6 @@ public class SettingsView implements Extension
     de.willuhn.jameica.webadmin.Settings.setUseAuth(((Boolean) getUseAuth().getValue()).booleanValue());
     de.willuhn.jameica.webadmin.Settings.setUseSSL(((Boolean) getUseSSL().getValue()).booleanValue());
     de.willuhn.jameica.webadmin.Settings.setAddress(((AddressObject)getAddress().getValue()).ia);
-    
-    try
-    {
-      Logger.info("restart http listener");
-      Service listener = Application.getServiceFactory().lookup(Plugin.class,"listener.http");
-      listener.stop(true);
-      listener.start();
-    }
-    catch (Exception e)
-    {
-      Logger.error("unable to restart listener",e);
-      throw new ApplicationException(i18n.tr("Fehler beim Neustart des Dienstes, bitte starten Sie Jameica neu"));
-    }
   }
 
   /**
