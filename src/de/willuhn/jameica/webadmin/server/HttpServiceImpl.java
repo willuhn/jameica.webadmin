@@ -113,7 +113,7 @@ public class HttpServiceImpl extends UnicastRemoteObject implements HttpService
       try
       {
         SslContextFactory sf = new SslContextFactory();
-        sf.setCertAlias("jameica");
+        sf.setCertAlias(Settings.SETTINGS.getString("keystore.alias","jameica"));
         sf.setNeedClientAuth(false);
         sf.setSslContext(Application.getSSLFactory().getSSLContext());
         
