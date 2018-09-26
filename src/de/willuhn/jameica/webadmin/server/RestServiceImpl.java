@@ -124,13 +124,27 @@ public class RestServiceImpl implements RestService
           Object value = method.invoke(bean,params);
           if (method.getReturnType() != null && value != null)
           {
+            boolean json = false;
+            
             String s = null;
             if ((value instanceof JSONObject) && jsonIndent > 0)
+            {
               s = ((JSONObject)value).toString(jsonIndent);
+              json = true;
+            }
             else if ((value instanceof JSONArray) && jsonIndent > 0)
+            {
               s = ((JSONArray)value).toString(jsonIndent);
+              json = true;
+            }
             else
+            {
               s = value.toString();
+            }
+            
+            if (json)
+              response.setContentType("application/json");
+            
             response.getWriter().print(s);
           }
           return;
