@@ -70,7 +70,7 @@ public abstract class AbstractWebAppDeployer implements Deployer
   
   /**
    * Liefert den Pfad im Dateisystem zu der Web-Anwendung.
-   * Also das Verzeichnis, in dem sich die index.jsp befindet.
+   * Also das Verzeichnis, in dem sich die index.html befindet.
    * @return Pfad im Dateisystem zur Webanwendung.
    */
   protected abstract String getPath();

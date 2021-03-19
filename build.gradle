@@ -15,13 +15,12 @@ repositories {
 }
 
 dependencies {
-  compile 'org.eclipse.jetty:jetty-webapp:9.3+'
-  compile 'org.eclipse.jetty:jetty-deploy:9.3+'
-  compile 'org.eclipse.jetty:jetty-annotations:9.3+'
-  compile 'org.eclipse.jetty:jetty-jsp:9.3+'
-  compile 'org.eclipse.jetty:apache-jsp:9.3+'
-  compile 'javax.jws:javax.jws-api:1.1+'
-  compile 'javax.xml.ws:jaxws-api:2.3+'
+  compile 'org.eclipse.jetty:jetty-webapp:9.4+'
+  compile 'org.eclipse.jetty:jetty-deploy:9.4+'
+  compile 'org.eclipse.jetty:jetty-annotations:9.4+'
+  compile 'org.eclipse.jetty:apache-jsp:9.4+'
+  compile 'javax.jws:javax.jws-api:+'
+  compile 'javax.xml.ws:jaxws-api:+'
   
   compile 'org.slf4j:slf4j-jdk14:+'
   compile 'commons-fileupload:commons-fileupload:+'
